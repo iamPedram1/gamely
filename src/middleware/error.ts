@@ -1,10 +1,6 @@
-import type {
-  Request,
-  Response,
-  NextFunction,
-  ErrorRequestHandler,
-} from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import logger from 'utilites/logger';
+import { ValidationError } from 'utilites/errors';
 
 export default function errorMiddleware(
   error: Error,
@@ -13,5 +9,9 @@ export default function errorMiddleware(
   next: NextFunction
 ) {
   logger.error(error.message, error.stack);
-  res.status(400).send('Something went very wrong.');
+
+  if (error instanceof ValidationError)
+    return res.status(400).send(error.message);
+
+  res.status(500).send('Interntal server error');
 }
