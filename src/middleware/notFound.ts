@@ -1,15 +1,11 @@
-import type {
-  Request,
-  Response,
-  NextFunction,
-  ErrorRequestHandler,
-} from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import logger from 'utilites/logger';
 
 export default function notFoundMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  console.log('Not-found middleware');
+  logger.error('Not found route -> ' + req.url);
   res.status(400).send('Something went very wrong.');
 }

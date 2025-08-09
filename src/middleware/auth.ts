@@ -1,0 +1,18 @@
+import jwt from 'jsonwebtoken';
+import { jwtPrivateKey, tokenHeaderName } from 'utilites/configs';
+import type { Request, Response, NextFunction } from 'express';
+
+export default function auth(req: Request, res: Response, next: NextFunction) {
+  const token = req.header(tokenHeaderName);
+  if (!token) return res.status(401).send('Access denied. No token provided.');
+
+  try {
+    const decoded = jwt.verify(token, jwtPrivateKey);
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    if (!token)
+      return res.status(401).send('Access denied. Invalid or expired token.');
+  }
+}

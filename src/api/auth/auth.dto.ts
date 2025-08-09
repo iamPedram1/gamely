@@ -24,7 +24,7 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  constructor(user: IUserProps) {
+  constructor(user: Pick<IUserProps, 'email' | 'password'>) {
     this.email = user?.email || '';
     this.password = user?.password || '';
   }

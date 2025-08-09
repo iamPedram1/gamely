@@ -1,27 +1,39 @@
 import bcryptjs from 'bcryptjs';
-import validator from 'class-validator';
 
 import UserModel, { UserDocument } from 'api/user/user.model';
 import { ValidationError } from 'utilites/errors';
 import type { IUserProps } from 'api/user/user.types';
 
 export interface IUserService {
-  validate: (data: IUserProps) => Promise<validator.ValidationError[]>;
+  login: (data: Pick<IUserProps, 'email' | 'password'>) => Promise<string>;
+  register: (data: IUserProps) => Promise<string>;
   comparePassword: (password: string, hash: string) => Promise<void>;
   hashPassword: (password: string) => Promise<string>;
   create: (data: IUserProps) => Promise<UserDocument>;
   getUserByEmail: (email: string) => Promise<UserDocument | null>;
-  checkEmailExist: (
-    email: string,
-    callbackFn?: (exist: boolean) => void
-  ) => Promise<boolean>;
 }
 
 export default class UserService implements IUserService {
-  async validate(data: IUserProps) {
-    const result = await validator.validate(data);
-    if (result.length > 0) throw new ValidationError('User validation failed.');
-    return result;
+  async register(data: IUserProps): Promise<string> {
+    const user = await this.getUserByEmail(data.email);
+    if (user)
+      throw new ValidationError('A user with the given email already exist.');
+
+    data.password = await this.hashPassword(data.password);
+
+    return (await this.create(data)).generateAuthToken();
+  }
+
+  async login(data: Pick<IUserProps, 'email' | 'password'>) {
+    const message = 'Email or password is incorrect.';
+
+    const user = await this.getUserByEmail(data.email);
+    if (!user) throw new ValidationError(message);
+
+    const isPasswordCorrect = await user.comparePassword(data.password);
+    if (!isPasswordCorrect) throw new ValidationError(message);
+
+    return user.generateAuthToken();
   }
 
   async comparePassword(password: string, hash: string) {
@@ -44,16 +56,10 @@ export default class UserService implements IUserService {
     return user;
   }
 
-  async checkEmailExist(
-    email: string,
-    callback?: (exist: boolean) => void
-  ): Promise<boolean> {
-    const count = await UserModel.countDocuments({ email });
-    if (callback) callback(count > 0);
-    return count > 0;
-  }
-
   async getUserByEmail(email: string): Promise<UserDocument | null> {
     return await UserModel.findOne({ email });
+  }
+  async emailExist(email: string): Promise<boolean> {
+    return (await UserModel.countDocuments({ email })) > 0;
   }
 }

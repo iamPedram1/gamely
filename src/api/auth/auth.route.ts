@@ -5,10 +5,11 @@ import AuthController from 'api/auth/auth.controller';
 import blockRequestWithToken from 'api/auth/auth.middleware';
 import UserService from 'api/user/user.services';
 import validateBody from 'middleware/validateBody';
+
+// DTO
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 
 const authRouter = express.Router();
-
 const userService = new UserService();
 const authController = new AuthController(userService);
 

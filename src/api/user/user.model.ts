@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema<
 });
 
 userSchema.methods.generateAuthToken = function () {
-  return jwt.sign({ _id: this._id }, jwtPrivateKey);
+  return jwt.sign({ _id: this._id, email: this.email }, jwtPrivateKey);
 };
 
 userSchema.methods.comparePassword = async function (password) {
