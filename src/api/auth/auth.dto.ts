@@ -1,4 +1,4 @@
-import validator from 'class-validator';
+import * as validator from 'class-validator';
 import type { IUserProps } from 'api/user/user.types';
 
 export class RegisterDto {

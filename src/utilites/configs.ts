@@ -1,6 +1,6 @@
 import config from 'config';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const appPort = config.get('port') as number;
 export const appDbUrl = config.get('db') as string;

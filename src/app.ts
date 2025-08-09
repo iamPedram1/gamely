@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ quiet: true });
 
 import express from 'express';
 import { appPort } from 'utilites/configs';
@@ -16,10 +16,12 @@ app.use(morgan('dev'));
 dbStartup();
 routesStartup(app);
 
-app.listen(appPort, () => {
+const server = app.listen(appPort, () => {
   logger.info(`Listening on port ${appPort}`);
 });
 
 process.on('unhandledRejection', (ex) => {
   throw ex;
 });
+
+export default server;
