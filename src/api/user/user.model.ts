@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
 import { isEmail } from 'class-validator';
 
 // Utils
@@ -10,6 +10,7 @@ import { jwtPrivateKey } from 'utilites/configs';
 import type { IUserProps } from 'api/user/user.types';
 
 export type UserDocument = HydratedDocument<IUserProps, IUserMethods>;
+export type UserLeanDocument = FlattenMaps<IUserProps>;
 
 interface IUserMethods {
   generateAuthToken(): string;
@@ -45,7 +46,7 @@ const userSchema = new mongoose.Schema<
       minlength: 8,
       maxlength: 255,
       required: true,
-      select: true,
+      select: false,
     },
   },
   { timestamps: true }

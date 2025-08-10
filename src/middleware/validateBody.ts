@@ -21,7 +21,13 @@ export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
   return async function (req: Request, res: Response, next: NextFunction) {
     const dto = plainToInstance(DtoClass, req.body);
     const errors = await validate(dto as object);
-    if (errors.length > 0) throw new ValidationError('Validation failed.');
+
+    if (errors.length > 0) {
+      const messages = errors.flatMap((err) =>
+        Object.values(err.constraints || {})
+      );
+      throw new ValidationError('Validation failed.', { cause: messages });
+    }
     next();
   };
 }

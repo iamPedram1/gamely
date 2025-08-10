@@ -11,32 +11,31 @@ import {
 import type { ITagProps } from 'api/tag/tag.type';
 
 export interface ITagService {
+  transformToTag: (tag: TagLeanDocument) => TagResponseDto;
+  transformToTagSummary: (tag: TagLeanDocument) => TagSummaryResponseDto;
   getTags: () => Promise<TagLeanDocument[]>;
   getTagsSummaries: () => Promise<TagLeanDocument[]>;
   getTagBySlug: (slug: string) => Promise<TagLeanDocument | null>;
   getTagById: (_id: string) => Promise<TagLeanDocument | null>;
+  delete: (tagId: string) => Promise<DeleteResult>;
+  update: (tagId: string, data: UpdateTagDto) => Promise<TagDocument | null>;
   create: (
     data: Pick<ITagProps, 'title' | 'slug'>,
     userId: string
-  ) => Promise<TagResponseDto>;
-  delete: (tagId: string) => Promise<DeleteResult>;
-  update: (tagId: string, data: UpdateTagDto) => Promise<TagDocument | null>;
+  ) => Promise<TagDocument>;
 }
 
 export default class TagService implements ITagService {
-  private transformToTag(tag: TagDocument): TagResponseDto {
-    return plainToInstance(TagResponseDto, tag.toObject({ getters: true }), {
+  transformToTag(tag: TagLeanDocument): TagResponseDto {
+    return plainToInstance(TagResponseDto, tag, {
       excludeExtraneousValues: true,
     });
   }
-  private transformToTagSummary(tag: TagDocument): TagSummaryResponseDto {
-    return plainToInstance(
-      TagSummaryResponseDto,
-      tag.toObject({ getters: true }),
-      {
-        excludeExtraneousValues: true,
-      }
-    );
+
+  transformToTagSummary(tag: TagLeanDocument): TagSummaryResponseDto {
+    return plainToInstance(TagSummaryResponseDto, tag, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async getTagBySlug(slug: string) {
@@ -66,18 +65,15 @@ export default class TagService implements ITagService {
   async create(
     data: Pick<ITagProps, 'title' | 'slug'>,
     userId: string
-  ): Promise<TagResponseDto> {
+  ): Promise<TagDocument> {
     const tag = await this.checkTagExistBySlug(data.slug);
 
-    if (tag)
-      throw new ValidationError(
-        'A tag with given slug already exist. Tag should be unique'
-      );
+    if (tag) throw new ValidationError('A tag with given slug already exist');
 
     const newTag = await new Tag({ ...data, creator: userId }).save();
     if (!newTag) throw new ValidationError('Tag could not be created');
 
-    return this.transformToTag(newTag);
+    return newTag;
   }
 
   async delete(tagId: string): Promise<DeleteResult> {

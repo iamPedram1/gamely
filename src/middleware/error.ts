@@ -1,17 +1,42 @@
 import type { Request, Response, NextFunction } from 'express';
 import logger from 'utilites/logger';
+import ApiResponse from 'utilites/response';
 import { ValidationError } from 'utilites/errors';
 
+/**
+ * Global error-handling middleware for Express.
+ *
+ * Logs the error and sends a standardized `ApiResponse` object to the client.
+ * Distinguishes between `ValidationError` (client error) and all other errors (server error).
+ *
+ * - ValidationError → HTTP 400 with detailed validation messages.
+ * - Other errors → HTTP 500 with a generic internal server error message.
+ *
+ * @param error - The error object thrown from the route or middleware.
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @param next - The Express next middleware function.
+ *
+ * @returns Sends a JSON `ApiResponse` to the client.
+ */
 export default function errorMiddleware(
   error: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
-  logger.error(error.message, error.stack);
+  logger.error(error.name, error);
 
-  if (error instanceof ValidationError)
-    return res.status(400).send(error.message);
+  const isValidationError = error instanceof ValidationError;
+  const status = isValidationError ? 400 : 500;
 
-  res.status(500).send('Interntal server error');
+  const response = new ApiResponse(
+    { status },
+    {
+      errors: isValidationError ? (error.cause as string[]) : [],
+      message: isValidationError ? error.message : 'Internal server error',
+    }
+  );
+
+  res.status(status).json(response);
 }
