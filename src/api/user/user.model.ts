@@ -20,39 +20,36 @@ const userSchema = new mongoose.Schema<
   IUserProps,
   mongoose.Model<IUserProps, IUserMethods>,
   IUserMethods
->({
-  name: {
-    type: String,
-    trim: true,
-    minlength: 3,
-    maxlength: 255,
-    required: true,
-  },
-  email: {
-    type: String,
-    trim: true,
-    unique: true,
-    required: true,
-    validator: {
-      message: 'Invalid email address.',
-      validator: (v: string) => isEmail(v),
+>(
+  {
+    name: {
+      type: String,
+      trim: true,
+      minlength: 3,
+      maxlength: 255,
+      required: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      unique: true,
+      required: true,
+      immutable: true,
+      validator: {
+        message: 'Invalid email address.',
+        validator: (v: string) => isEmail(v),
+      },
+    },
+    password: {
+      type: String,
+      minlength: 8,
+      maxlength: 255,
+      required: true,
+      select: true,
     },
   },
-  password: {
-    type: String,
-    minlength: 8,
-    maxlength: 255,
-    required: true,
-  },
-  createDate: {
-    type: Date,
-    default: Date.now,
-  },
-  updateDate: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign({ _id: this._id, email: this.email }, jwtPrivateKey);

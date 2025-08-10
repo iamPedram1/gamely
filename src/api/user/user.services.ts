@@ -11,6 +11,7 @@ export interface IUserService {
   hashPassword: (password: string) => Promise<string>;
   create: (data: IUserProps) => Promise<UserDocument>;
   getUserByEmail: (email: string) => Promise<UserDocument | null>;
+  getUserById: (_id: string) => Promise<UserDocument | null>;
 }
 
 export default class UserService implements IUserService {
@@ -59,6 +60,11 @@ export default class UserService implements IUserService {
   async getUserByEmail(email: string): Promise<UserDocument | null> {
     return await UserModel.findOne({ email });
   }
+
+  async getUserById(_id: string): Promise<UserDocument | null> {
+    return await UserModel.findOne({ _id });
+  }
+
   async emailExist(email: string): Promise<boolean> {
     return (await UserModel.countDocuments({ email })) > 0;
   }

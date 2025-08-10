@@ -1,28 +1,55 @@
-import validator from 'class-validator';
-import type { IUserProps } from 'api/user/user.types';
+import { Expose } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsString,
+  IsMongoId,
+  IsEmail,
+  IsISO8601,
+} from 'class-validator';
+import type { UserProps } from 'api/user/user.types';
 
-export class RegisterDto {
-  constructor(user: IUserProps) {
-    this.name = user?.name || '';
-    this.email = user?.email || '';
-    this.password = user?.password || '';
+class UserBaseDto implements Pick<UserProps, '_id' | 'name'> {
+  constructor(data: Partial<UserProps>) {
+    Object.assign(this, data);
   }
 
-  @validator.IsNotEmpty()
-  @validator.IsString()
-  @validator.Length(3, 255)
-  name: string;
+  @Expose()
+  @IsNotEmpty()
+  @IsMongoId()
+  readonly _id!: string;
 
-  @validator.IsNotEmpty()
-  @validator.IsEmail()
-  email: string;
+  @Expose()
+  @IsNotEmpty()
+  @IsString()
+  readonly name!: string;
+}
 
-  @validator.IsNotEmpty()
-  @validator.IsString()
-  @validator.Length(8, 255)
-  password: string;
+export class UserResponseDto
+  extends UserBaseDto
+  implements Omit<UserProps, 'password'>
+{
+  constructor(data: Partial<UserProps>) {
+    super(data);
+  }
 
-  async validate() {
-    return validator.validate(this);
+  @Expose()
+  @IsNotEmpty()
+  @IsEmail()
+  readonly email!: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @IsISO8601()
+  readonly createDate!: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @IsISO8601()
+  readonly updateDate!: string;
+}
+
+export class UserSummaryResponseDto extends UserBaseDto {
+  constructor(data: Partial<UserProps>) {
+    super(data);
   }
 }
