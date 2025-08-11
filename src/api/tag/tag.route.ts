@@ -17,15 +17,25 @@ import TagService from 'api/tag/tag.service';
 
 // DTO
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
+import validateQuery from 'middleware/validateQuery';
+import { BaseQueryDto } from 'dto/query';
 
 const tagRouter = express.Router();
 const tagService = new TagService();
 const tagController = new TagController(tagService);
 
-tagRouter.post('/', [auth, validateBody(CreateTagDto), tagController.create]);
-tagRouter.get('/', [auth, tagController.getAll]);
-tagRouter.get('/summaries', [auth, tagController.getAllSummaries]);
-tagRouter.get('/:id', [auth, validateObjectId(Tag), tagController.getOne]);
+tagRouter.post('/', [
+  auth,
+  validateBody(CreateTagDto),
+  checkUniqueConflict(Tag, 'slug'),
+  tagController.create,
+]);
+tagRouter.get('/', [validateQuery(BaseQueryDto), tagController.getAll]);
+tagRouter.get('/summaries', [
+  validateQuery(BaseQueryDto),
+  tagController.getAllSummaries,
+]);
+tagRouter.get('/:id', [validateObjectId(Tag), tagController.getOne]);
 tagRouter.patch('/:id', [
   auth,
   validateObjectId(Tag),

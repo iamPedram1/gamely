@@ -10,7 +10,7 @@ type HttpMethod =
 interface ApiResponseProps<T = null> {
   message?: string;
   errors?: string[];
-  body: T | null;
+  data: T | null;
 }
 
 interface ApiResponseConfig {
@@ -23,14 +23,14 @@ export default class ApiResponse<T = null> implements ApiResponseProps<T> {
   isSuccess: boolean;
   message: string = '';
   errors?: string[] = [];
-  body: T | null = null;
+  data: T | null = null;
 
   constructor(
     config: ApiResponseConfig,
     payload: Partial<ApiResponseProps<T>> = {}
   ) {
     this.isSuccess = config.status >= 200 && config.status < 300;
-    this.body = payload.body ?? null;
+    this.data = payload.data ?? null;
     this.errors = payload.errors ?? [];
 
     if (payload.message) this.message = payload.message;

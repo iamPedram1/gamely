@@ -28,7 +28,8 @@ export default class UserService implements IUserService {
   async login(data: Pick<IUserProps, 'email' | 'password'>) {
     const message = 'Email or password is incorrect.';
 
-    const user = await this.getUserByEmail(data.email);
+    const user = await this.getUserByEmail(data.email, true);
+
     if (!user) throw new ValidationError(message);
 
     const isPasswordCorrect = await user.comparePassword(data.password);
@@ -57,8 +58,13 @@ export default class UserService implements IUserService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<UserDocument | null> {
-    return await UserModel.findOne({ email });
+  async getUserByEmail(
+    email: string,
+    selectPassword?: boolean
+  ): Promise<UserDocument | null> {
+    return selectPassword
+      ? await UserModel.findOne({ email }).select('+password').exec()
+      : await UserModel.findOne({ email }).exec();
   }
 
   async getUserById(_id: string): Promise<UserDocument | null> {

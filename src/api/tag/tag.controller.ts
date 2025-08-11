@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 import { ITagService } from 'api/tag/tag.service';
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 import ApiResponse from 'utilites/response';
+import RequestQueryBaseProps from 'types/query';
 
 export default class TagController {
   private tagService: ITagService;
@@ -11,23 +12,35 @@ export default class TagController {
   }
 
   getAll: RequestHandler = async (req, res) => {
-    const body = await this.tagService.getTags();
+    const { docs, pagination } = await this.tagService.getTags(
+      req.query as unknown as RequestQueryBaseProps
+    );
 
     const response = new ApiResponse(
       { status: 200, httpMethod: 'GET', featureName: 'Tags' },
-      { body }
+      {
+        data: {
+          pagination: pagination,
+          docs: docs.map((tag) => this.tagService.transformToTag(tag)),
+        },
+      }
     );
 
     res.status(200).json(response);
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const tags = await this.tagService.getTagsSummaries();
+    const { pagination, docs } = await this.tagService.getTagsSummaries(
+      req.query as unknown as RequestQueryBaseProps
+    );
 
     const response = new ApiResponse(
       { status: 200, httpMethod: 'GET', featureName: 'Tags' },
       {
-        body: tags.map((tag) => this.tagService.transformToTagSummary(tag)),
+        data: {
+          pagination: pagination,
+          docs: docs.map((tag) => this.tagService.transformToTagSummary(tag)),
+        },
       }
     );
 
@@ -40,7 +53,7 @@ export default class TagController {
     const response = new ApiResponse(
       { status: tag ? 200 : 400, httpMethod: 'GET', featureName: 'Tag' },
       {
-        body: tag ? this.tagService.transformToTag(tag) : null,
+        data: tag ? this.tagService.transformToTag(tag) : null,
       }
     );
 
@@ -54,7 +67,7 @@ export default class TagController {
 
     const response = new ApiResponse(
       { status: tag ? 201 : 400, featureName: 'Tag', httpMethod: 'POST' },
-      { body: this.tagService.transformToTag(tag) }
+      { data: this.tagService.transformToTag(tag) }
     );
 
     res.status(201).json(response);
@@ -70,8 +83,8 @@ export default class TagController {
       featureName: 'Tag',
     });
 
-    if (deleted) res.status(400).json(response);
-    else res.status(200).json(response);
+    if (deleted) res.status(200).json(response);
+    else res.status(400).json(response);
   };
 
   update: RequestHandler = async (req, res) => {
@@ -81,7 +94,7 @@ export default class TagController {
 
     const response = new ApiResponse(
       { status: 200, httpMethod: 'PATCH', featureName: 'Tag' },
-      { body }
+      { data: body }
     );
 
     res.status(200).json(response);

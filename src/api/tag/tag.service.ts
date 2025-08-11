@@ -1,4 +1,4 @@
-import { DeleteResult } from 'mongoose';
+import { DeleteResult, Query } from 'mongoose';
 import { plainToInstance } from 'class-transformer';
 import Tag, { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
 
@@ -8,13 +8,20 @@ import {
   TagSummaryResponseDto,
   UpdateTagDto,
 } from 'api/tag/tag.dto';
-import type { ITagProps } from 'api/tag/tag.type';
+import type { ITagProps, TagProps } from 'api/tag/tag.type';
+import paginate from 'utilites/pagination';
+import { WithPagination } from 'types/paginate';
+import RequestQueryBaseProps from 'types/query';
 
 export interface ITagService {
   transformToTag: (tag: TagLeanDocument) => TagResponseDto;
   transformToTagSummary: (tag: TagLeanDocument) => TagSummaryResponseDto;
-  getTags: () => Promise<TagLeanDocument[]>;
-  getTagsSummaries: () => Promise<TagLeanDocument[]>;
+  getTags: (
+    query?: RequestQueryBaseProps
+  ) => Promise<WithPagination<TagLeanDocument>>;
+  getTagsSummaries: (
+    query?: RequestQueryBaseProps
+  ) => Promise<WithPagination<TagLeanDocument>>;
   getTagBySlug: (slug: string) => Promise<TagLeanDocument | null>;
   getTagById: (_id: string) => Promise<TagLeanDocument | null>;
   delete: (tagId: string) => Promise<DeleteResult>;
@@ -38,14 +45,6 @@ export default class TagService implements ITagService {
     });
   }
 
-  async getTagBySlug(slug: string) {
-    return await Tag.findOne({ slug }).lean();
-  }
-
-  async getTags() {
-    return await Tag.find().populate('creator', '_id name').lean();
-  }
-
   async checkTagExistBySlug(slug: string) {
     return (await Tag.countDocuments({ slug })) > 0;
   }
@@ -54,8 +53,20 @@ export default class TagService implements ITagService {
     return (await Tag.countDocuments({ _id })) > 0;
   }
 
-  async getTagsSummaries() {
-    return await Tag.find().lean().select('_id title slug');
+  async getTagBySlug(slug: string) {
+    return await Tag.findOne({ slug }).lean();
+  }
+
+  async getTags(reqQuery?: RequestQueryBaseProps) {
+    const query = Tag.find().populate('creator', '_id name');
+
+    return await paginate(query, reqQuery);
+  }
+
+  async getTagsSummaries(reqQuery?: RequestQueryBaseProps) {
+    const query = Tag.find().select('_id title slug');
+
+    return await paginate(query, reqQuery);
   }
 
   async getTagById(_id: string) {

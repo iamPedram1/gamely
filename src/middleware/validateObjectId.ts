@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { isValidObjectId, Model } from 'mongoose';
-import { ValidationError } from 'utilites/errors';
+import { NotFoundError, ValidationError } from 'utilites/errors';
 
 /**
  * Middleware factory to validate the `id` parameter in the request URL.
@@ -31,7 +31,7 @@ export default function validateObjectId<T>(Model: Model<T>) {
 
     const count = await Model.countDocuments({ _id: id });
     if (count === 0)
-      throw new ValidationError(
+      throw new NotFoundError(
         `No ${Model.modelName.toLowerCase()} with given id was found`
       );
 

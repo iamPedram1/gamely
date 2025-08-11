@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config({ quiet: true });
 
@@ -11,7 +12,10 @@ import routesStartup from 'startup/routes';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
 
 dbStartup();
 routesStartup(app);

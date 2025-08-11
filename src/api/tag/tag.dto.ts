@@ -23,7 +23,7 @@ export class CreateTagDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 255)
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'slug is not valid' })
   slug: string;
 }
 
