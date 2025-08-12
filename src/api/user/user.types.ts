@@ -1,4 +1,4 @@
-export interface IUserProps {
+export interface IUserEntity {
   name: string;
   email: string;
   password: string;
@@ -6,6 +6,6 @@ export interface IUserProps {
   updateDate?: string;
 }
 
-export interface UserProps extends IUserProps {
+export interface IUser extends IUserEntity {
   _id: string;
 }

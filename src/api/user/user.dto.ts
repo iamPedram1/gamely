@@ -6,10 +6,10 @@ import {
   IsEmail,
   IsISO8601,
 } from 'class-validator';
-import type { UserProps } from 'api/user/user.types';
+import type { IUser } from 'api/user/user.types';
 
-class UserBaseDto implements Pick<UserProps, '_id' | 'name'> {
-  constructor(data: Partial<UserProps>) {
+class UserBaseDto implements Pick<IUser, '_id' | 'name'> {
+  constructor(data: Partial<IUser>) {
     Object.assign(this, data);
   }
 
@@ -26,10 +26,11 @@ class UserBaseDto implements Pick<UserProps, '_id' | 'name'> {
 
 export class UserResponseDto
   extends UserBaseDto
-  implements Omit<UserProps, 'password'>
+  implements Omit<IUser, 'password'>
 {
-  constructor(data: Partial<UserProps>) {
+  constructor(data: Partial<IUser>) {
     super(data);
+    Object.assign(this, data);
   }
 
   @Expose()
@@ -49,7 +50,8 @@ export class UserResponseDto
 }
 
 export class UserSummaryResponseDto extends UserBaseDto {
-  constructor(data: Partial<UserProps>) {
+  constructor(data: Partial<IUser>) {
     super(data);
+    Object.assign(this, data);
   }
 }

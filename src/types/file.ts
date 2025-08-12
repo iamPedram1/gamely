@@ -1,3 +1,3 @@
-interface FileProps {}
+interface IFileEntity {}
 
-export default FileProps;
+export default IFileEntity;

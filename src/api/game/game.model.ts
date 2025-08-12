@@ -1,12 +1,15 @@
 import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
 
 // Types
-import type { IGameProps } from 'api/game/game.type';
+import type { IGameEntity } from 'api/game/game.type';
 
-export type GameDocument = HydratedDocument<IGameProps>;
+export type GameDocument = HydratedDocument<IGameEntity>;
 export type GameLeanDocument = FlattenMaps<GameDocument>;
 
-const gameSchema = new mongoose.Schema<IGameProps, mongoose.Model<IGameProps>>(
+const gameSchema = new mongoose.Schema<
+  IGameEntity,
+  mongoose.Model<IGameEntity>
+>(
   {
     title: {
       type: String,
@@ -33,6 +36,6 @@ const gameSchema = new mongoose.Schema<IGameProps, mongoose.Model<IGameProps>>(
   { timestamps: true }
 );
 
-export const Game = mongoose.model<IGameProps>('Game', gameSchema);
+export const Game = mongoose.model<IGameEntity>('Game', gameSchema);
 
 export default Game;

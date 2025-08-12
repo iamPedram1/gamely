@@ -9,7 +9,7 @@ import User from 'api/user/user.model';
 import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
 
 // Types
-import { IUserProps } from 'api/user/user.types';
+import { IUserEntity } from 'api/user/user.types';
 
 describe('auth routes', () => {
   const registerURL = prefixBaseUrl('/auth/register');
@@ -23,7 +23,7 @@ describe('auth routes', () => {
 
   describe('POST /register', () => {
     let token: string;
-    let payload: IUserProps;
+    let payload: IUserEntity;
 
     beforeEach(() => {
       token = '';
@@ -84,7 +84,7 @@ describe('auth routes', () => {
 
   describe('POST /login', () => {
     let token: string;
-    let payload: Pick<IUserProps, 'email' | 'password'>;
+    let payload: Pick<IUserEntity, 'email' | 'password'>;
 
     beforeEach(() => {
       token = '';

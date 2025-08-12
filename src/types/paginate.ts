@@ -1,4 +1,4 @@
-export interface PaginationProps {
+export interface IPagination {
   totalDocs: number;
   currentPage: number;
   totalPages: number;
@@ -8,5 +8,5 @@ export interface PaginationProps {
 
 export interface WithPagination<T> {
   docs: T[];
-  pagination: PaginationProps;
+  pagination: IPagination;
 }

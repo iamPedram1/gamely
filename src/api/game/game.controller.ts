@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
-import RequestQueryBaseProps from 'types/query';
+import IRequestQueryBase from 'types/query';
 import { IGameService } from 'api/game/game.service';
 import { IGameMapper } from 'api/game/game.mapper';
 import { ValidationError } from 'utilites/errors';
@@ -17,7 +17,7 @@ export default class GameController {
 
   getAll: RequestHandler = async (req, res) => {
     const { pagination, docs } = await this.gameService.getAll(
-      req.query as unknown as RequestQueryBaseProps
+      req.query as unknown as IRequestQueryBase
     );
 
     sendResponse(res, 200, {
@@ -34,7 +34,7 @@ export default class GameController {
 
   getAllSummaries: RequestHandler = async (req, res) => {
     const { pagination, docs } = await this.gameService.getAllSummaries(
-      req.query as unknown as RequestQueryBaseProps
+      req.query as unknown as IRequestQueryBase
     );
 
     sendResponse(res, 200, {

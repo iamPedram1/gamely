@@ -10,7 +10,7 @@ import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 import sendResponse from 'utilites/response';
 
 // Types
-import type RequestQueryBaseProps from 'types/query';
+import type IRequestQueryBase from 'types/query';
 import type { ITagMapper } from 'api/tag/tag.mapper';
 
 export default class TagController {
@@ -24,7 +24,7 @@ export default class TagController {
 
   getAll: RequestHandler = async (req, res) => {
     const { docs, pagination } = await this.tagService.getAll(
-      req.query as unknown as RequestQueryBaseProps
+      req.query as unknown as IRequestQueryBase
     );
 
     sendResponse(res, 200, {
@@ -41,7 +41,7 @@ export default class TagController {
 
   getAllSummaries: RequestHandler = async (req, res) => {
     const { pagination, docs } = await this.tagService.getAllSummaries(
-      req.query as unknown as RequestQueryBaseProps
+      req.query as unknown as IRequestQueryBase
     );
 
     sendResponse(res, 200, {

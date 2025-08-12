@@ -22,9 +22,8 @@ import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 import { GameMapper } from 'api/game/game.mapper';
 
 const gameRouter = express.Router();
-
-const gameService = new GameService();
 const gameMapper = new GameMapper();
+const gameService = new GameService();
 const gameController = new GameController(gameService, gameMapper);
 
 gameRouter.post('/', [

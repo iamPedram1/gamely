@@ -7,20 +7,20 @@ import { isEmail } from 'class-validator';
 import { jwtPrivateKey } from 'utilites/configs';
 
 // Types
-import type { IUserProps } from 'api/user/user.types';
+import type { IUserEntity } from 'api/user/user.types';
 
-export type UserDocument = HydratedDocument<IUserProps, IUserMethods>;
-export type UserLeanDocument = FlattenMaps<IUserProps>;
+export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
+export type UserLeanDocument = FlattenMaps<IUserEntity>;
 
-interface IUserMethods {
+interface IUserEntityMethods {
   generateAuthToken(): string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema<
-  IUserProps,
-  mongoose.Model<IUserProps, IUserMethods>,
-  IUserMethods
+  IUserEntity,
+  mongoose.Model<IUserEntity, IUserEntityMethods>,
+  IUserEntityMethods
 >(
   {
     name: {

@@ -1,8 +1,8 @@
 import * as validator from 'class-validator';
-import type { IUserProps } from 'api/user/user.types';
+import type { IUser } from 'api/user/user.types';
 
 export class RegisterDto {
-  constructor(user: IUserProps) {
+  constructor(user: IUser) {
     this.name = user?.name || '';
     this.email = user?.email || '';
     this.password = user?.password || '';
@@ -24,7 +24,7 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  constructor(user: Pick<IUserProps, 'email' | 'password'>) {
+  constructor(user: Pick<IUser, 'email' | 'password'>) {
     this.email = user?.email || '';
     this.password = user?.password || '';
   }

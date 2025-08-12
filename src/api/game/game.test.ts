@@ -10,7 +10,7 @@ import User from 'api/user/user.model';
 import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
 
 // Types
-import { IGameProps } from 'api/game/game.type';
+import { IGameEntity } from 'api/game/game.type';
 
 describe('game routes', () => {
   afterAll(async () => {
@@ -22,7 +22,7 @@ describe('game routes', () => {
   describe('POST /', () => {
     let token: string;
     let userId: string;
-    let payload: Pick<IGameProps, 'title' | 'slug'> = {
+    let payload: Pick<IGameEntity, 'title' | 'slug'> = {
       slug: '',
       title: '',
     };
@@ -94,7 +94,7 @@ describe('game routes', () => {
     let token: string;
     let gameId: string;
     let userId: string;
-    let payload: Pick<IGameProps, 'title' | 'slug'> = {
+    let payload: Pick<IGameEntity, 'title' | 'slug'> = {
       slug: '',
       title: '',
     };

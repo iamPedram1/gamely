@@ -1,12 +1,12 @@
 import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
 
 // Types
-import type { ITagProps } from 'api/tag/tag.type';
+import type { ITagEntity } from 'api/tag/tag.type';
 
-export type TagDocument = HydratedDocument<ITagProps>;
+export type TagDocument = HydratedDocument<ITagEntity>;
 export type TagLeanDocument = FlattenMaps<TagDocument>;
 
-const tagSchema = new mongoose.Schema<ITagProps, mongoose.Model<ITagProps>>(
+const tagSchema = new mongoose.Schema<ITagEntity, mongoose.Model<ITagEntity>>(
   {
     title: {
       type: String,
@@ -33,6 +33,6 @@ const tagSchema = new mongoose.Schema<ITagProps, mongoose.Model<ITagProps>>(
   { timestamps: true }
 );
 
-export const Tag = mongoose.model<ITagProps>('Tag', tagSchema);
+export const Tag = mongoose.model<ITagEntity>('Tag', tagSchema);
 
 export default Tag;

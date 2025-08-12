@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import type { Response } from 'express';
 
 type HttpMethod =
   | 'GET'
@@ -9,7 +9,7 @@ type HttpMethod =
   | 'OPTIONS'
   | 'HEAD';
 
-interface ApiResponseProps<T = null> {
+interface IApiResponse<T = null> {
   message?: string;
   isSuccess: boolean;
   errors?: string[];
@@ -19,7 +19,7 @@ interface ApiResponseProps<T = null> {
 interface ApiResponseConfig<T> {
   httpMethod?: HttpMethod;
   featureName?: string;
-  body?: Partial<ApiResponseProps<T>>;
+  body?: Partial<IApiResponse<T>>;
 }
 
 const generateDefaultMessage = (
@@ -58,7 +58,7 @@ const sendResponse = <T>(
     ? config?.body?.message
     : generateDefaultMessage(isSuccess, config.httpMethod, config.featureName);
 
-  const response: ApiResponseProps<T> = {
+  const response: IApiResponse<T> = {
     data,
     isSuccess,
     errors,

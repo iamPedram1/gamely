@@ -2,20 +2,20 @@ import bcryptjs from 'bcryptjs';
 
 import UserModel, { UserDocument } from 'api/user/user.model';
 import { ValidationError } from 'utilites/errors';
-import type { IUserProps } from 'api/user/user.types';
+import type { IUserEntity } from 'api/user/user.types';
 
 export interface IUserService {
-  login: (data: Pick<IUserProps, 'email' | 'password'>) => Promise<string>;
-  register: (data: IUserProps) => Promise<string>;
+  login: (data: Pick<IUserEntity, 'email' | 'password'>) => Promise<string>;
+  register: (data: IUserEntity) => Promise<string>;
   comparePassword: (password: string, hash: string) => Promise<void>;
   hashPassword: (password: string) => Promise<string>;
-  create: (data: IUserProps) => Promise<UserDocument>;
+  create: (data: IUserEntity) => Promise<UserDocument>;
   getUserByEmail: (email: string) => Promise<UserDocument | null>;
   getUserById: (_id: string) => Promise<UserDocument | null>;
 }
 
 export default class UserService implements IUserService {
-  async register(data: IUserProps): Promise<string> {
+  async register(data: IUserEntity): Promise<string> {
     const user = await this.getUserByEmail(data.email);
     if (user)
       throw new ValidationError('A user with the given email already exist.');
@@ -25,7 +25,7 @@ export default class UserService implements IUserService {
     return (await this.create(data)).generateAuthToken();
   }
 
-  async login(data: Pick<IUserProps, 'email' | 'password'>) {
+  async login(data: Pick<IUserEntity, 'email' | 'password'>) {
     const message = 'Email or password is incorrect.';
 
     const user = await this.getUserByEmail(data.email, true);
@@ -50,7 +50,7 @@ export default class UserService implements IUserService {
     return hash;
   }
 
-  async create(data: IUserProps): Promise<UserDocument> {
+  async create(data: IUserEntity): Promise<UserDocument> {
     const user = new UserModel(data);
 
     await user.save();

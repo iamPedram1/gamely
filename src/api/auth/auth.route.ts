@@ -2,8 +2,12 @@ import express from 'express';
 
 // Controllers
 import AuthController from 'api/auth/auth.controller';
-import blockRequestWithToken from 'api/auth/auth.middleware';
+
+// Services
 import UserService from 'api/user/user.services';
+
+// Middlewares
+import blockRequestWithToken from 'api/auth/auth.middleware';
 import validateBody from 'middleware/validateBody';
 
 // DTO

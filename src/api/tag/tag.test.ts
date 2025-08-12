@@ -10,7 +10,7 @@ import User from 'api/user/user.model';
 import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
 
 // Types
-import { ITagProps } from 'api/tag/tag.type';
+import { ITagEntity } from 'api/tag/tag.type';
 
 describe('tag routes', () => {
   afterAll(async () => {
@@ -22,7 +22,7 @@ describe('tag routes', () => {
   describe('POST /', () => {
     let token: string;
     let userId: string;
-    let payload: Pick<ITagProps, 'title' | 'slug'> = {
+    let payload: Pick<ITagEntity, 'title' | 'slug'> = {
       slug: '',
       title: '',
     };
@@ -94,7 +94,7 @@ describe('tag routes', () => {
     let token: string;
     let tagId: string;
     let userId: string;
-    let payload: Pick<ITagProps, 'title' | 'slug'> = {
+    let payload: Pick<ITagEntity, 'title' | 'slug'> = {
       slug: '',
       title: '',
     };

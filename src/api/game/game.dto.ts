@@ -8,10 +8,10 @@ import {
 } from 'class-validator';
 
 import { UserSummaryResponseDto } from 'api/user/user.dto';
-import type { IGameProps } from 'api/game/game.type';
+import type { IGameEntity } from 'api/game/game.type';
 
 export class CreateGameDto {
-  constructor(game?: Pick<IGameProps, 'title' | 'slug'>) {
+  constructor(game?: Pick<IGameEntity, 'title' | 'slug'>) {
     Object.assign(this, game);
   }
 
@@ -28,7 +28,7 @@ export class CreateGameDto {
 }
 
 export class UpdateGameDto {
-  constructor(game?: Pick<IGameProps, 'title' | 'slug'>) {
+  constructor(game?: Pick<IGameEntity, 'title' | 'slug'>) {
     Object.assign(this, game);
   }
 

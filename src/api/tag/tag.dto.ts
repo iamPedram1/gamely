@@ -8,10 +8,10 @@ import {
 } from 'class-validator';
 
 import { UserSummaryResponseDto } from 'api/user/user.dto';
-import type { ITagProps } from 'api/tag/tag.type';
+import type { ITagEntity } from 'api/tag/tag.type';
 
 export class CreateTagDto {
-  constructor(tag?: Pick<ITagProps, 'title' | 'slug'>) {
+  constructor(tag?: Pick<ITagEntity, 'title' | 'slug'>) {
     Object.assign(this, tag);
   }
 
@@ -28,7 +28,7 @@ export class CreateTagDto {
 }
 
 export class UpdateTagDto {
-  constructor(tag?: Pick<ITagProps, 'title' | 'slug'>) {
+  constructor(tag?: Pick<ITagEntity, 'title' | 'slug'>) {
     Object.assign(this, tag);
   }
 

@@ -10,14 +10,12 @@ import type {
   FilterQuery,
   Query,
 } from 'mongoose';
+import type IRequestQueryBase from 'types/query';
 import type { WithPagination } from 'types/paginate';
-import type RequestQueryBaseProps from 'types/query';
 
-export interface IBaseServiceProps<TLean> {
-  getAll(reqQuery?: RequestQueryBaseProps): Promise<WithPagination<TLean>>;
-  getAllSummaries(
-    reqQuery?: RequestQueryBaseProps
-  ): Promise<WithPagination<TLean>>;
+export interface IBaseService<TLean> {
+  getAll(reqQuery?: IRequestQueryBase): Promise<WithPagination<TLean>>;
+  getAllSummaries(reqQuery?: IRequestQueryBase): Promise<WithPagination<TLean>>;
   getById(id: string): Promise<TLean | null>;
   getBySlug(slug: string): Promise<TLean | null>;
   checkExistenceById(id: string): Promise<boolean>;
@@ -25,11 +23,11 @@ export interface IBaseServiceProps<TLean> {
   deleteById(id: string): Promise<DeleteResult>;
 }
 
-export default abstract class IBaseService<
+export default abstract class BaseService<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
   TLean = FlattenMaps<TDoc>,
-> implements IBaseServiceProps<TLean>
+> implements IBaseService<TLean>
 {
   protected model: Model<TSchema>;
 
@@ -63,7 +61,7 @@ export default abstract class IBaseService<
   }
 
   async getAll(
-    reqQuery?: RequestQueryBaseProps,
+    reqQuery?: IRequestQueryBase,
     populate?: string | Array<string> | Record<string, unknown>
   ): Promise<WithPagination<TLean>> {
     let q: Query<TDoc[], TDoc> = (this.model as any).find();
@@ -74,7 +72,7 @@ export default abstract class IBaseService<
   }
 
   async getAllSummaries(
-    reqQuery?: RequestQueryBaseProps,
+    reqQuery?: IRequestQueryBase,
     select = '_id title slug'
   ): Promise<WithPagination<TLean>> {
     let q: Query<TDoc[], TDoc> = (this.model as any).find().select(select);

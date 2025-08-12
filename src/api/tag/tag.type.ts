@@ -1,13 +1,13 @@
-import { UserProps } from 'api/user/user.types';
+import type { IUser } from 'api/user/user.types';
 
-export interface ITagProps {
+export interface ITagEntity {
   title: string;
   slug: string;
-  creator: UserProps;
+  creator: IUser;
   createDate?: string;
   updateDate?: string;
 }
 
-export interface TagProps extends ITagProps {
+export interface ITag extends ITagEntity {
   _id: string;
 }

@@ -1,14 +1,14 @@
-import type { PaginationProps, WithPagination } from 'types/paginate';
-import type { Query, Document, FlattenMaps, Model } from 'mongoose';
+import type { WithPagination } from 'types/paginate';
+import type { Query, Document, FlattenMaps } from 'mongoose';
 
-interface PaginationConfigProps {
+interface IPaginationConfig {
   page: number;
   limit: number;
 }
 
 export default async function paginate<TResult, TDoc extends Document>(
   query: Query<TResult[], TDoc>,
-  configs?: PaginationConfigProps
+  configs?: IPaginationConfig
 ): Promise<WithPagination<FlattenMaps<TResult>>> {
   const currentPage = configs?.page || 1;
   const limit = configs?.limit || 20;

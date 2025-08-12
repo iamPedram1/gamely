@@ -1,41 +1,33 @@
 import { DeleteResult } from 'mongoose';
-import { plainToInstance } from 'class-transformer';
 
 // Models
 import Game from 'api/game/game.model';
 
 // Dto
-import {
-  GameResponseDto,
-  GameSummaryResponseDto,
-  UpdateGameDto,
-} from 'api/game/game.dto';
+import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 // Services
-import IBaseService, { IBaseServiceProps } from 'services/Base';
+import BaseService, { IBaseService } from 'services/Base';
 
 // Utilities
 import { ValidationError } from 'utilites/errors';
 
 // Types
-import type { IGameProps } from 'api/game/game.type';
+import type { IGameEntity } from 'api/game/game.type';
 import type { GameDocument, GameLeanDocument } from 'api/game/game.model';
 
-export interface IGameService extends IBaseServiceProps<GameLeanDocument> {
+export interface IGameService extends IBaseService<GameLeanDocument> {
   update: (gameId: string, data: UpdateGameDto) => Promise<GameDocument | null>;
-  create: (
-    data: Pick<IGameProps, 'title' | 'slug'>,
-    userId: string
-  ) => Promise<GameDocument>;
+  create: (data: CreateGameDto, userId: string) => Promise<GameDocument>;
 }
 
-class GameService extends IBaseService<IGameProps> {
+class GameService extends BaseService<IGameEntity> {
   constructor() {
     super(Game);
   }
 
   async create(
-    data: Pick<IGameProps, 'title' | 'slug'>,
+    data: Pick<IGameEntity, 'title' | 'slug'>,
     userId: string
   ): Promise<GameDocument> {
     const game = await this.checkExistenceBySlug(data.slug);

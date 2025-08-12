@@ -1,15 +1,15 @@
-import { UserProps } from 'api/user/user.types';
-import FileProps from 'types/file';
+import { IUser } from 'api/user/user.types';
+import IFileEntity from 'types/file';
 
-export interface IGameProps {
+export interface IGameEntity {
   title: string;
   slug: string;
-  image: FileProps;
-  creator: UserProps;
+  image: IFileEntity;
+  creator: IUser;
   createDate?: string;
   updateDate?: string;
 }
 
-export interface GameProps extends IGameProps {
+export interface IGame extends IGameEntity {
   _id: string;
 }
