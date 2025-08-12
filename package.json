@@ -44,7 +44,7 @@
     "dev": "set NODE_ENV=development&& tsx --watch src/app.ts",
     "start": "set NODE_ENV=production&& node dist/app.ts",
     "build": "tsc",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll --runInBand"
   },
   "tsup": {
     "entry": [

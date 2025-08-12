@@ -1,3 +1,5 @@
+import { Response } from 'express';
+
 type HttpMethod =
   | 'GET'
   | 'POST'
@@ -9,61 +11,61 @@ type HttpMethod =
 
 interface ApiResponseProps<T = null> {
   message?: string;
+  isSuccess: boolean;
   errors?: string[];
   data: T | null;
 }
 
-interface ApiResponseConfig {
-  status: number;
+interface ApiResponseConfig<T> {
   httpMethod?: HttpMethod;
   featureName?: string;
+  body?: Partial<ApiResponseProps<T>>;
 }
 
-export default class ApiResponse<T = null> implements ApiResponseProps<T> {
-  isSuccess: boolean;
-  message: string = '';
-  errors?: string[] = [];
-  data: T | null = null;
+const generateDefaultMessage = (
+  isSuccess: boolean,
+  method?: HttpMethod,
+  featureName?: string
+): string => {
+  if (!isSuccess) return 'Request failed due to an error.';
 
-  constructor(
-    config: ApiResponseConfig,
-    payload: Partial<ApiResponseProps<T>> = {}
-  ) {
-    this.isSuccess = config.status >= 200 && config.status < 300;
-    this.data = payload.data ?? null;
-    this.errors = payload.errors ?? [];
+  const name = featureName ?? 'Document';
 
-    if (payload.message) this.message = payload.message;
-    else {
-      this.message = this.generateDefaultMessage(
-        this.isSuccess,
-        config.httpMethod,
-        config.featureName
-      );
-    }
+  switch (method) {
+    case 'GET':
+      return `${name} received successfully.`;
+    case 'POST':
+      return `${name} created successfully.`;
+    case 'PUT':
+    case 'PATCH':
+      return `${name} updated successfully.`;
+    case 'DELETE':
+      return `${name} deleted successfully.`;
+    default:
+      return 'Request processed successfully.';
   }
+};
 
-  private generateDefaultMessage(
-    isSuccess: boolean,
-    method?: HttpMethod,
-    featureName?: string
-  ): string {
-    if (!isSuccess) return 'Request failed due to an error.';
+const sendResponse = <T>(
+  res: Response,
+  status: number,
+  config: ApiResponseConfig<T>
+): void => {
+  const isSuccess = status >= 200 && status < 300;
+  const data = config.body?.data ?? null;
+  const errors = config?.body?.errors ?? [];
+  const message = config?.body?.message
+    ? config?.body?.message
+    : generateDefaultMessage(isSuccess, config.httpMethod, config.featureName);
 
-    const name = featureName ?? 'Document';
+  const response: ApiResponseProps<T> = {
+    data,
+    isSuccess,
+    errors,
+    message,
+  };
 
-    switch (method) {
-      case 'GET':
-        return `${name} received successfully.`;
-      case 'POST':
-        return `${name} created successfully.`;
-      case 'PUT':
-      case 'PATCH':
-        return `${name} updated successfully.`;
-      case 'DELETE':
-        return `${name} deleted successfully.`;
-      default:
-        return 'Request processed successfully.';
-    }
-  }
-}
+  res.send(status).json(response);
+};
+
+export default sendResponse;

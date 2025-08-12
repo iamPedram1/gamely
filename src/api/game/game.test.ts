@@ -3,26 +3,26 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 
 // Models
-import Tag from 'api/tag/tag.model';
+import Game from 'api/game/game.model';
 import User from 'api/user/user.model';
 
 // Utils
 import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
 
 // Types
-import { ITagProps } from 'api/tag/tag.type';
+import { IGameProps } from 'api/game/game.type';
 
-describe('tag routes', () => {
+describe('game routes', () => {
   afterAll(async () => {
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
-    await server.close();
+    server.close();
   });
 
   describe('POST /', () => {
     let token: string;
     let userId: string;
-    let payload: Pick<ITagProps, 'title' | 'slug'> = {
+    let payload: Pick<IGameProps, 'title' | 'slug'> = {
       slug: '',
       title: '',
     };
@@ -36,18 +36,17 @@ describe('tag routes', () => {
 
       userId = user._id.toHexString();
       token = user.generateAuthToken();
-      payload = { title: 'Action', slug: 'action' };
+      payload = { title: 'Red Dead Redemption 2', slug: 'rdr2' };
     });
 
     afterEach(async () => {
       await User.deleteMany({});
-      await Tag.deleteMany({});
-      await server.closeAllConnections();
+      await Game.deleteMany({});
     });
 
     const exec = async () => {
       return await request(server)
-        .post(prefixBaseUrl('/tags'))
+        .post(prefixBaseUrl('/games'))
         .set(tokenHeaderName, token)
         .send(payload);
     };
@@ -77,24 +76,25 @@ describe('tag routes', () => {
     });
 
     it('should return 400 if slug is taken', async () => {
-      await new Tag({ ...payload, creator: userId }).save();
+      await new Game({ ...payload, creator: userId }).save();
 
       const response = await exec();
+
       expect(response.status).toBe(400);
     });
 
     it('should return 201 if payload is valid', async () => {
       const response = await exec();
 
-      expect(response.status).toBe(201);
       expect(response.body.data).toMatchObject(payload);
+      expect(response.status).toBe(201);
     });
   });
   describe('PATCH /', () => {
     let token: string;
-    let tagId: string;
+    let gameId: string;
     let userId: string;
-    let payload: Pick<ITagProps, 'title' | 'slug'> = {
+    let payload: Pick<IGameProps, 'title' | 'slug'> = {
       slug: '',
       title: '',
     };
@@ -106,23 +106,22 @@ describe('tag routes', () => {
         name: 'Test',
       }).save();
 
-      tagId = '';
+      gameId = '';
       userId = user._id.toHexString();
       token = user.generateAuthToken();
-      payload = { title: 'Action', slug: 'action' };
-      const tag = await new Tag({ ...payload, creator: userId }).save();
-      tagId = tag._id.toHexString();
+      payload = { title: 'Red Dead Redemption 2', slug: 'rdr2' };
+      const game = await new Game({ ...payload, creator: userId }).save();
+      gameId = game._id.toHexString();
     });
 
     afterEach(async () => {
       await User.deleteMany({});
-      await Tag.deleteMany({});
-      await server.closeAllConnections();
+      await Game.deleteMany({});
     });
 
     const exec = async () => {
       return await request(server)
-        .patch(prefixBaseUrl(`/tags/${tagId}`))
+        .patch(prefixBaseUrl(`/games/${gameId}`))
         .set(tokenHeaderName, token)
         .send(payload);
     };
@@ -139,6 +138,7 @@ describe('tag routes', () => {
       payload.title = 'ab';
 
       const response = await exec();
+
       expect(response.status).toBe(400);
     });
 
@@ -151,13 +151,13 @@ describe('tag routes', () => {
     });
 
     it('should return 400 if slug is taken', async () => {
-      const newTag = await new Tag({
+      const newGame = await new Game({
         title: 'Drama',
         slug: 'drama',
         creator: userId,
       }).save();
 
-      payload.slug = newTag.slug;
+      payload.slug = newGame.slug;
       const response = await exec();
 
       expect(response.status).toBe(400);
@@ -173,7 +173,7 @@ describe('tag routes', () => {
   });
   describe('DELETE /:id', () => {
     let token: string = '';
-    let tagId: string = '';
+    let gameId: string = '';
     let userId: string = '';
 
     beforeEach(async () => {
@@ -184,23 +184,22 @@ describe('tag routes', () => {
       }).save();
       userId = user._id.toHexString();
       token = user.generateAuthToken();
-      const tag = await new Tag({
-        title: 'Drama',
-        slug: 'drama',
+      const game = await new Game({
+        title: 'Red Dead Redemption 2',
+        slug: 'rdr2',
         creator: userId,
       }).save();
-      tagId = tag._id.toHexString();
+      gameId = game._id.toHexString();
     });
 
     afterEach(async () => {
       await User.deleteMany({});
-      await Tag.deleteMany({});
-      await server.closeAllConnections();
+      await Game.deleteMany({});
     });
 
     const exec = async () => {
       return await request(server)
-        .delete(prefixBaseUrl(`/tags/${tagId}`))
+        .delete(prefixBaseUrl(`/games/${gameId}`))
         .set(tokenHeaderName, token)
         .send();
     };
@@ -214,22 +213,22 @@ describe('tag routes', () => {
     });
 
     it('should return 400 if invalid id passed', async () => {
-      tagId = 'abcdefg';
+      gameId = 'abcdefg';
 
       const response = await exec();
 
       expect(response.status).toBe(400);
     });
 
-    it('should return 404 if tag id dosent exist', async () => {
-      tagId = new mongoose.Types.ObjectId().toHexString();
+    it('should return 404 if game id dosent exist', async () => {
+      gameId = new mongoose.Types.ObjectId().toHexString();
 
       const response = await exec();
 
       expect(response.status).toBe(404);
     });
 
-    it('should remove the tag if id is valid', async () => {
+    it('should remove the game if id is valid', async () => {
       const response = await exec();
 
       expect(response.status).toBe(200);

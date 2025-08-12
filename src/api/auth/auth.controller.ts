@@ -12,18 +12,18 @@ export default class UserController {
   }
 
   register: RequestHandler = async (req, res) => {
-    const dto = new RegisterDto(req.body);
+    const dto = req.body as RegisterDto;
 
     const token = await this.userService.register(dto);
 
-    res.header(tokenHeaderName, token).status(201).json({ message: 'success' });
+    res.header(tokenHeaderName, token).status(204);
   };
 
   login: RequestHandler = async (req, res) => {
-    const dto = new LoginDto(req.body);
+    const dto = req.body as LoginDto;
 
     const token = await this.userService.login(dto);
 
-    res.status(200).header(tokenHeaderName, token).send({ message: 'success' });
+    res.status(200).header(tokenHeaderName, token).send(204);
   };
 }

@@ -10,7 +10,7 @@ const logger = winston.createLogger({
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' })
   ),
   transports: [
-    new winston.transports.Console(), // Log to the console
+    // new winston.transports.Console(), // Log to the console
     new winston.transports.File({ filename: 'logs/app.log' }), // Log to a file
   ],
 });

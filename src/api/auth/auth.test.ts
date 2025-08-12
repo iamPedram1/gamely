@@ -1,4 +1,5 @@
 import server from 'app';
+import mongoose from 'mongoose';
 import request from 'supertest';
 
 // Models
@@ -13,6 +14,12 @@ import { IUserProps } from 'api/user/user.types';
 describe('auth routes', () => {
   const registerURL = prefixBaseUrl('/auth/register');
   const loginURL = prefixBaseUrl('/auth/login');
+
+  afterAll(async () => {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+    server.close();
+  });
 
   describe('POST /register', () => {
     let token: string;
@@ -30,7 +37,6 @@ describe('auth routes', () => {
 
     afterEach(async () => {
       await User.deleteMany({});
-      await server.close();
     });
 
     const exec = async () => {
@@ -91,7 +97,6 @@ describe('auth routes', () => {
 
     afterEach(async () => {
       await User.deleteMany({});
-      await server.close();
     });
 
     const exec = async () => {

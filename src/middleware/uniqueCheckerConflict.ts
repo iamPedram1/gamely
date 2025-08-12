@@ -15,7 +15,7 @@ import { ValidationError } from 'utilites/errors';
  *
  * @returns Express middleware function (req, res, next) => void
  */
-export function checkUniqueConflict(
+export default function validateUniqueConflict(
   Model: Model<any>,
   fieldName: string,
   bodyFieldKey = fieldName,

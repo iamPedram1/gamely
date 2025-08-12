@@ -4,7 +4,7 @@ import express from 'express';
 import auth from 'middleware/auth';
 import validateBody from 'middleware/validateBody';
 import validateObjectId from 'middleware/validateObjectId';
-import { checkUniqueConflict } from 'middleware/uniqueCheckerConflict';
+import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 
 // Model
 import Tag from 'api/tag/tag.model';
@@ -19,15 +19,17 @@ import TagService from 'api/tag/tag.service';
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 import validateQuery from 'middleware/validateQuery';
 import { BaseQueryDto } from 'dto/query';
+import { TagMapper } from 'api/tag/tag.mapper';
 
 const tagRouter = express.Router();
+const tagMapper = new TagMapper();
 const tagService = new TagService();
-const tagController = new TagController(tagService);
+const tagController = new TagController(tagService, tagMapper);
 
 tagRouter.post('/', [
   auth,
   validateBody(CreateTagDto),
-  checkUniqueConflict(Tag, 'slug'),
+  validateUniqueConflict(Tag, 'slug'),
   tagController.create,
 ]);
 tagRouter.get('/', [validateQuery(BaseQueryDto), tagController.getAll]);
@@ -40,7 +42,7 @@ tagRouter.patch('/:id', [
   auth,
   validateObjectId(Tag),
   validateBody(UpdateTagDto),
-  checkUniqueConflict(Tag, 'slug'),
+  validateUniqueConflict(Tag, 'slug'),
   tagController.update,
 ]);
 tagRouter.delete('/:id', [auth, validateObjectId(Tag), tagController.delete]);

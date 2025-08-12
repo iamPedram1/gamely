@@ -19,8 +19,12 @@ import { ValidationError } from 'utilites/errors';
  */
 export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
   return async function (req: Request, res: Response, next: NextFunction) {
-    const dto = plainToInstance(DtoClass, req.body);
-    const errors = await validate(dto as object);
+    const dto = plainToInstance(DtoClass, req.body, {
+      enableImplicitConversion: true,
+    });
+    const errors = await validate(dto as object, {
+      whitelist: true,
+    });
 
     if (errors.length > 0) {
       const messages = errors.flatMap((err) =>
@@ -28,6 +32,13 @@ export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
       );
       throw new ValidationError('Validation failed.', { cause: messages });
     }
+
+    Object.defineProperty(req, 'body', {
+      ...Object.getOwnPropertyDescriptor(req, 'body'),
+      writable: false,
+      value: dto,
+    });
+
     next();
   };
 }
