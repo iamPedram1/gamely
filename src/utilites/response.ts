@@ -49,14 +49,18 @@ const generateDefaultMessage = (
 const sendResponse = <T>(
   res: Response,
   status: number,
-  config: ApiResponseConfig<T>
+  config?: ApiResponseConfig<T>
 ): void => {
   const isSuccess = status >= 200 && status < 300;
-  const data = config.body?.data ?? null;
+  const data = config?.body?.data ?? null;
   const errors = config?.body?.errors ?? [];
   const message = config?.body?.message
     ? config?.body?.message
-    : generateDefaultMessage(isSuccess, config.httpMethod, config.featureName);
+    : generateDefaultMessage(
+        isSuccess,
+        config?.httpMethod,
+        config?.featureName
+      );
 
   const response: IApiResponse<T> = {
     data,
@@ -65,7 +69,7 @@ const sendResponse = <T>(
     message,
   };
 
-  res.send(status).json(response);
+  res.status(status).json(response);
 };
 
 export default sendResponse;

@@ -1,32 +1,27 @@
-import { plainToInstance } from 'class-transformer';
-
 // Model
 import { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
 
 // Dto
 import { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
 
+// Mapper
+import { BaseMapper } from 'mapper/base';
+
 export interface ITagMapper {
-  toTagDto: (tag: TagDocument | TagLeanDocument) => TagResponseDto;
-  toTagSummaryDto: (
-    tag: TagDocument | TagLeanDocument
-  ) => TagSummaryResponseDto;
+  toDto: (tag: TagDocument | TagLeanDocument) => TagResponseDto;
+  toSummaryDto: (tag: TagDocument | TagLeanDocument) => TagSummaryResponseDto;
 }
 
-export class TagMapper implements ITagMapper {
-  private toPlain(tag: TagDocument | TagLeanDocument) {
-    return tag.toObject();
-  }
-
-  toTagDto(tag: TagDocument | TagLeanDocument) {
-    return plainToInstance(TagResponseDto, this.toPlain(tag), {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  toTagSummaryDto(tag: TagDocument | TagLeanDocument) {
-    return plainToInstance(TagSummaryResponseDto, this.toPlain(tag), {
-      excludeExtraneousValues: true,
-    });
+export class TagMapper
+  extends BaseMapper<
+    TagDocument,
+    TagLeanDocument,
+    TagResponseDto,
+    TagSummaryResponseDto
+  >
+  implements ITagMapper
+{
+  constructor() {
+    super(TagResponseDto, TagSummaryResponseDto);
   }
 }

@@ -16,6 +16,6 @@ export class BaseQueryDto {
   limit?: number;
 
   @IsOptional()
-  @IsIn(['title', 'createDate', '-createDate'])
+  @IsIn(['title', 'createdAt', '-createdAt'])
   sort?: string;
 }

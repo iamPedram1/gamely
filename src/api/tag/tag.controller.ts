@@ -33,7 +33,7 @@ export default class TagController {
       body: {
         data: {
           pagination: pagination,
-          docs: docs.map((tag) => this.tagMapper.toTagDto(tag)),
+          docs: docs.map((tag) => this.tagMapper.toDto(tag)),
         },
       },
     });
@@ -50,7 +50,7 @@ export default class TagController {
       body: {
         data: {
           pagination: pagination,
-          docs: docs.map((tag) => this.tagMapper.toTagSummaryDto(tag)),
+          docs: docs.map((tag) => this.tagMapper.toSummaryDto(tag)),
         },
       },
     });
@@ -63,7 +63,7 @@ export default class TagController {
       httpMethod: 'GET',
       featureName: 'Tag',
       body: {
-        data: tag ? this.tagMapper.toTagDto(tag) : null,
+        data: tag ? this.tagMapper.toDto(tag) : null,
       },
     });
   };
@@ -76,7 +76,7 @@ export default class TagController {
     sendResponse(res, tag ? 201 : 400, {
       httpMethod: 'POST',
       featureName: 'Tag',
-      body: { data: this.tagMapper.toTagDto(tag) },
+      body: { data: this.tagMapper.toDto(tag) },
     });
   };
 

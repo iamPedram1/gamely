@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import logger from 'utilites/logger';
-import ApiResponse from 'utilites/response';
+import sendResponse from 'utilites/response';
 import { NotFoundError, ValidationError } from 'utilites/errors';
 
 /**
@@ -25,23 +25,22 @@ export default function errorMiddleware(
   res: Response,
   _next: NextFunction
 ) {
-  logger.error(error.name, error);
+  logger.error(error.message, {
+    name: error.name,
+    stack: error.stack,
+    cause: error.cause,
+  });
 
   const isValidationError = error instanceof ValidationError;
   const isNotFoundError = error instanceof NotFoundError;
 
-  const status = isValidationError ? 400 : isNotFoundError ? 404 : 500;
-
-  const response = new ApiResponse(
-    { status },
-    {
+  sendResponse(res, isValidationError ? 400 : isNotFoundError ? 404 : 500, {
+    body: {
       errors: isValidationError ? (error.cause as string[]) : [],
       message:
         isValidationError || isNotFoundError
           ? error.message
           : 'Internal server error',
-    }
-  );
-
-  res.status(status).json(response);
+    },
+  });
 }

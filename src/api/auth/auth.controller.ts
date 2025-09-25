@@ -1,5 +1,5 @@
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
-import { IUserService } from 'api/user/user.services';
+import { IUserService } from 'api/user/user.service';
 import { tokenHeaderName } from 'utilites/configs';
 
 import type { RequestHandler } from 'express';

@@ -6,8 +6,8 @@ export interface IGameEntity {
   slug: string;
   image: IFileEntity;
   creator: IUser;
-  createDate?: string;
-  updateDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IGame extends IGameEntity {

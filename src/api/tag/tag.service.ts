@@ -11,19 +11,17 @@ import {
 } from 'api/tag/tag.dto';
 
 // Services
-import BaseService from 'services/Base';
+import BaseService from 'services/base';
 
 // Utilities
 import { ValidationError } from 'utilites/errors';
 import type { ITagEntity } from 'api/tag/tag.type';
-import type { IBaseService } from 'services/Base';
+import type { IBaseService } from 'services/base';
 import type { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
+import IRequestQueryBase from 'types/query';
+import { WithPagination } from 'types/paginate';
 
 export interface ITagService extends IBaseService<TagLeanDocument> {
-  transformToTag: (tag: TagDocument | TagLeanDocument) => TagResponseDto;
-  transformToTagSummary: (
-    tag: TagDocument | TagLeanDocument
-  ) => TagSummaryResponseDto;
   update: (tagId: string, data: UpdateTagDto) => Promise<TagDocument | null>;
   create: (
     data: Pick<ITagEntity, 'title' | 'slug'>,
@@ -36,16 +34,10 @@ class TagService extends BaseService<ITagEntity> implements ITagService {
     super(Tag);
   }
 
-  transformToTag(tag: TagLeanDocument): TagResponseDto {
-    return plainToInstance(TagResponseDto, tag, {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  transformToTagSummary(tag: TagLeanDocument): TagSummaryResponseDto {
-    return plainToInstance(TagSummaryResponseDto, tag, {
-      excludeExtraneousValues: true,
-    });
+  async getAll(
+    reqQuery?: IRequestQueryBase
+  ): Promise<WithPagination<TagLeanDocument>> {
+    return super.getAll(reqQuery, 'creator');
   }
 
   async create(
@@ -65,7 +57,7 @@ class TagService extends BaseService<ITagEntity> implements ITagService {
   async update(tagId: string, payload: UpdateTagDto) {
     return await Tag.findByIdAndUpdate(
       tagId,
-      { ...payload, updateDate: Date.now() },
+      { ...payload, updatedAt: Date.now() },
       { new: true }
     )
       .populate('creator', 'name email')

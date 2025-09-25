@@ -26,7 +26,7 @@ export default class GameController {
       body: {
         data: {
           pagination,
-          docs: docs.map((game) => this.gameMapper.toGameDto(game)),
+          docs: docs.map((game) => this.gameMapper.toDto(game)),
         },
       },
     });
@@ -43,7 +43,7 @@ export default class GameController {
       body: {
         data: {
           pagination,
-          docs: docs.map((game) => this.gameMapper.toGameSummaryDto(game)),
+          docs: docs.map((game) => this.gameMapper.toSummaryDto(game)),
         },
       },
     });
@@ -56,7 +56,7 @@ export default class GameController {
       httpMethod: 'GET',
       featureName: 'Game',
       body: {
-        data: game ? this.gameMapper.toGameDto(game) : null,
+        data: game ? this.gameMapper.toDto(game) : null,
       },
     });
   };
@@ -69,7 +69,7 @@ export default class GameController {
     sendResponse(res, game ? 201 : 400, {
       httpMethod: 'POST',
       featureName: 'Game',
-      body: { data: this.gameMapper.toGameDto(game) },
+      body: { data: this.gameMapper.toDto(game) },
     });
   };
 
@@ -93,7 +93,7 @@ export default class GameController {
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
       featureName: 'Game',
-      body: { data: this.gameMapper.toGameDto(body) },
+      body: { data: this.gameMapper.toDto(body) },
     });
   };
 }

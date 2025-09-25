@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -7,8 +7,9 @@ import {
   Matches,
 } from 'class-validator';
 
+import { BaseResponseDto } from 'dto/response';
 import { UserSummaryResponseDto } from 'api/user/user.dto';
-import type { ITagEntity } from 'api/tag/tag.type';
+import { ITagEntity } from 'api/tag/tag.type';
 
 export class CreateTagDto {
   constructor(tag?: Pick<ITagEntity, 'title' | 'slug'>) {
@@ -44,30 +45,19 @@ export class UpdateTagDto {
   slug: string;
 }
 
-export class TagResponseDto {
-  @Expose()
-  _id!: string;
-
+export class TagResponseDto extends BaseResponseDto {
   @Expose()
   title!: string;
-
-  @Expose()
-  createDate!: string;
-
-  @Expose()
-  updateDate!: string;
 
   @Expose()
   slug!: string;
 
   @Expose()
+  @Type(() => UserSummaryResponseDto)
   creator: UserSummaryResponseDto;
 }
 
-export class TagSummaryResponseDto {
-  @Expose()
-  _id!: string;
-
+export class TagSummaryResponseDto extends BaseResponseDto {
   @Expose()
   title!: string;
 

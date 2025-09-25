@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 
 import { UserSummaryResponseDto } from 'api/user/user.dto';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 import type { IGameEntity } from 'api/game/game.type';
 
 export class CreateGameDto {
@@ -44,30 +45,19 @@ export class UpdateGameDto {
   slug: string;
 }
 
-export class GameResponseDto {
-  @Expose()
-  _id!: string;
-
+export class GameResponseDto extends BaseResponseDto {
   @Expose()
   title!: string;
-
-  @Expose()
-  createDate!: string;
-
-  @Expose()
-  updateDate!: string;
 
   @Expose()
   slug!: string;
 
   @Expose()
+  @Type(() => UserSummaryResponseDto)
   creator: UserSummaryResponseDto;
 }
 
-export class GameSummaryResponseDto {
-  @Expose()
-  _id!: string;
-
+export class GameSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   title!: string;
 

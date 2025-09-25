@@ -29,8 +29,8 @@ export default function validateObjectId<T>(Model: Model<T>) {
 
     if (!isValidObjectId(id)) throw new ValidationError('Invalid id format');
 
-    const count = await Model.countDocuments({ _id: id });
-    if (count === 0)
+    const count = await Model.exists({ _id: id });
+    if (!count)
       throw new NotFoundError(
         `No ${Model.modelName.toLowerCase()} with given id was found`
       );

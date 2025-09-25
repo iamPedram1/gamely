@@ -4,8 +4,8 @@ export interface ITagEntity {
   title: string;
   slug: string;
   creator: IUser;
-  createDate?: string;
-  updateDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ITag extends ITagEntity {

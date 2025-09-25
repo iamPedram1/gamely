@@ -4,7 +4,7 @@ import express from 'express';
 import AuthController from 'api/auth/auth.controller';
 
 // Services
-import UserService from 'api/user/user.services';
+import UserService from 'api/user/user.service';
 
 // Middlewares
 import blockRequestWithToken from 'api/auth/auth.middleware';

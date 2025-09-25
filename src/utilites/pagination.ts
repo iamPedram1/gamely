@@ -20,7 +20,7 @@ export default async function paginate<TResult, TDoc extends Document>(
 
   const [totalDocs, docs] = await Promise.all([
     model.countDocuments(filter),
-    query.clone().skip(skip).limit(validLimit).lean().exec() as Promise<
+    query.clone().skip(skip).limit(validLimit).exec() as Promise<
       FlattenMaps<TResult>[]
     >,
   ]);

@@ -7,7 +7,7 @@ import Game from 'api/game/game.model';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 // Services
-import BaseService, { IBaseService } from 'services/Base';
+import BaseService, { IBaseService } from 'services/base';
 
 // Utilities
 import { ValidationError } from 'utilites/errors';
@@ -49,7 +49,7 @@ class GameService extends BaseService<IGameEntity> {
   async update(gameId: string, payload: UpdateGameDto) {
     return await Game.findByIdAndUpdate(
       gameId,
-      { ...payload, updateDate: Date.now() },
+      { ...payload, updatedAt: Date.now() },
       { new: true }
     )
       .populate('creator', 'name email')

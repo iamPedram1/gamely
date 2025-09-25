@@ -1,25 +1,25 @@
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
-import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
+import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 import { isEmail } from 'class-validator';
 
 // Utils
 import { jwtPrivateKey } from 'utilites/configs';
 
 // Types
-import type { IUserEntity } from 'api/user/user.types';
-
-export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
-export type UserLeanDocument = FlattenMaps<IUserEntity>;
+import type { IUser, IUserEntity } from 'api/user/user.types';
 
 interface IUserEntityMethods {
   generateAuthToken(): string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const userSchema = new mongoose.Schema<
+export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
+export type UserLeanDocument = FlattenMaps<IUserEntity>;
+
+const userSchema = new Schema<
   IUserEntity,
-  mongoose.Model<IUserEntity, IUserEntityMethods>,
+  Model<IUserEntity, IUserEntityMethods>,
   IUserEntityMethods
 >(
   {
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema<
       unique: true,
       required: true,
       immutable: true,
-      validator: {
+      validate: {
         message: 'Invalid email address.',
         validator: (v: string) => isEmail(v),
       },
@@ -57,9 +57,10 @@ userSchema.methods.generateAuthToken = function () {
 };
 
 userSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false;
   return await bcryptjs.compare(password, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
+const User = model('User', userSchema);
 
 export default User;

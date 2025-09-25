@@ -12,6 +12,7 @@ export interface IUserService {
   create: (data: IUserEntity) => Promise<UserDocument>;
   getUserByEmail: (email: string) => Promise<UserDocument | null>;
   getUserById: (_id: string) => Promise<UserDocument | null>;
+  getUsers: () => Promise<UserDocument[]>;
 }
 
 export default class UserService implements IUserService {
@@ -69,6 +70,10 @@ export default class UserService implements IUserService {
 
   async getUserById(_id: string): Promise<UserDocument | null> {
     return await UserModel.findOne({ _id });
+  }
+
+  async getUsers(): Promise<UserDocument[]> {
+    return await UserModel.find();
   }
 
   async emailExist(email: string): Promise<boolean> {
