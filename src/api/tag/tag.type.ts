@@ -1,3 +1,4 @@
+// Types
 import type { IUser } from 'api/user/user.types';
 
 export interface ITagEntity {

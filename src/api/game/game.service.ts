@@ -30,11 +30,8 @@ class GameService extends BaseService<IGameEntity> {
     data: Pick<IGameEntity, 'title' | 'slug'>,
     userId: string
   ): Promise<GameDocument> {
-    const game = await this.checkExistenceBySlug(data.slug);
-
-    if (game) throw new ValidationError('A game with given slug already exist');
-
     const newGame = await new Game({ ...data, creator: userId }).save();
+
     if (!newGame) throw new ValidationError('Game could not be created');
 
     return newGame;

@@ -26,29 +26,27 @@ const gameMapper = new GameMapper();
 const gameService = new GameService();
 const gameController = new GameController(gameService, gameMapper);
 
-gameRouter.post('/', [
-  auth,
-  validateBody(CreateGameDto),
-  validateUniqueConflict(Game, 'slug'),
-  gameController.create,
-]);
+// Public Routes
+gameRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
 gameRouter.get('/', [validateQuery(BaseQueryDto), gameController.getAll]);
 gameRouter.get('/summaries', [
   validateQuery(BaseQueryDto),
   gameController.getAllSummaries,
 ]);
-gameRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
+
+// Protected Routes
+gameRouter.use(auth);
+gameRouter.delete('/:id', [validateObjectId(Game), gameController.delete]);
+gameRouter.post('/', [
+  validateBody(CreateGameDto),
+  validateUniqueConflict(Game, 'slug'),
+  gameController.create,
+]);
 gameRouter.patch('/:id', [
-  auth,
   validateObjectId(Game),
   validateBody(UpdateGameDto),
   validateUniqueConflict(Game, 'slug'),
   gameController.update,
-]);
-gameRouter.delete('/:id', [
-  auth,
-  validateObjectId(Game),
-  gameController.delete,
 ]);
 
 export default gameRouter;

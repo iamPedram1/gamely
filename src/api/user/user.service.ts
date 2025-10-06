@@ -77,6 +77,6 @@ export default class UserService implements IUserService {
   }
 
   async emailExist(email: string): Promise<boolean> {
-    return (await UserModel.countDocuments({ email })) > 0;
+    return Boolean(await UserModel.exists({ email }));
   }
 }

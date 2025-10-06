@@ -1,0 +1,107 @@
+import { Expose, Transform, Type } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsString,
+  Length,
+  IsOptional,
+  Matches,
+  IsMongoId,
+} from 'class-validator';
+
+import { UserSummaryResponseDto } from 'api/user/user.dto';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+import type {
+  ICategory,
+  ICategoryEntity,
+  INestedCategory,
+} from 'api/category/category.type';
+
+export class CreateCategoryDto {
+  constructor(category?: Pick<ICategoryEntity, 'title' | 'slug'>) {
+    Object.assign(this, category);
+  }
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(3, 255)
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(3, 255)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'slug is not valid' })
+  slug: string;
+
+  @IsString()
+  @IsOptional()
+  @Length(1, 255)
+  parentId: string;
+}
+
+export class UpdateCategoryDto {
+  constructor(game?: Pick<ICategoryEntity, 'title' | 'slug'>) {
+    Object.assign(this, game);
+  }
+
+  @IsOptional()
+  @IsString()
+  @Length(3, 255)
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(3, 255)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  slug: string;
+
+  @IsOptional()
+  @IsMongoId()
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  parentId: string;
+}
+
+export class CategoryResponseDto extends BaseResponseDto {
+  @Expose()
+  title!: string;
+
+  @Expose()
+  slug!: string;
+
+  @Expose()
+  @IsMongoId()
+  @Transform(({ obj }) => (obj.parentId ? String(obj.parentId) : null))
+  parentId!: string | null;
+
+  @Expose()
+  @Type(() => UserSummaryResponseDto)
+  creator: UserSummaryResponseDto;
+}
+
+export class NestedCategoryResponseDto extends BaseSummaryResponseDto {
+  @Expose()
+  title!: string;
+
+  @Expose()
+  slug!: string;
+
+  @Expose()
+  @IsMongoId()
+  @Transform(({ obj }) => (obj.parentId ? String(obj.parentId) : null))
+  parentId!: string | null;
+
+  @Expose()
+  @Type(() => NestedCategoryResponseDto)
+  children!: INestedCategory[];
+}
+
+export class CategorySummaryResponseDto extends BaseSummaryResponseDto {
+  @Expose()
+  title!: string;
+
+  @Expose()
+  @Type(() => CategorySummaryResponseDto)
+  parentId!: ICategory | null;
+
+  @Expose()
+  slug!: string;
+}

@@ -3,15 +3,15 @@ import type { RequestHandler } from 'express';
 // Services
 import { ITagService } from 'api/tag/tag.service';
 
-// Dto
-import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
-
 // Utilities
 import sendResponse from 'utilites/response';
 
+// DTO
+import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
+
 // Types
-import type IRequestQueryBase from 'types/query';
 import type { ITagMapper } from 'api/tag/tag.mapper';
+import type IRequestQueryBase from 'types/query';
 
 export default class TagController {
   private tagService: ITagService;
@@ -23,41 +23,39 @@ export default class TagController {
   }
 
   getAll: RequestHandler = async (req, res) => {
-    const { docs, pagination } = await this.tagService.getAll(
-      req.query as unknown as IRequestQueryBase
-    );
+    const query = req.query as unknown as IRequestQueryBase;
+    const { docs, pagination } = await this.tagService.getAll(query);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Tags',
       body: {
         data: {
-          pagination: pagination,
-          docs: docs.map((tag) => this.tagMapper.toDto(tag)),
+          pagination,
+          docs: docs.map((doc) => this.tagMapper.toDto(doc)),
         },
       },
     });
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const { pagination, docs } = await this.tagService.getAllSummaries(
-      req.query as unknown as IRequestQueryBase
-    );
+    const query = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.tagService.getAllSummaries(query);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Tags',
       body: {
         data: {
-          pagination: pagination,
-          docs: docs.map((tag) => this.tagMapper.toSummaryDto(tag)),
+          pagination,
+          docs: docs.map((doc) => this.tagMapper.toSummaryDto(doc)),
         },
       },
     });
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const tag = await this.tagService.getById(req.params.id);
+    const tag = await this.tagService.getLeanById(req.params.id);
 
     sendResponse(res, tag ? 200 : 400, {
       httpMethod: 'GET',
@@ -70,7 +68,6 @@ export default class TagController {
 
   create: RequestHandler = async (req, res) => {
     const dto = req.body as CreateTagDto;
-
     const tag = await this.tagService.create(dto, req.user._id);
 
     sendResponse(res, tag ? 201 : 400, {
@@ -92,7 +89,6 @@ export default class TagController {
 
   update: RequestHandler = async (req, res) => {
     const dto = req.body as UpdateTagDto;
-
     const body = await this.tagService.update(req.params.id, dto);
 
     sendResponse(res, 200, {

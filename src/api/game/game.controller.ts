@@ -1,10 +1,17 @@
 import type { RequestHandler } from 'express';
-import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
-import IRequestQueryBase from 'types/query';
+
+// Service
 import { IGameService } from 'api/game/game.service';
+
+// Dto
 import { IGameMapper } from 'api/game/game.mapper';
-import { ValidationError } from 'utilites/errors';
+
+// Utilities
 import sendResponse from 'utilites/response';
+import { ValidationError } from 'utilites/errors';
+
+// Types
+import IRequestQueryBase from 'types/query';
 
 export default class GameController {
   private gameService: IGameService;
@@ -26,7 +33,7 @@ export default class GameController {
       body: {
         data: {
           pagination,
-          docs: docs.map((game) => this.gameMapper.toDto(game)),
+          docs: docs.map((doc) => this.gameMapper.toDto(doc)),
         },
       },
     });
@@ -43,14 +50,14 @@ export default class GameController {
       body: {
         data: {
           pagination,
-          docs: docs.map((game) => this.gameMapper.toSummaryDto(game)),
+          docs: docs.map((doc) => this.gameMapper.toSummaryDto(doc)),
         },
       },
     });
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const game = await this.gameService.getById(req.params.id);
+    const game = await this.gameService.getLeanById(req.params.id);
 
     sendResponse(res, game ? 200 : 400, {
       httpMethod: 'GET',
@@ -62,14 +69,12 @@ export default class GameController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const dto = req.body as CreateGameDto;
-
-    const game = await this.gameService.create(dto, req.user._id);
+    const game = await this.gameService.create(req.body, req.user._id);
 
     sendResponse(res, game ? 201 : 400, {
       httpMethod: 'POST',
       featureName: 'Game',
-      body: { data: this.gameMapper.toDto(game) },
+      body: { data: game ? this.gameMapper.toDto(game) : null },
     });
   };
 
@@ -84,9 +89,7 @@ export default class GameController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const dto = req.body as UpdateGameDto;
-
-    const body = await this.gameService.update(req.params.id, dto);
+    const body = await this.gameService.update(req.params.id, req.body);
 
     if (!body) throw new ValidationError('Error in updating game');
 

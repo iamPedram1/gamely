@@ -1,9 +1,7 @@
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 import { IUserService } from 'api/user/user.service';
 import { tokenHeaderName } from 'utilites/configs';
-
 import type { RequestHandler } from 'express';
-
 export default class UserController {
   private userService: IUserService;
 
@@ -16,7 +14,7 @@ export default class UserController {
 
     const token = await this.userService.register(dto);
 
-    res.header(tokenHeaderName, token).status(204);
+    res.status(204).header(tokenHeaderName, token).send();
   };
 
   login: RequestHandler = async (req, res) => {
@@ -24,6 +22,6 @@ export default class UserController {
 
     const token = await this.userService.login(dto);
 
-    res.status(200).header(tokenHeaderName, token).send(204);
+    res.status(200).header(tokenHeaderName, token).send();
   };
 }

@@ -1,25 +1,21 @@
-import { plainToInstance } from 'class-transformer';
-
 // Models
 import Tag from 'api/tag/tag.model';
 
 // DTO
-import {
-  TagResponseDto,
-  TagSummaryResponseDto,
-  UpdateTagDto,
-} from 'api/tag/tag.dto';
+import { UpdateTagDto } from 'api/tag/tag.dto';
 
 // Services
 import BaseService from 'services/base';
 
 // Utilities
 import { ValidationError } from 'utilites/errors';
+
+// Types
+import type IRequestQueryBase from 'types/query';
 import type { ITagEntity } from 'api/tag/tag.type';
 import type { IBaseService } from 'services/base';
+import type { WithPagination } from 'types/paginate';
 import type { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
-import IRequestQueryBase from 'types/query';
-import { WithPagination } from 'types/paginate';
 
 export interface ITagService extends IBaseService<TagLeanDocument> {
   update: (tagId: string, data: UpdateTagDto) => Promise<TagDocument | null>;
@@ -44,11 +40,8 @@ class TagService extends BaseService<ITagEntity> implements ITagService {
     data: Pick<ITagEntity, 'title' | 'slug'>,
     userId: string
   ): Promise<TagDocument> {
-    const tag = await this.checkExistenceBySlug(data.slug);
-
-    if (tag) throw new ValidationError('A tag with given slug already exist');
-
     const newTag = await new Tag({ ...data, creator: userId }).save();
+
     if (!newTag) throw new ValidationError('Tag could not be created');
 
     return newTag;
