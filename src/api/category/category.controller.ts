@@ -97,7 +97,7 @@ export default class CategoryController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const { deletedCount } = await this.categoryService.deleteById(
+    const { deletedCount } = await this.categoryService.deleteOneById(
       req.params.id
     );
 

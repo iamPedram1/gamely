@@ -7,7 +7,7 @@ import { IPostService } from 'api/post/post.service';
 import { IPostMapper } from 'api/post/post.mapper';
 
 // Utilities
-import sendResponse from 'utilites/response';
+import sendResponse, { sendBatchResponse } from 'utilites/response';
 import { ValidationError } from 'utilites/errors';
 
 // Types
@@ -86,12 +86,29 @@ export default class PostController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const post = await this.postService.deleteById(req.params.id);
+    const post = await this.postService.deleteOneById(req.params.id);
     const deleted = post.deletedCount > 0;
 
     sendResponse(res, deleted ? 200 : 400, {
       httpMethod: 'DELETE',
       featureName: 'Post',
+    });
+  };
+
+  batchDelete: RequestHandler = async (req, res) => {
+    const result = await this.postService.batchDelete(req.body.ids);
+
+    sendBatchResponse(res, 200, {
+      httpMethod: 'DELETE',
+      featureName: 'Post',
+      body: {
+        data: result,
+        isSuccess: result.isAllSucceed,
+        errors: result.errors,
+        message: result.isAllSucceed
+          ? 'Batch operation completed successfuly'
+          : 'Operation completed with some errors',
+      },
     });
   };
 

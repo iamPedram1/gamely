@@ -4,7 +4,7 @@ import type { RequestHandler } from 'express';
 import { ITagService } from 'api/tag/tag.service';
 
 // Utilities
-import sendResponse from 'utilites/response';
+import sendResponse, { sendBatchResponse } from 'utilites/response';
 
 // DTO
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
@@ -78,12 +78,29 @@ export default class TagController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const tag = await this.tagService.deleteById(req.params.id);
+    const tag = await this.tagService.deleteOneById(req.params.id);
     const deleted = tag.deletedCount > 0;
 
     sendResponse(res, deleted ? 200 : 400, {
       httpMethod: 'DELETE',
       featureName: 'Tag',
+    });
+  };
+
+  batchDelete: RequestHandler = async (req, res) => {
+    const result = await this.tagService.batchDelete(req.body.ids as string[]);
+
+    sendBatchResponse(res, 200, {
+      httpMethod: 'DELETE',
+      featureName: 'Tag',
+      body: {
+        data: result,
+        isSuccess: result.isAllSucceed,
+        errors: result.errors,
+        message: result.isAllSucceed
+          ? 'Batch operation completed successfuly'
+          : 'Operation completed with some errors',
+      },
     });
   };
 

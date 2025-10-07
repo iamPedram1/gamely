@@ -15,6 +15,21 @@ interface IApiResponse<T = null> {
   errors?: string[];
   data: T | null;
 }
+export type IApiBatchResult = {
+  id: string;
+  success: boolean;
+  message: string;
+};
+
+export interface IApiBatchResponse {
+  results: IApiBatchResult[];
+  errors: string[];
+  successIds: string[];
+  failedIds: string[];
+  totalCount: number;
+  successCount: number;
+  isAllSucceed: boolean;
+}
 
 interface ApiResponseConfig<T> {
   httpMethod?: HttpMethod;
@@ -51,7 +66,7 @@ const sendResponse = <T>(
   status: number,
   config?: ApiResponseConfig<T>
 ): void => {
-  const isSuccess = status >= 200 && status < 300;
+  const isSuccess = config?.body?.isSuccess || (status >= 200 && status < 300);
   const data = config?.body?.data ?? null;
   const errors = config?.body?.errors ?? [];
   const message = config?.body?.message
@@ -63,13 +78,21 @@ const sendResponse = <T>(
       );
 
   const response: IApiResponse<T> = {
-    data,
     isSuccess,
     errors,
     message,
+    data,
   };
 
   res.status(status).json(response);
+};
+
+export const sendBatchResponse = (
+  res: Response,
+  status: number,
+  config: ApiResponseConfig<IApiBatchResponse>
+): void => {
+  sendResponse(res, status, config);
 };
 
 export default sendResponse;

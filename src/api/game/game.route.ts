@@ -10,21 +10,15 @@ import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 // Model
 import Game from 'api/game/game.model';
 
-// Controllers
-import GameController from 'api/game/game.controller';
-
-// Services
-import GameService from 'api/game/game.service';
+// Module
+import createGameModule from 'api/game/game.module';
 
 // Dto
 import { BaseQueryDto } from 'dto/query';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
-import { GameMapper } from 'api/game/game.mapper';
 
 const gameRouter = express.Router();
-const gameMapper = new GameMapper();
-const gameService = new GameService();
-const gameController = new GameController(gameService, gameMapper);
+const { gameController } = createGameModule();
 
 // Public Routes
 gameRouter.get('/', [validateQuery(BaseQueryDto), gameController.getAll]);
@@ -36,6 +30,7 @@ gameRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
 
 // Protected Routes
 gameRouter.use(auth);
+gameRouter.delete('/batch/delete', gameController.batchDelete);
 gameRouter.delete('/:id', [validateObjectId(Game), gameController.delete]);
 gameRouter.post('/', [
   validateBody(CreateGameDto),

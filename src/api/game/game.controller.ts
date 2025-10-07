@@ -7,7 +7,7 @@ import { IGameService } from 'api/game/game.service';
 import { IGameMapper } from 'api/game/game.mapper';
 
 // Utilities
-import sendResponse from 'utilites/response';
+import sendResponse, { sendBatchResponse } from 'utilites/response';
 import { ValidationError } from 'utilites/errors';
 
 // Types
@@ -79,12 +79,29 @@ export default class GameController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const game = await this.gameService.deleteById(req.params.id);
+    const game = await this.gameService.deleteOneById(req.params.id);
     const deleted = game.deletedCount > 0;
 
     sendResponse(res, deleted ? 200 : 400, {
       httpMethod: 'DELETE',
       featureName: 'Game',
+    });
+  };
+
+  batchDelete: RequestHandler = async (req, res) => {
+    const result = await this.gameService.batchDelete(req.body.ids as string[]);
+
+    sendBatchResponse(res, 200, {
+      httpMethod: 'DELETE',
+      featureName: 'Game',
+      body: {
+        data: result,
+        isSuccess: result.isAllSucceed,
+        errors: result.errors,
+        message: result.isAllSucceed
+          ? 'Batch operation completed successfuly'
+          : 'Operation completed with some errors',
+      },
     });
   };
 

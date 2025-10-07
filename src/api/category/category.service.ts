@@ -17,50 +17,46 @@ import BaseService, { IBaseService } from 'services/base';
 import { ValidationError } from 'utilites/errors';
 
 // Types
+import type { IPostService } from 'api/post/post.service';
+import type { CategoryDocument } from 'api/category/category.model';
 import type {
   ICategoryEntity,
   INestedCategory,
 } from 'api/category/category.type';
-import type {
-  CategoryDocument,
-  CategoryLeanDocument,
-} from 'api/category/category.model';
 
 export interface ICategoryService
-  extends IBaseService<CategoryLeanDocument, CategoryDocument> {
+  extends IBaseService<ICategoryEntity, CreateCategoryDto, UpdateCategoryDto> {
   getAllNested(): Promise<INestedCategory[]>;
-  getChildrenCount(id: string): Promise<number>;
-  getAllDescendantIds(id: string): Promise<string[]>;
-  removeChildrens(id: string, session: ClientSession): Promise<DeleteResult>;
-  create(data: CreateCategoryDto, userId: string): Promise<CategoryDocument>;
-  update(
-    categoryId: string,
-    data: UpdateCategoryDto
-  ): Promise<CategoryDocument | null>;
 }
 
 type ParentMap = Record<string, number[]>;
 
+interface Dependencies {
+  postService: IPostService;
+}
 class CategoryService
-  extends BaseService<ICategoryEntity, CategoryDocument, CategoryLeanDocument>
+  extends BaseService<ICategoryEntity, CreateCategoryDto, UpdateCategoryDto>
   implements ICategoryService
 {
+  private postService: IPostService;
+
   constructor() {
     super(Category);
   }
 
-  async create(data: CreateCategoryDto, userId: string) {
+  setDependencies({ postService }: Dependencies) {
+    this.postService = postService;
+  }
+
+  async create(data: CreateCategoryDto) {
     if (data.parentId) {
-      const parentExists = await this.checkExistenceById(data.parentId);
+      const parentExists = await this.existsById(data.parentId);
       if (!parentExists)
         throw new ValidationError(
-          'Category with the provided categoryId does not exists'
+          'Category with the provided categoryId does not exist'
         );
     }
-    return (await Category.create({
-      ...data,
-      creator: userId,
-    })) as CategoryDocument;
+    return await super.create(data);
   }
 
   async update(categoryId: string, payload: UpdateCategoryDto) {
@@ -84,17 +80,18 @@ class CategoryService
     return category;
   }
 
-  async deleteById(id: string): Promise<DeleteResult> {
+  async deleteOneById(id: string): Promise<DeleteResult> {
     const session = await mongoose.startSession();
     let deleteResult: DeleteResult = { acknowledged: false, deletedCount: 0 };
     try {
       await session.withTransaction(async () => {
-        deleteResult = await super.deleteById(id);
+        deleteResult = await super.deleteOneById(id);
         const deleted = deleteResult.deletedCount > 0;
         if (!deleted)
           throw new ValidationError('Service was unable to delete category.');
 
         await this.removeChildrens(id, session);
+        await this.postService.deleteManyByKey('category', id);
       });
 
       return deleteResult;
@@ -103,60 +100,6 @@ class CategoryService
     } finally {
       session.endSession();
     }
-  }
-
-  async getAllDescendantIds(id: string): Promise<string[]> {
-    const categories = await Category.find().lean();
-    const map: Record<string, string[]> = {};
-
-    for (const cat of categories) {
-      if (!cat.parentId) continue;
-      const pid = String(cat.parentId);
-      if (!map[pid]) map[pid] = [];
-      map[pid].push(String(cat._id));
-    }
-
-    const descendants: string[] = [];
-    const stack = [id];
-
-    while (stack.length) {
-      const current = stack.pop()!;
-      const children = map[current] || [];
-      descendants.push(...children);
-      stack.push(...children);
-    }
-
-    return descendants;
-  }
-
-  async removeChildrens(id: string, session: ClientSession) {
-    const children = await Category.find({ parentId: id }).session(session);
-
-    for (const child of children) {
-      await this.removeChildrens(String(child._id), session);
-    }
-
-    return Category.deleteMany({ parentId: id }).session(session);
-  }
-
-  async getChildrenCount(id: string) {
-    return await Category.countDocuments({ parentId: id });
-  }
-
-  private getChildren(
-    category: INestedCategory,
-    categories: INestedCategory[],
-    parentMap: ParentMap
-  ) {
-    return (category?._id ? parentMap?.[String(category._id)] || [] : []).map(
-      (index) => {
-        const category = categories[index];
-        const parentId = category.parentId ? String(category.parentId) : null;
-        if (parentId)
-          category.children = this.getChildren(category, categories, parentMap);
-        return category;
-      }
-    );
   }
 
   async getAllNested() {
@@ -190,6 +133,59 @@ class CategoryService
 
     // Remove Every Categories expect First Level.
     return categories.filter((ctg) => !ctg.parentId);
+  }
+
+  private async getAllDescendantIds(id: string): Promise<string[]> {
+    const categories = await Category.find().lean();
+    const map: Record<string, string[]> = {};
+
+    for (const cat of categories) {
+      if (!cat.parentId) continue;
+      const pid = String(cat.parentId);
+      if (!map[pid]) map[pid] = [];
+      map[pid].push(String(cat._id));
+    }
+
+    const stack = [id];
+    const descendants = new Set<string>();
+
+    while (stack.length) {
+      const current = stack.pop()!;
+      const children = map[current] || [];
+      children.forEach((c) => {
+        if (!descendants.has(c)) {
+          descendants.add(c);
+          stack.push(c);
+        }
+      });
+    }
+    return Array.from(descendants);
+  }
+
+  private getChildren(
+    category: INestedCategory,
+    categories: INestedCategory[],
+    parentMap: ParentMap
+  ) {
+    return (category?._id ? parentMap?.[String(category._id)] || [] : []).map(
+      (index) => {
+        const category = categories[index];
+        const parentId = category.parentId ? String(category.parentId) : null;
+        if (parentId)
+          category.children = this.getChildren(category, categories, parentMap);
+        return category;
+      }
+    );
+  }
+
+  private async removeChildrens(id: string, session: ClientSession) {
+    const children = await Category.find({ parentId: id }).session(session);
+
+    for (const child of children) {
+      await this.removeChildrens(String(child._id), session);
+    }
+
+    return Category.deleteMany({ parentId: id }).session(session);
   }
 }
 

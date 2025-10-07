@@ -9,7 +9,7 @@ export interface IPostEntity {
   slug: string;
   content: string;
   tags: ITag[] | string[];
-  creator: IUser;
+  creator: IUser | string;
   category: string | ICategory;
   image: IFileEntity;
   game: IGame | string | null;

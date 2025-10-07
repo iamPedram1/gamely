@@ -1,4 +1,4 @@
-import express, { RequestHandler } from 'express';
+import express from 'express';
 
 // Middlewares
 import auth from 'middleware/auth';
@@ -10,27 +10,18 @@ import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 // Model
 import Category from 'api/category/category.model';
 
-// Controllers
-import CategoryController from 'api/category/category.controller';
-
 // Services
-import CategoryService from 'api/category/category.service';
+import createCategoryModule from 'api/category/category.module';
 
 // Dto
 import { BaseQueryDto } from 'dto/query';
-import { CategoryMapper } from 'api/category/category.mapper';
 import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from 'api/category/category.dto';
 
 const categoryRouter = express.Router();
-const categoryMapper = new CategoryMapper();
-const categoryService = new CategoryService();
-const categoryController = new CategoryController(
-  categoryService,
-  categoryMapper
-);
+const { categoryController } = createCategoryModule();
 
 // Public Routes
 categoryRouter.get('/', validateQuery(BaseQueryDto), categoryController.getAll);
