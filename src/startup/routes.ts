@@ -12,12 +12,14 @@ import notFound from 'middleware/notFound';
 
 // Utilities
 import { prefixBaseUrl } from 'utilites/configs';
+import postRouter from 'api/post/post.route';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/auth'), authRouter);
   app.use(prefixBaseUrl('/tags'), tagRouter);
   app.use(prefixBaseUrl('/games'), gameRouter);
   app.use(prefixBaseUrl('/categories'), categoryRouter);
+  app.use(prefixBaseUrl('/posts'), postRouter);
   app.use(notFound);
   app.use(error);
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 
-// Midllewares
+// Middlewares
 import auth from 'middleware/auth';
 import validateBody from 'middleware/validateBody';
 import validateQuery from 'middleware/validateQuery';

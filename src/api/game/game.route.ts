@@ -1,6 +1,6 @@
 import express from 'express';
 
-// Midllewares
+// Middlewares
 import auth from 'middleware/auth';
 import validateBody from 'middleware/validateBody';
 import validateObjectId from 'middleware/validateObjectId';
@@ -27,12 +27,12 @@ const gameService = new GameService();
 const gameController = new GameController(gameService, gameMapper);
 
 // Public Routes
-gameRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
 gameRouter.get('/', [validateQuery(BaseQueryDto), gameController.getAll]);
 gameRouter.get('/summaries', [
   validateQuery(BaseQueryDto),
   gameController.getAllSummaries,
 ]);
+gameRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
 
 // Protected Routes
 gameRouter.use(auth);

@@ -7,7 +7,7 @@ import {
   Matches,
 } from 'class-validator';
 
-import { BaseResponseDto } from 'dto/response';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { ITagEntity } from 'api/tag/tag.type';
 
@@ -57,7 +57,7 @@ export class TagResponseDto extends BaseResponseDto {
   creator: UserSummaryResponseDto;
 }
 
-export class TagSummaryResponseDto extends BaseResponseDto {
+export class TagSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   title!: string;
 

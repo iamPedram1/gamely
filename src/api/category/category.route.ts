@@ -1,6 +1,6 @@
 import express, { RequestHandler } from 'express';
 
-// Midllewares
+// Middlewares
 import auth from 'middleware/auth';
 import validateBody from 'middleware/validateBody';
 import validateObjectId from 'middleware/validateObjectId';

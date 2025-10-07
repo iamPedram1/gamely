@@ -1,7 +1,10 @@
 import { Expose } from 'class-transformer';
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+
+// Dto
+import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+
+// Types
 import type { IUser } from 'api/user/user.types';
-import { BaseResponseDto } from 'dto/response';
 
 export class UserResponseDto
   extends BaseResponseDto
@@ -13,22 +16,16 @@ export class UserResponseDto
   }
 
   @Expose()
-  @IsNotEmpty()
-  @IsEmail()
   readonly email!: string;
 
   @Expose()
-  @IsNotEmpty()
-  @IsString()
   readonly name!: string;
 }
 
 export class UserSummaryResponseDto
-  extends BaseResponseDto
+  extends BaseSummaryResponseDto
   implements Pick<IUser, 'name' | 'id'>
 {
   @Expose()
-  @IsNotEmpty()
-  @IsString()
   readonly name!: string;
 }
