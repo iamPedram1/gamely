@@ -22,9 +22,8 @@ export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
     const dto = plainToInstance(DtoClass, req.body, {
       enableImplicitConversion: true,
     });
-    const errors = await validate(dto as object, {
-      whitelist: true,
-    });
+
+    const errors = await validate(dto as object, { whitelist: true });
 
     if (errors.length > 0) {
       const messages = errors.flatMap((err) =>

@@ -1,5 +1,5 @@
 // Utilities
-import { ValidationError } from 'utilites/errors';
+import { NotFoundError } from 'utilites/errors';
 
 // Types
 import type { ITagService } from 'api/tag/tag.service';
@@ -24,13 +24,13 @@ export class PostValidation {
   async validateCategory(category: string) {
     const exist = await this.categoryService.existsById(category);
     if (exist) return;
-    else throw new ValidationError('Category with given id does not exist');
+    else throw new NotFoundError('Category with given id does not exist');
   }
 
   async validateGame(game: string) {
     if (!game) return;
     const exist = await this.gameService.existsById(game);
-    if (!exist) throw new ValidationError('Game with given id does not exist');
+    if (!exist) throw new NotFoundError('Game with given id does not exist');
   }
 
   async validateTags(tags: string[]) {
@@ -41,7 +41,7 @@ export class PostValidation {
     );
     exist.forEach((v, index) => {
       if (!v)
-        throw new ValidationError(
+        throw new NotFoundError(
           `Tag with given id (${tags[index]}) does not exist`
         );
     });

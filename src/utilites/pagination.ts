@@ -8,28 +8,28 @@ interface IPaginationConfig {
 
 export default async function paginate<TResult, TDoc extends Document>(
   query: Query<TResult[], TDoc>,
-  configs?: IPaginationConfig
+  configs?: Partial<IPaginationConfig>
 ): Promise<WithPagination<FlattenMaps<TResult>>> {
   const currentPage = configs?.page || 1;
   const limit = configs?.limit || 20;
-  const validLimit = getValidLimit(limit);
-  const skip = calculateSkip(validLimit, currentPage);
+  const skip = calculateSkip(limit, currentPage);
 
   const model = query.model;
   const filter = query.getFilter();
 
   const [totalDocs, docs] = await Promise.all([
     model.countDocuments(filter),
-    query.clone().skip(skip).limit(validLimit).exec() as Promise<
+    query.clone().skip(skip).limit(limit).exec() as Promise<
       FlattenMaps<TResult>[]
     >,
   ]);
 
-  const totalPages = calculateTotalPages(totalDocs, validLimit);
+  const totalPages = calculateTotalPages(totalDocs, limit);
 
   return {
     docs,
     pagination: {
+      limit,
       totalDocs,
       currentPage,
       totalPages,

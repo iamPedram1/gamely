@@ -4,6 +4,7 @@ import { Express } from 'express';
 import tagRouter from 'api/tag/tag.route';
 import authRouter from 'api/auth/auth.route';
 import gameRouter from 'api/game/game.route';
+import commentRouter from 'api/comment/comment.route';
 import categoryRouter from 'api/category/category.route';
 
 // Middlewares
@@ -19,6 +20,7 @@ export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/tags'), tagRouter);
   app.use(prefixBaseUrl('/games'), gameRouter);
   app.use(prefixBaseUrl('/categories'), categoryRouter);
+  app.use(prefixBaseUrl('/posts'), commentRouter);
   app.use(prefixBaseUrl('/posts'), postRouter);
   app.use(notFound);
   app.use(error);

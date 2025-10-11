@@ -23,8 +23,11 @@ export default class TagController {
   }
 
   getAll: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
-    const { docs, pagination } = await this.tagService.getAll(query);
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { docs, pagination } = await this.tagService.find({
+      reqQuery,
+      lean: true,
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -39,8 +42,11 @@ export default class TagController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.tagService.getAllSummaries(query);
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.tagService.find({
+      reqQuery,
+      lean: true,
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -55,7 +61,7 @@ export default class TagController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const tag = await this.tagService.getLeanById(req.params.id);
+    const tag = await this.tagService.getOneById(req.params.id, { lean: true });
 
     sendResponse(res, tag ? 200 : 400, {
       httpMethod: 'GET',
@@ -88,7 +94,7 @@ export default class TagController {
   };
 
   batchDelete: RequestHandler = async (req, res) => {
-    const result = await this.tagService.batchDelete(req.body.ids as string[]);
+    const result = await this.tagService.batchDelete(req.body.ids);
 
     sendBatchResponse(res, 200, {
       httpMethod: 'DELETE',
@@ -106,7 +112,7 @@ export default class TagController {
 
   update: RequestHandler = async (req, res) => {
     const dto = req.body as UpdateTagDto;
-    const body = await this.tagService.update(req.params.id, dto);
+    const body = await this.tagService.updateOneById(req.params.id, dto);
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',

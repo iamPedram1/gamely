@@ -1,7 +1,14 @@
 import type { Request, Response, NextFunction } from 'express';
 import logger from 'utilites/logger';
 import sendResponse from 'utilites/response';
-import { NotFoundError, ValidationError } from 'utilites/errors';
+import {
+  BadRequestError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from 'utilites/errors';
 
 /**
  * Global error-handling middleware for Express.
@@ -31,16 +38,24 @@ export default function errorMiddleware(
     cause: error.cause,
   });
 
-  const isValidationError = error instanceof ValidationError;
   const isNotFoundError = error instanceof NotFoundError;
+  const isForbiddenError = error instanceof ForbiddenError;
+  const isValidationError = error instanceof ValidationError;
+  const isBadRequestError = error instanceof BadRequestError;
+  const isInternalServerError = error instanceof InternalServerError;
+  const isUnauthorizedError = error instanceof UnauthorizedError;
+  const isHandledError =
+    isNotFoundError ||
+    isForbiddenError ||
+    isValidationError ||
+    isBadRequestError ||
+    isInternalServerError ||
+    isUnauthorizedError;
 
-  sendResponse(res, isValidationError ? 400 : isNotFoundError ? 404 : 500, {
+  sendResponse(res, isHandledError ? error.status || 500 : 500, {
     body: {
-      errors: isValidationError ? (error.cause as string[]) : [],
-      message:
-        isValidationError || isNotFoundError
-          ? error.message
-          : 'Internal server error',
+      errors: isHandledError ? error.cause : ['Internal server error'],
+      message: isHandledError ? error.message : 'Internal server error',
     },
   });
 }

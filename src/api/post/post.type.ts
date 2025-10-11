@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import type { ICategory } from 'api/category/category.type';
 import type { IGame } from 'api/game/game.type';
 import type { ITag } from 'api/tag/tag.type';
@@ -8,11 +9,11 @@ export interface IPostEntity {
   title: string;
   slug: string;
   content: string;
-  tags: ITag[] | string[];
-  creator: IUser | string;
-  category: string | ICategory;
+  tags: ITag[] | Types.ObjectId[];
+  creator: IUser | Types.ObjectId;
+  category: Types.ObjectId | ICategory;
   image: IFileEntity;
-  game: IGame | string | null;
+  game: IGame | Types.ObjectId | null;
   createdAt?: string;
   updatedAt?: string;
 }

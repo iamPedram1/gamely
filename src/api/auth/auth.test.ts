@@ -10,6 +10,7 @@ import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
 
 // Types
 import { IUserEntity } from 'api/user/user.types';
+import { RegisterDto } from 'api/auth/auth.dto';
 
 describe('auth routes', () => {
   const registerURL = prefixBaseUrl('/auth/register');
@@ -23,7 +24,7 @@ describe('auth routes', () => {
 
   describe('POST /register', () => {
     let token: string;
-    let payload: IUserEntity;
+    let payload: RegisterDto;
 
     beforeEach(() => {
       token = '';

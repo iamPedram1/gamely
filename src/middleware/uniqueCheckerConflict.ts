@@ -38,7 +38,7 @@ export default function validateUniqueConflict(
       if (conflict) {
         return next(
           new ValidationError(
-            `Conflict: ${fieldName} '${value}' is already taken.`
+            `${fieldName} '${value}' is already taken by another ${Model.modelName.toLocaleLowerCase()}.`
           )
         );
       }

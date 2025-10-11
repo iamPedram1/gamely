@@ -8,7 +8,7 @@ import { ICategoryMapper } from 'api/category/category.mapper';
 
 // Utilities
 import sendResponse from 'utilites/response';
-import { ValidationError } from 'utilites/errors';
+import { InternalServerError } from 'utilites/errors';
 
 // Types
 import IRequestQueryBase from 'types/query';
@@ -26,9 +26,13 @@ export default class CategoryController {
   }
 
   getAll: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.categoryService.getAll(query);
-    await this.categoryService.getAllNested();
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.categoryService.find({
+      reqQuery,
+      lean: true,
+      populate: 'creator',
+    });
+
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Categories',
@@ -52,12 +56,12 @@ export default class CategoryController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.categoryService.getAllSummaries(
-      query,
-      'parentId',
-      'title slug parentId'
-    );
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.categoryService.find({
+      reqQuery,
+      lean: true,
+      select: 'title slug parentId',
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -72,10 +76,10 @@ export default class CategoryController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const category = await this.categoryService.getLeanById(
-      req.params.id,
-      'creator'
-    );
+    const category = await this.categoryService.getOneById(req.params.id, {
+      populate: 'creator',
+      lean: true,
+    });
 
     sendResponse(res, category ? 200 : 400, {
       httpMethod: 'GET',
@@ -87,7 +91,9 @@ export default class CategoryController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const category = await this.categoryService.create(req.body, req.user._id);
+    const category = await this.categoryService.create(req.body, req.user._id, {
+      lean: true,
+    });
 
     sendResponse(res, category ? 201 : 400, {
       httpMethod: 'POST',
@@ -108,9 +114,12 @@ export default class CategoryController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const body = await this.categoryService.update(req.params.id, req.body);
+    const body = await this.categoryService.updateOneById(
+      req.params.id,
+      req.body
+    );
 
-    if (!body) throw new ValidationError('Error in updating category');
+    if (!body) throw new InternalServerError('Error in updating category');
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',

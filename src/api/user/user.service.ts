@@ -2,31 +2,22 @@ import bcryptjs from 'bcryptjs';
 
 import UserModel, { UserDocument } from 'api/user/user.model';
 import { ValidationError } from 'utilites/errors';
-import type { IUserEntity } from 'api/user/user.types';
+import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 
-export interface IUserService {
-  login: (data: Pick<IUserEntity, 'email' | 'password'>) => Promise<string>;
-  register: (data: IUserEntity) => Promise<string>;
-  comparePassword: (password: string, hash: string) => Promise<void>;
-  hashPassword: (password: string) => Promise<string>;
-  create: (data: IUserEntity) => Promise<UserDocument>;
-  getUserByEmail: (email: string) => Promise<UserDocument | null>;
-  getUserById: (_id: string) => Promise<UserDocument | null>;
-  getUsers: () => Promise<UserDocument[]>;
-}
+export type IUserService = InstanceType<typeof UserService>;
 
 export default class UserService implements IUserService {
-  async register(data: IUserEntity): Promise<string> {
+  async register(data: RegisterDto): Promise<string> {
     const user = await this.getUserByEmail(data.email);
     if (user)
       throw new ValidationError('A user with the given email already exist.');
 
     data.password = await this.hashPassword(data.password);
 
-    return (await this.create(data)).generateAuthToken();
+    return (await this.create({ ...data })).generateAuthToken();
   }
 
-  async login(data: Pick<IUserEntity, 'email' | 'password'>) {
+  async login(data: LoginDto) {
     const message = 'Email or password is incorrect.';
 
     const user = await this.getUserByEmail(data.email, true);
@@ -51,7 +42,7 @@ export default class UserService implements IUserService {
     return hash;
   }
 
-  async create(data: IUserEntity): Promise<UserDocument> {
+  async create(data: RegisterDto): Promise<UserDocument> {
     const user = new UserModel(data);
 
     await user.save();

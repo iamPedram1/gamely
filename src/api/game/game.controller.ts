@@ -23,9 +23,11 @@ export default class GameController {
   }
 
   getAll: RequestHandler = async (req, res) => {
-    const { pagination, docs } = await this.gameService.getAll(
-      req.query as unknown as IRequestQueryBase
-    );
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.gameService.find({
+      reqQuery,
+      lean: true,
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -40,9 +42,11 @@ export default class GameController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const { pagination, docs } = await this.gameService.getAllSummaries(
-      req.query as unknown as IRequestQueryBase
-    );
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.gameService.find({
+      reqQuery,
+      lean: true,
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -57,7 +61,7 @@ export default class GameController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const game = await this.gameService.getLeanById(req.params.id);
+    const game = await this.gameService.getOneById(req.params.id);
 
     sendResponse(res, game ? 200 : 400, {
       httpMethod: 'GET',
@@ -106,7 +110,7 @@ export default class GameController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const body = await this.gameService.update(req.params.id, req.body);
+    const body = await this.gameService.updateOneById(req.params.id, req.body);
 
     if (!body) throw new ValidationError('Error in updating game');
 

@@ -23,11 +23,12 @@ export default class PostController {
   }
 
   getAll: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.postService.getAll(
-      query,
-      'category game tags creator'
-    );
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.postService.find({
+      reqQuery,
+      lean: true,
+      populate: 'category game tags creator',
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -42,11 +43,12 @@ export default class PostController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.postService.getAllSummaries(
-      query,
-      'category game tags'
-    );
+    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const { pagination, docs } = await this.postService.find({
+      reqQuery,
+      lean: true,
+      populate: 'category game tags',
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -61,10 +63,10 @@ export default class PostController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const post = await this.postService.getLeanById(
-      req.params.id,
-      'category game tags'
-    );
+    const post = await this.postService.getOneById(req.params.id, {
+      lean: true,
+      populate: 'category game tags',
+    });
 
     sendResponse(res, post ? 200 : 400, {
       httpMethod: 'GET',
@@ -113,7 +115,7 @@ export default class PostController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const body = await this.postService.update(req.params.id, req.body);
+    const body = await this.postService.updateOneById(req.params.id, req.body);
 
     if (!body) throw new ValidationError('Error in updating post');
 

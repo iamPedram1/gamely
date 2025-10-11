@@ -1,3 +1,5 @@
+import { DeleteResult } from 'mongoose';
+
 // Models
 import Post from 'api/post/post.model';
 
@@ -5,74 +7,77 @@ import Post from 'api/post/post.model';
 import { CreatePostDto, UpdatePostDto } from 'api/post/post.dto';
 
 // Services
-import BaseService, { IBaseService } from 'services/base';
+import BaseService from 'services/base.service.module';
+import { ICommentService } from 'api/comment/comment.service';
 
 // Types
 import type { IPostEntity } from 'api/post/post.type';
 import type { PostDocument } from 'api/post/post.model';
 import type { PostValidation } from 'api/post/post.validation';
 
-export interface IPostService
-  extends IBaseService<IPostEntity, CreatePostDto, UpdatePostDto> {
-  getPostsByTag: (tagId: string) => Promise<PostDocument[]>;
-  getPostsByGame: (gameId: string) => Promise<PostDocument[]>;
-  getPostsByCategory: (categoryId: string) => Promise<PostDocument[]>;
-}
+export type IPostService = InstanceType<typeof PostService>;
 
 interface Dependencies {
   postValidation: PostValidation;
+  commentService: ICommentService;
 }
 
-class PostService
-  extends BaseService<IPostEntity, CreatePostDto, UpdatePostDto>
-  implements IPostService
-{
+class PostService extends BaseService<
+  IPostEntity,
+  CreatePostDto,
+  UpdatePostDto
+> {
   postValidation: PostValidation;
+  commentService: ICommentService;
 
   constructor() {
     super(Post);
   }
 
-  setDependencies({ postValidation }: Dependencies) {
+  setDependencies({ postValidation, commentService }: Dependencies) {
     this.postValidation = postValidation;
+    this.commentService = commentService;
   }
 
-  async getPostsByGame(gameId: string): Promise<PostDocument[]> {
-    return await Post.find({ game: gameId });
+  async getPostsBy(
+    keyName: keyof IPostEntity,
+    value: IPostEntity[typeof keyName]
+  ): Promise<PostDocument[]> {
+    return await super.find({
+      filter: { [keyName]: value },
+      lean: true,
+      paginate: false,
+    });
   }
 
-  async getPostsByCategory(categoryId: string): Promise<PostDocument[]> {
-    return await Post.find({ category: categoryId });
-  }
-
-  async getPostsByTag(tagId: string): Promise<PostDocument[]> {
-    return await Post.find({ tags: { $in: [tagId] } });
-  }
-
-  async create(data: CreatePostDto): Promise<PostDocument> {
+  async create(data: CreatePostDto, userId?: string): Promise<PostDocument> {
     await Promise.all([
-      this.postValidation.validateGame(data.game as string),
-      this.postValidation.validateTags(data.tags as string[]),
-      this.postValidation.validateCategory(data.category as string),
+      this.postValidation.validateGame(data.game),
+      this.postValidation.validateTags(data.tags),
+      this.postValidation.validateCategory(data.category),
     ]);
 
-    return await super.create(data);
+    return await super.create(data, userId);
   }
 
-  async update(id: string, payload: UpdatePostDto) {
+  async updateOneById(id: string, payload: UpdatePostDto) {
     await Promise.all([
-      ...(payload.game
-        ? [this.postValidation.validateGame(payload.game as string)]
-        : []),
-      ...(payload.tags
-        ? [this.postValidation.validateTags(payload.tags as string[])]
-        : []),
+      ...(payload.game ? [this.postValidation.validateGame(payload.game)] : []),
+      ...(payload.tags ? [this.postValidation.validateTags(payload.tags)] : []),
       ...(payload.category
-        ? [this.postValidation.validateCategory(payload.category as string)]
+        ? [this.postValidation.validateCategory(payload.category)]
         : []),
     ]);
 
-    return await super.update(id, payload);
+    return await super.updateOneById(id, payload);
+  }
+
+  async deleteOneById(id: string): Promise<DeleteResult> {
+    return this.withTransaction(async (session) => {
+      await this.commentService.deleteManyByKey('postId', id, { session });
+
+      return super.deleteOneById(id, { session });
+    });
   }
 }
 

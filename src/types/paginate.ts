@@ -1,7 +1,8 @@
 export interface IPagination {
+  limit: number;
   totalDocs: number;
-  currentPage: number;
   totalPages: number;
+  currentPage: number;
   hasPrevPage: boolean;
   hasNextPage: boolean;
 }

@@ -1,5 +1,5 @@
 // Controllers
-import GameController from 'api/game/game.controller';
+import CommentController from 'api/comment/comment.controller';
 
 // Services
 import TagService from 'api/tag/tag.service';
@@ -9,13 +9,13 @@ import CommentService from 'api/comment/comment.service';
 import CategoryService from 'api/category/category.service';
 
 // Dto
-import { GameMapper } from 'api/game/game.mapper';
+import { CommentMapper } from 'api/comment/comment.mapper';
 
 // Validation
 import { PostValidation } from 'api/post/post.validation';
 
-export default function createGameModule() {
-  const gameMapper = new GameMapper();
+export default function createCommentModule() {
+  const commentMapper = new CommentMapper();
   const tagService = new TagService();
   const gameService = new GameService();
   const commentService = new CommentService();
@@ -31,6 +31,10 @@ export default function createGameModule() {
   gameService.setDependencies({ postService });
   categoryService.setDependencies({ postService });
 
-  const gameController = new GameController(gameService, gameMapper);
-  return { gameController };
+  const commentController = new CommentController(
+    commentService,
+    commentMapper
+  );
+
+  return { commentController };
 }

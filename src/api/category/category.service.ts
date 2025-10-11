@@ -11,12 +11,17 @@ import {
 } from 'api/category/category.dto';
 
 // Services
-import BaseService, { IBaseService } from 'services/base';
+import BaseService from 'services/base.service.module';
 
 // Utilities
-import { ValidationError } from 'utilites/errors';
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+} from 'utilites/errors';
 
 // Types
+import { IBaseService } from 'services/base.service.type';
 import type { IPostService } from 'api/post/post.service';
 import type { CategoryDocument } from 'api/category/category.model';
 import type {
@@ -50,75 +55,71 @@ class CategoryService
 
   async create(data: CreateCategoryDto) {
     if (data.parentId) {
-      const parentExists = await this.existsById(data.parentId);
+      const parentExists = await super.existsBySlug(data.parentId);
       if (!parentExists)
-        throw new ValidationError(
+        throw new NotFoundError(
           'Category with the provided categoryId does not exist'
         );
     }
     return await super.create(data);
   }
 
-  async update(categoryId: string, payload: UpdateCategoryDto) {
-    const category = (await Category.findOne({
-      _id: categoryId,
-    })) as CategoryDocument;
-    const descendants = await this.getAllDescendantIds(categoryId);
+  async updateOneById(categoryId: string, payload: UpdateCategoryDto) {
+    const [category, descendants] = await Promise.all([
+      this.getOneById(categoryId) as Promise<CategoryDocument>,
+      this.getAllDescendantIds(categoryId),
+    ]);
+
     const isIdChanged =
-      'parentId' in payload ? category.parentId !== payload.parentId : false;
+      'parentId' in payload
+        ? (String(category.parentId || '') || null) !== payload.parentId
+        : false;
 
     if (isIdChanged && descendants.includes(payload.parentId))
-      throw new ValidationError(
-        'Invalid parentId: circular relationship detected'
+      throw new BadRequestError('parentId: Circular relationship detected');
+
+    if (payload.parentId === categoryId)
+      throw new BadRequestError(
+        'parentId: A category cannot be its own parent.'
       );
 
     if (payload.title) category.set('title', payload.title);
     if (payload.slug) category.set('slug', payload.slug);
     if (payload.parentId) category.set('parentId', payload.parentId);
 
-    await category.save();
-    return category;
+    return await category.save();
   }
 
   async deleteOneById(id: string): Promise<DeleteResult> {
-    const session = await mongoose.startSession();
-    let deleteResult: DeleteResult = { acknowledged: false, deletedCount: 0 };
-    try {
-      await session.withTransaction(async () => {
-        deleteResult = await super.deleteOneById(id);
-        const deleted = deleteResult.deletedCount > 0;
-        if (!deleted)
-          throw new ValidationError('Service was unable to delete category.');
-
-        await this.removeChildrens(id, session);
-        await this.postService.deleteManyByKey('category', id);
-      });
+    return this.withTransaction(async (session) => {
+      await this.removeChildrens(id, session);
+      await this.postService.deleteManyByKey('category', id, { session });
+      const deleteResult = await super.deleteOneById(id);
+      if (deleteResult.deletedCount === 0)
+        throw new InternalServerError('Service was unable to delete category.');
 
       return deleteResult;
-    } catch (error) {
-      throw new ValidationError(error.message);
-    } finally {
-      session.endSession();
-    }
+    });
   }
 
   async getAllNested() {
-    const categories =
-      (await Category.find().lean()) as unknown as INestedCategory[];
+    const categories = (await super.find({
+      lean: true,
+      paginate: false,
+    })) as unknown as INestedCategory[];
 
     const parentMap: Record<string, number[]> = {};
 
     // Build Parent Map and Initialize Data
-    for (let i = 0; i < categories.length; i++) {
-      categories[i].children = [];
-      const category = categories[i];
+    categories.forEach((category, index) => {
+      category.children = [];
       const parentId = category.parentId ? String(category.parentId) : null;
 
-      if (!parentId) continue;
+      if (!parentId) return;
 
-      if (parentMap[parentId]) parentMap[parentId as string].push(i);
-      else parentMap[parentId] = [i];
-    }
+      if (!parentMap[parentId]) parentMap[parentId] = [];
+      parentMap[parentId].push(index);
+    });
 
     // Append Childrens to Parent
     for (let i = 0; i < categories.length; i++) {
@@ -136,7 +137,7 @@ class CategoryService
   }
 
   private async getAllDescendantIds(id: string): Promise<string[]> {
-    const categories = await Category.find().lean();
+    const categories = await super.find({ paginate: false, lean: true });
     const map: Record<string, string[]> = {};
 
     for (const cat of categories) {
@@ -167,15 +168,14 @@ class CategoryService
     categories: INestedCategory[],
     parentMap: ParentMap
   ) {
-    return (category?._id ? parentMap?.[String(category._id)] || [] : []).map(
-      (index) => {
-        const category = categories[index];
-        const parentId = category.parentId ? String(category.parentId) : null;
-        if (parentId)
-          category.children = this.getChildren(category, categories, parentMap);
-        return category;
-      }
-    );
+    const id = category?._id ? String(category._id) : '';
+    return (id ? parentMap?.[id] || [] : []).map((index) => {
+      const category = categories[index];
+      const parentId = category.parentId ? String(category.parentId) : null;
+      if (parentId)
+        category.children = this.getChildren(category, categories, parentMap);
+      return category;
+    });
   }
 
   private async removeChildrens(id: string, session: ClientSession) {

@@ -41,6 +41,7 @@ const postSchema = new mongoose.Schema<
     game: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Game',
+      default: null,
     },
     category: {
       required: true,

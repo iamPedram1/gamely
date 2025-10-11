@@ -1,10 +1,11 @@
+import { Types } from 'mongoose';
 import { IUser } from 'api/user/user.types';
 import IFileEntity from 'types/file';
 
 export interface ICategoryEntity {
   title: string;
   slug: string;
-  parentId: string | null;
+  parentId: Types.ObjectId | null;
   image: IFileEntity;
   creator: IUser;
   createdAt?: string;

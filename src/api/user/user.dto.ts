@@ -6,10 +6,7 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 // Types
 import type { IUser } from 'api/user/user.types';
 
-export class UserResponseDto
-  extends BaseResponseDto
-  implements Omit<IUser, 'password' | '_id'>
-{
+export class UserResponseDto extends BaseResponseDto implements IUser {
   constructor(data: Partial<IUser>) {
     super();
     Object.assign(this, data);

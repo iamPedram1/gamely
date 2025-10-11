@@ -8,8 +8,11 @@ import {
   IsMongoId,
 } from 'class-validator';
 
+// DTO
 import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+
+// Types
 import type {
   ICategory,
   ICategoryEntity,
@@ -32,10 +35,9 @@ export class CreateCategoryDto {
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'slug is not valid' })
   slug: string;
 
-  @IsString()
   @IsOptional()
-  @Length(1, 255)
-  parentId: string;
+  @IsMongoId()
+  parentId: string | null;
 }
 
 export class UpdateCategoryDto {

@@ -7,15 +7,14 @@ import Game from 'api/game/game.model';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 // Services
-import BaseService, { IBaseService } from 'services/base';
+import BaseService from 'services/base.service.module';
 
 // Types
 import type { IGameEntity } from 'api/game/game.type';
 import type { IPostService } from 'api/post/post.service';
 import type { IApiBatchResponse } from 'utilites/response';
 
-export interface IGameService
-  extends IBaseService<IGameEntity, CreateGameDto, UpdateGameDto> {}
+export type IGameService = InstanceType<typeof GameService>;
 
 interface Dependencies {
   postService: IPostService;

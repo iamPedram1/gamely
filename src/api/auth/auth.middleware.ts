@@ -1,4 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
+
+// Utilites
 import { tokenHeaderName } from 'utilites/configs';
 
 export default function blockRequestWithToken(

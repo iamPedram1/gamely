@@ -32,6 +32,7 @@ const gameSchema = new mongoose.Schema<
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
       required: false,
+      default: null,
       validate: {
         validator: (v) => v === null || mongoose.Types.ObjectId.isValid(v),
         message: (props) => `${props.value} is not a valid ObjectId or null`,
