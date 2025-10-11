@@ -7,7 +7,7 @@ import type { Document } from 'mongoose';
  * Usage: extend this class and optionally override `normalize` to handle
  * entity-specific normalization (title/name fallbacks, nested populated fields, etc.).
  */
-export abstract class BaseMapper<
+export class BaseMapper<
   TDoc extends Document | Record<string, any>,
   TLean extends Record<string, any>,
   TDto,

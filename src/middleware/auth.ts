@@ -5,7 +5,7 @@ import User from 'api/user/user.model';
 
 // Utilities
 import { UnauthorizedError } from 'utilites/errors';
-import { jwtPrivateKey, tokenHeaderName } from 'utilites/configs';
+import { jwtPrivateKey, jwtCookieName } from 'utilites/configs';
 
 // Types
 import type { Request, Response, NextFunction } from 'express';
@@ -15,7 +15,7 @@ export default async function auth(
   res: Response,
   next: NextFunction
 ) {
-  const token = req.header(tokenHeaderName);
+  const token = req.header(jwtCookieName);
   if (!token) throw new UnauthorizedError('Access denied. No token provided.');
 
   const decoded = jwt.verify(token, jwtPrivateKey) as { _id: string };

@@ -11,12 +11,9 @@ import {
 // Dto
 import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
-import { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
-import { GameResponseDto, GameSummaryResponseDto } from 'api/game/game.dto';
-import {
-  CategoryResponseDto,
-  CategorySummaryResponseDto,
-} from 'api/category/category.dto';
+import { TagResponseDto } from 'api/tag/tag.dto';
+import { GameResponseDto } from 'api/game/game.dto';
+import { CategoryResponseDto } from 'api/category/category.dto';
 
 // Types
 import type { IPostEntity } from 'api/post/post.type';
@@ -30,6 +27,11 @@ export class CreatePostDto {
   @IsString()
   @Length(3, 255)
   title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 150)
+  abstract: string;
 
   @IsNotEmpty()
   @IsString()
@@ -67,6 +69,11 @@ export class UpdatePostDto {
 
   @IsOptional()
   @IsString()
+  @Length(1, 150)
+  abstract: string;
+
+  @IsOptional()
+  @IsString()
   @Length(3)
   content: string;
 
@@ -94,6 +101,9 @@ export class PostResponseDto extends BaseResponseDto {
   title!: string;
 
   @Expose()
+  abstract: string;
+
+  @Expose()
   slug!: string;
 
   @Expose()
@@ -119,16 +129,4 @@ export class PostSummaryResponseDto extends BaseSummaryResponseDto {
 
   @Expose()
   slug!: string;
-
-  @Expose()
-  @Type(() => GameSummaryResponseDto)
-  game: GameSummaryResponseDto;
-
-  @Expose()
-  @Type(() => CategorySummaryResponseDto)
-  category: CategorySummaryResponseDto;
-
-  @Expose()
-  @Type(() => TagSummaryResponseDto)
-  tags: TagSummaryResponseDto[];
 }

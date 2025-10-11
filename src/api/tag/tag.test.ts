@@ -7,7 +7,7 @@ import Tag from 'api/tag/tag.model';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
+import { prefixBaseUrl, jwtCookieName } from 'utilites/configs';
 
 // Types
 import { ITagEntity } from 'api/tag/tag.type';
@@ -48,7 +48,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .post(prefixBaseUrl('/tags'))
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send(payload);
     };
 
@@ -123,7 +123,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .patch(prefixBaseUrl(`/tags/${tagId}`))
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send(payload);
     };
 
@@ -201,7 +201,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .delete(prefixBaseUrl(`/tags/${tagId}`))
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send();
     };
 

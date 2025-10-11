@@ -15,7 +15,11 @@ import type { WithPagination } from 'types/paginate';
 import BaseService from 'services/base.service.module';
 
 /** Mongoose populate option */
-export type PopulateOption = string | string[] | Record<string, unknown>;
+export type PopulateOption =
+  | string
+  | string[]
+  | Record<string, unknown>
+  | Record<string, unknown>[];
 export type GetOneResult<TLean, TDoc> =
   | (TLean extends true ? FlattenMaps<TDoc> : TDoc)
   | null;

@@ -4,10 +4,10 @@ import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 import { isEmail } from 'class-validator';
 
 // Utils
-import { jwtPrivateKey } from 'utilites/configs';
+import { jwtPrivateKey, jwtTokenExpiresIn } from 'utilites/configs';
 
 // Types
-import type { IUser, IUserEntity } from 'api/user/user.types';
+import type { IUserEntity } from 'api/user/user.types';
 
 interface IUserEntityMethods {
   generateAuthToken(): string;
@@ -34,6 +34,7 @@ const userSchema = new Schema<
       type: String,
       trim: true,
       unique: true,
+      lowercase: true,
       required: true,
       immutable: true,
       validate: {
@@ -53,7 +54,9 @@ const userSchema = new Schema<
 );
 
 userSchema.methods.generateAuthToken = function () {
-  return jwt.sign({ _id: this._id, email: this.email }, jwtPrivateKey);
+  return jwt.sign({ _id: this._id, email: this.email }, jwtPrivateKey, {
+    expiresIn: jwtTokenExpiresIn as `${number}d`,
+  });
 };
 
 userSchema.methods.comparePassword = async function (password) {

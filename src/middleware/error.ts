@@ -52,6 +52,14 @@ export default function errorMiddleware(
     isInternalServerError ||
     isUnauthorizedError;
 
+  console.log(
+    isHandledError,
+    error.status,
+    error.cause,
+    error.message,
+    error.name
+  );
+
   sendResponse(res, isHandledError ? error.status || 500 : 500, {
     body: {
       errors: isHandledError ? error.cause : ['Internal server error'],

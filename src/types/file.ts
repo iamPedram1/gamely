@@ -1,3 +1,1 @@
-interface IFileEntity {}
-
-export default IFileEntity;
+export interface IFileEntity {}

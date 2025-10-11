@@ -6,7 +6,7 @@ import request from 'supertest';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
+import { prefixBaseUrl, jwtCookieName } from 'utilites/configs';
 
 // Types
 import { IUserEntity } from 'api/user/user.types';
@@ -43,7 +43,7 @@ describe('auth routes', () => {
     const exec = async () => {
       return await request(server)
         .post(registerURL)
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send(payload);
     };
 
@@ -103,7 +103,7 @@ describe('auth routes', () => {
     const exec = async () => {
       return await request(server)
         .post(loginURL)
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send(payload);
     };
 
@@ -138,7 +138,7 @@ describe('auth routes', () => {
       const result = await exec();
 
       expect(result.status).toBe(200);
-      expect(result.headers).toHaveProperty(tokenHeaderName);
+      expect(result.headers).toHaveProperty(jwtCookieName);
     });
   });
 });

@@ -7,7 +7,7 @@ import Game from 'api/game/game.model';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, tokenHeaderName } from 'utilites/configs';
+import { prefixBaseUrl, jwtCookieName } from 'utilites/configs';
 
 // Types
 import { IGameEntity } from 'api/game/game.type';
@@ -47,7 +47,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .post(prefixBaseUrl('/games'))
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send(payload);
     };
 
@@ -122,7 +122,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .patch(prefixBaseUrl(`/games/${gameId}`))
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send(payload);
     };
 
@@ -200,7 +200,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .delete(prefixBaseUrl(`/games/${gameId}`))
-        .set(tokenHeaderName, token)
+        .set(jwtCookieName, token)
         .send();
     };
 

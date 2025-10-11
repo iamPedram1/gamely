@@ -27,7 +27,12 @@ export default class PostController {
     const { pagination, docs } = await this.postService.find({
       reqQuery,
       lean: true,
-      populate: 'category game tags creator',
+      populate: [
+        { path: 'category', populate: { path: 'creator' } },
+        { path: 'game' },
+        { path: 'tags' },
+        { path: 'creator' },
+      ],
     });
 
     sendResponse(res, 200, {
@@ -47,7 +52,7 @@ export default class PostController {
     const { pagination, docs } = await this.postService.find({
       reqQuery,
       lean: true,
-      populate: 'category game tags',
+      populate: 'category game tags creator',
     });
 
     sendResponse(res, 200, {
@@ -65,7 +70,7 @@ export default class PostController {
   getOne: RequestHandler = async (req, res) => {
     const post = await this.postService.getOneById(req.params.id, {
       lean: true,
-      populate: 'category game tags',
+      populate: 'category game tags creator',
     });
 
     sendResponse(res, post ? 200 : 400, {

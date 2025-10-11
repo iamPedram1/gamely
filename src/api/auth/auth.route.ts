@@ -12,17 +12,20 @@ import validateBody from 'middleware/validateBody';
 
 // DTO
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
+import { authLimiter } from 'middleware/rateLimitter';
 
 const authRouter = express.Router();
 const userService = new UserService();
 const authController = new AuthController(userService);
 
 authRouter.post('/login', [
+  authLimiter,
   blockRequestWithToken,
   validateBody(LoginDto),
   authController.login,
 ]);
 authRouter.post('/register', [
+  authLimiter,
   blockRequestWithToken,
   validateBody(RegisterDto),
   authController.register,

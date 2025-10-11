@@ -4,7 +4,7 @@ interface CustomErrorOptions {
 
 export class ValidationError extends Error {
   cause: string[];
-  status: 400;
+  status = 400;
 
   constructor(message: string, options?: CustomErrorOptions) {
     super(message);
@@ -21,7 +21,7 @@ export class ValidationError extends Error {
 
 export class NotFoundError extends Error {
   cause: string[];
-  status: 404;
+  status = 404;
 
   constructor(message: string, options?: CustomErrorOptions) {
     super(message);
@@ -33,7 +33,7 @@ export class NotFoundError extends Error {
 }
 
 export class BadRequestError extends Error {
-  status: 400;
+  status = 400;
   cause: string[];
 
   constructor(message: string, options?: CustomErrorOptions) {
@@ -46,7 +46,7 @@ export class BadRequestError extends Error {
 }
 
 export class InternalServerError extends Error {
-  status: 500;
+  status = 500;
   cause: string[];
 
   constructor(message: string, options?: CustomErrorOptions) {
@@ -59,7 +59,7 @@ export class InternalServerError extends Error {
 }
 
 export class ForbiddenError extends Error {
-  status: 403;
+  status = 403;
   cause: string[];
 
   constructor(message: string, options?: CustomErrorOptions) {
@@ -72,7 +72,7 @@ export class ForbiddenError extends Error {
 }
 
 export class UnauthorizedError extends Error {
-  status: 403;
+  status = 401;
   cause: string[];
 
   constructor(message: string, options?: CustomErrorOptions) {

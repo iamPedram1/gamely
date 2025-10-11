@@ -20,7 +20,7 @@ export default class UserService implements IUserService {
   async login(data: LoginDto) {
     const message = 'Email or password is incorrect.';
 
-    const user = await this.getUserByEmail(data.email, true);
+    const user = await this.getUserByEmail(data.email.toLowerCase(), true);
 
     if (!user) throw new ValidationError(message);
 
@@ -31,9 +31,7 @@ export default class UserService implements IUserService {
   }
 
   async comparePassword(password: string, hash: string) {
-    const isPasswordCorrect = await bcryptjs.compare(password, hash);
-    if (!isPasswordCorrect)
-      throw new ValidationError('Email or password is incorrect.');
+    return await bcryptjs.compare(password, hash);
   }
 
   async hashPassword(password: string) {

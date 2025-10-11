@@ -18,6 +18,13 @@ const postSchema = new mongoose.Schema<
       maxlength: 255,
       required: true,
     },
+    abstract: {
+      type: String,
+      trim: true,
+      minlength: 1,
+      maxLength: 150,
+      required: true,
+    },
     content: {
       type: String,
       trim: true,

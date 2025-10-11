@@ -74,7 +74,7 @@ export default class BaseMutateService<
       );
     }
 
-    return await q.exec();
+    return result;
   }
 
   async batchDelete(
