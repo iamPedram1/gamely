@@ -26,6 +26,7 @@ export default class GameController {
     const { pagination, docs } = await this.gameService.find({
       reqQuery,
       lean: true,
+      populate: ['coverImage', 'creator'],
     });
 
     sendResponse(res, 200, {
@@ -60,7 +61,10 @@ export default class GameController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const game = await this.gameService.getOneById(req.params.id);
+    const game = await this.gameService.getOneById(req.params.id, {
+      lean: true,
+      populate: 'coverImage',
+    });
 
     sendResponse(res, game ? 200 : 400, {
       httpMethod: 'GET',
@@ -72,7 +76,9 @@ export default class GameController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const game = await this.gameService.create(req.body, req.user._id);
+    const game = await this.gameService.create(req.body, req.user._id, {
+      populate: 'coverImage creator',
+    });
 
     sendResponse(res, game ? 201 : 400, {
       httpMethod: 'POST',
@@ -82,10 +88,9 @@ export default class GameController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const game = await this.gameService.deleteOneById(req.params.id);
-    const deleted = game.deletedCount > 0;
+    await this.gameService.deleteOneById(req.params.id);
 
-    sendResponse(res, deleted ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'Game',
     });
@@ -109,7 +114,10 @@ export default class GameController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const body = await this.gameService.updateOneById(req.params.id, req.body);
+    const body = await this.gameService.updateOneById(req.params.id, req.body, {
+      populate: 'coverImage creator',
+      lean: true,
+    });
 
     if (!body) throw new ValidationError('Error in updating game');
 

@@ -1,5 +1,4 @@
 import { delay, inject, injectable } from 'tsyringe';
-import type { RequestHandler } from 'express';
 
 // Service
 import CategoryService from 'api/category/category.service';
@@ -12,6 +11,7 @@ import sendResponse from 'utilites/response';
 import { InternalServerError } from 'utilites/errors';
 
 // Types
+import type { RequestHandler } from 'express';
 import type { IRequestQueryBase } from 'types/query';
 
 @injectable()
@@ -78,11 +78,11 @@ export default class CategoryController {
       lean: true,
     });
 
-    sendResponse(res, category ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Category',
       body: {
-        data: category ? this.categoryMapper.toDto(category) : null,
+        data: this.categoryMapper.toDto(category),
       },
     });
   };
@@ -92,19 +92,17 @@ export default class CategoryController {
       lean: true,
     });
 
-    sendResponse(res, category ? 201 : 400, {
+    sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'Category',
-      body: { data: category ? this.categoryMapper.toDto(category) : null },
+      body: { data: this.categoryMapper.toDto(category) },
     });
   };
 
   delete: RequestHandler = async (req, res) => {
-    const { deletedCount } = await this.categoryService.deleteOneById(
-      req.params.id
-    );
+    await this.categoryService.deleteOneById(req.params.id);
 
-    sendResponse(res, deletedCount > 0 ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'Category',
     });

@@ -26,13 +26,7 @@ export default class PostController {
     const { pagination, docs } = await this.postService.find({
       reqQuery,
       lean: true,
-      populate: [
-        { path: 'category', populate: { path: 'creator' } },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-        { path: 'creator' },
-      ],
+      populate: 'category game tags coverImage creator',
     });
 
     sendResponse(res, 200, {
@@ -52,7 +46,7 @@ export default class PostController {
     const { pagination, docs } = await this.postService.find({
       reqQuery,
       lean: true,
-      populate: 'category game tags creator',
+      populate: 'category game tags coverImage creator',
     });
 
     sendResponse(res, 200, {
@@ -70,7 +64,7 @@ export default class PostController {
   getOne: RequestHandler = async (req, res) => {
     const post = await this.postService.getOneById(req.params.id, {
       lean: true,
-      populate: 'category game tags creator',
+      populate: 'category game tags coverImage creator',
     });
 
     sendResponse(res, post ? 200 : 400, {
@@ -83,7 +77,10 @@ export default class PostController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const post = await this.postService.create(req.body, req.user._id);
+    const post = await this.postService.create(req.body, req.user._id, {
+      lean: true,
+      populate: 'category game tags coverImage creator',
+    });
 
     sendResponse(res, post ? 201 : 400, {
       httpMethod: 'POST',
@@ -93,10 +90,9 @@ export default class PostController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const post = await this.postService.deleteOneById(req.params.id);
-    const deleted = post.deletedCount > 0;
+    await this.postService.deleteOneById(req.params.id);
 
-    sendResponse(res, deleted ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'Post',
     });
@@ -120,7 +116,10 @@ export default class PostController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const body = await this.postService.updateOneById(req.params.id, req.body);
+    const body = await this.postService.updateOneById(req.params.id, req.body, {
+      lean: true,
+      populate: 'category game tags coverImage creator',
+    });
 
     if (!body) throw new ValidationError('Error in updating post');
 

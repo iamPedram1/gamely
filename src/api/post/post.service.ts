@@ -16,19 +16,20 @@ import { PostValidation } from 'api/post/post.validation';
 
 // Utilities
 import logger from 'utilites/logger';
-import { NotFoundError } from 'utilites/errors';
 
 // Types
-import type { DeleteResult } from 'mongoose';
+import type { Document, Types } from 'mongoose';
 import type { IPostEntity } from 'api/post/post.type';
 import type { PostDocument } from 'api/post/post.model';
+import type { BaseMutateOptions } from 'services/base.service.type';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()
 class PostService extends BaseService<
   IPostEntity,
   CreatePostDto,
-  UpdatePostDto
+  UpdatePostDto,
+  PostDocument
 > {
   constructor(
     @inject(delay(() => FileService)) private fileService: FileService,
@@ -49,17 +50,33 @@ class PostService extends BaseService<
     });
   }
 
-  async create(data: CreatePostDto, userId?: string): Promise<PostDocument> {
+  async create(
+    data: CreatePostDto,
+    userId?: string,
+    options?: BaseMutateOptions
+  ): Promise<
+    Document<unknown, {}, IPostEntity, {}, {}> &
+      IPostEntity &
+      Required<{ _id: Types.ObjectId }> & { __v: number }
+  > {
     await Promise.all([
       this.postValidation.validateGame(data.game),
       this.postValidation.validateTags(data.tags),
       this.postValidation.validateCategory(data.category),
     ]);
 
-    return await super.create(data, userId);
+    return await super.create(data, userId, options);
   }
 
-  async updateOneById(id: string, payload: UpdatePostDto) {
+  async updateOneById(
+    id: string,
+    payload: Partial<UpdatePostDto>,
+    options?: BaseMutateOptions
+  ): Promise<
+    Document<unknown, {}, IPostEntity, {}, {}> &
+      IPostEntity &
+      Required<{ _id: Types.ObjectId }> & { __v: number }
+  > {
     await Promise.all([
       ...(payload.game ? [this.postValidation.validateGame(payload.game)] : []),
       ...(payload.tags ? [this.postValidation.validateTags(payload.tags)] : []),
@@ -68,14 +85,12 @@ class PostService extends BaseService<
         : []),
     ]);
 
-    return await super.updateOneById(id, payload);
+    return await super.updateOneById(id, payload, options);
   }
 
-  async deleteOneById(id: string): Promise<DeleteResult> {
+  async deleteOneById(id: string): Promise<true> {
     return this.withTransaction(async (session) => {
       const post = await super.getOneById(id, { lean: true });
-      if (!post)
-        throw new NotFoundError('Post with the given id was not found.');
 
       // Delete the post itself first
       const result = await super.deleteOneById(id, { session });

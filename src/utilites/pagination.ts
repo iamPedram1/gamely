@@ -6,7 +6,7 @@ interface IPaginationConfig {
   limit: number;
 }
 
-export default async function paginate<TResult, TDoc extends Document>(
+export default async function paginate<TResult, TDoc>(
   query: Query<TResult[], TDoc>,
   configs?: Partial<IPaginationConfig>
 ): Promise<WithPagination<FlattenMaps<TResult>>> {

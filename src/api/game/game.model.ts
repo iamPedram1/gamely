@@ -26,7 +26,7 @@ const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
       lowercase: true,
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
     },
-    image: {
+    coverImage: {
       default: null,
       type: Schema.Types.ObjectId,
       ref: 'File',

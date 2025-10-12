@@ -5,7 +5,7 @@ export interface IGameEntity {
   _id: Types.ObjectId;
   title: string;
   slug: string;
-  image: Types.ObjectId | null;
+  coverImage: Types.ObjectId | null;
   creator: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;

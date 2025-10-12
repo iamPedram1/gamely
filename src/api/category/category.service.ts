@@ -45,17 +45,13 @@ class CategoryService extends BaseService<
   }
 
   async create(
-    data: Partial<CreateCategoryDto>,
+    data: CreateCategoryDto,
     userId?: string,
     options?: BaseMutateOptions
-  ): Promise<
-    Document<unknown, {}, ICategoryEntity, {}, {}> &
-      ICategoryEntity &
-      Required<{ _id: Types.ObjectId }> & { __v: number }
-  > {
+  ): Promise<CategoryDocument> {
     if (data.parentId) {
-      const parentExists = await super.existsBySlug(data.parentId);
-      if (!parentExists)
+      const exists = await super.existsBySlug(data.parentId);
+      if (!exists)
         throw new NotFoundError(
           'Category with the provided categoryId does not exist'
         );
@@ -63,21 +59,25 @@ class CategoryService extends BaseService<
     return await super.create(data, userId, options);
   }
 
-  async updateOneById(categoryId: string, payload: UpdateCategoryDto) {
+  async updateOneById(
+    id: string,
+    payload: Partial<UpdateCategoryDto>,
+    options?: BaseMutateOptions
+  ): Promise<CategoryDocument> {
     const [category, descendants] = await Promise.all([
-      this.getOneById(categoryId) as Promise<CategoryDocument>,
-      this.getAllDescendantIds(categoryId),
+      this.getOneById(id),
+      this.getAllDescendantIds(id),
     ]);
 
     const isIdChanged =
       'parentId' in payload
-        ? (String(category.parentId || '') || null) !== payload.parentId
+        ? (String(category.parentId) || null) !== payload.parentId
         : false;
 
-    if (isIdChanged && descendants.includes(payload.parentId))
+    if (isIdChanged && descendants.includes(payload.parentId as string))
       throw new BadRequestError('parentId: Circular relationship detected');
 
-    if (payload.parentId === categoryId)
+    if (payload.parentId === id)
       throw new BadRequestError(
         'parentId: A category cannot be its own parent.'
       );
@@ -86,18 +86,19 @@ class CategoryService extends BaseService<
     if (payload.slug) category.set('slug', payload.slug);
     if (payload.parentId) category.set('parentId', payload.parentId);
 
-    return await category.save();
+    return await category.save({ session: options?.session });
   }
 
-  async deleteOneById(id: string): Promise<DeleteResult> {
+  async deleteOneById<TThrowError extends boolean = true>(
+    id: string,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? true : boolean> {
     return this.withTransaction(async (session) => {
+      const deleted = await super.deleteOneById(id);
       await this.removeChildrens(id, session);
       await this.postService.deleteManyByKey('category', id, { session });
-      const deleteResult = await super.deleteOneById(id);
-      if (deleteResult.deletedCount === 0)
-        throw new InternalServerError('Service was unable to delete category.');
 
-      return deleteResult;
+      return deleted;
     });
   }
 

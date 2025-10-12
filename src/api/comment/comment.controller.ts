@@ -73,10 +73,9 @@ export default class CommentController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const comment = await this.commentService.deleteOneById(req.params.id);
-    const deleted = comment.deletedCount > 0;
+    await this.commentService.deleteOneById(req.params.id);
 
-    sendResponse(res, deleted ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'Comment',
     });

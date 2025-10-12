@@ -64,11 +64,11 @@ export default class TagController {
   getOne: RequestHandler = async (req, res) => {
     const tag = await this.tagService.getOneById(req.params.id, { lean: true });
 
-    sendResponse(res, tag ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Tag',
       body: {
-        data: tag ? this.tagMapper.toDto(tag) : null,
+        data: this.tagMapper.toDto(tag),
       },
     });
   };
@@ -77,7 +77,7 @@ export default class TagController {
     const dto = req.body as CreateTagDto;
     const tag = await this.tagService.create(dto, req.user._id);
 
-    sendResponse(res, tag ? 201 : 400, {
+    sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'Tag',
       body: { data: this.tagMapper.toDto(tag) },
@@ -85,10 +85,9 @@ export default class TagController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    const tag = await this.tagService.deleteOneById(req.params.id);
-    const deleted = tag.deletedCount > 0;
+    await this.tagService.deleteOneById(req.params.id);
 
-    sendResponse(res, deleted ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'Tag',
     });

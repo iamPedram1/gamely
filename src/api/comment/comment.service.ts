@@ -1,4 +1,4 @@
-import type { Document, Types } from 'mongoose';
+import { singleton } from 'tsyringe';
 
 // Models
 import Comment from 'api/comment/comment.model';
@@ -13,22 +13,22 @@ import BaseService from 'services/base.service.module';
 import { NotFoundError } from 'utilites/errors';
 
 // Types
+import type { Document, Types } from 'mongoose';
+import type { WithPagination } from 'types/paginate';
 import type { IRequestQueryBase } from 'types/query';
+import type { CommentType, ICommentEntity } from 'api/comment/comment.type';
 import type {
   BaseMutateOptions,
   IBaseService,
 } from 'services/base.service.type';
-import type { WithPagination } from 'types/paginate';
-import type { CommentType, ICommentEntity } from 'api/comment/comment.type';
 import type {
   CommentDocument,
   CommentLeanDocument,
 } from 'api/comment/comment.model';
-import { singleton } from 'tsyringe';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;
-  type: CommentType;
+  type?: CommentType;
   threadId?: Types.ObjectId | null;
 };
 
@@ -49,7 +49,8 @@ type CommentWithReplies = CommentLeanDocument & {
 class CommentService extends BaseService<
   ICommentEntity,
   CreateCommentInput,
-  UpdateCommentDto
+  UpdateCommentDto,
+  CommentDocument
 > {
   constructor() {
     super(Comment);
@@ -86,7 +87,7 @@ class CommentService extends BaseService<
   }
 
   async create(
-    data: Partial<CreateCommentInput>,
+    data: CreateCommentInput,
     userId?: string,
     options?: BaseMutateOptions
   ): Promise<
@@ -98,8 +99,6 @@ class CommentService extends BaseService<
       const comment = await this.getOneById(data.replyToCommentId, {
         lean: true,
       });
-      if (!comment)
-        throw new NotFoundError('Comment with the given id does not exist');
       data.type = 'reply';
       data.threadId = comment.threadId || comment._id;
     } else data.type = 'main';

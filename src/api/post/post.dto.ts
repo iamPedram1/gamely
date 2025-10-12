@@ -9,11 +9,11 @@ import {
 } from 'class-validator';
 
 // Dto
-import { TagResponseDto } from 'api/tag/tag.dto';
+import { TagSummaryResponseDto } from 'api/tag/tag.dto';
 import { GameResponseDto } from 'api/game/game.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { UserSummaryResponseDto } from 'api/user/user.dto';
-import { CategoryResponseDto } from 'api/category/category.dto';
+import { CategorySummaryResponseDto } from 'api/category/category.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 
 // Types
@@ -117,16 +117,16 @@ export class PostResponseDto extends BaseResponseDto {
   game: GameResponseDto;
 
   @Expose()
-  @Type(() => CategoryResponseDto)
-  category: CategoryResponseDto;
+  @Type(() => CategorySummaryResponseDto)
+  category: CategorySummaryResponseDto;
 
   @Expose()
   @Type(() => FileSummaryResponseDto)
   coverImage!: IFileSummary;
 
   @Expose()
-  @Type(() => TagResponseDto)
-  tags: TagResponseDto[];
+  @Type(() => TagSummaryResponseDto)
+  tags: TagSummaryResponseDto[];
 }
 
 export class PostSummaryResponseDto extends BaseSummaryResponseDto {

@@ -24,17 +24,19 @@ import type { IFileEntity, IFileLocation } from 'api/file/file.type';
 export type IFileService = InstanceType<typeof FileService>;
 
 @singleton()
-class FileService extends BaseService<IFileEntity, undefined, undefined> {
+class FileService extends BaseService<
+  IFileEntity,
+  undefined,
+  undefined,
+  FileDocument
+> {
   constructor() {
     super(File);
   }
 
-  async deleteOneById(
-    id: string,
-    options?: BaseMutateOptions
-  ): Promise<DeleteResult> {
+  async deleteOneById(id: string, options?: BaseMutateOptions): Promise<true> {
     const file = await super.getOneById(id, { lean: true });
-    if (!file) throw new NotFoundError('File with the given id was not found.');
+    const result = await super.deleteOneById(id, options);
 
     try {
       await fsPromises.access(file.path);
@@ -46,12 +48,6 @@ class FileService extends BaseService<IFileEntity, undefined, undefined> {
         );
       }
     }
-
-    const result = await super.deleteOneById(id, options);
-    if (result.deletedCount === 0)
-      throw new InternalServerError(
-        'An unexpected error occured while deleting file.'
-      );
 
     return result;
   }

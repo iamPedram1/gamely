@@ -19,145 +19,94 @@ import {
 
 // Types
 import type { IApiBatchResponse } from 'utilites/response';
-import type {
-  BaseMutateOptions,
-  IBaseMutateService,
-} from './base.service.type';
+import type { BaseMutateOptions } from './base.service.type';
 
-export default class BaseMutateService<
+/**
+ * Base service for CRUD and mutation operations on Mongoose models.
+ */
+class BaseMutateService<
   TSchema,
-  TCreateDto,
-  TUpdateDto,
+  TCreateDto = Partial<TSchema>,
+  TUpdateDto = Partial<TSchema>,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
-> implements IBaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>
-{
+> {
   constructor(protected readonly model: Model<TSchema>) {}
 
-  async deleteOneById(
-    id: string,
-    options?: BaseMutateOptions
-  ): Promise<DeleteResult> {
-    const q = this.model.deleteOne({ _id: id });
+  // --------------------------------------------------------------------------
+  // Create
+  // --------------------------------------------------------------------------
 
-    this.applyMutateOptions(q, options);
+  async create<TThrowError extends boolean = true>(
+    data: TCreateDto,
+    userId?: string,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
+    const doc = await new this.model({
+      ...data,
+      ...(userId && { creator: userId }),
+    } as any).save({ session: options?.session });
 
-    const result = await q.exec();
-
-    if (result.deletedCount === 0) {
-      throw new NotFoundError(
-        `${this.model.modelName} with the given id was not found`
-      );
-    }
-
-    return result;
-  }
-
-  async deleteManyByKey(
-    keyName: keyof AnyKeys<TSchema>,
-    matchValue: TSchema[typeof keyName],
-    options?: BaseMutateOptions
-  ): Promise<DeleteResult> {
-    const q = this.model.deleteMany({
-      [keyName]: matchValue,
-    } as FilterQuery<TSchema>);
-
-    this.applyMutateOptions(q, options);
-    const result = await q.exec();
-
-    if (result.deletedCount === 0) {
-      throw new NotFoundError(
-        `${this.model.modelName} with the given ${String(keyName || 'key')} was not found`
-      );
-    }
-
-    return result;
-  }
-
-  async batchDelete(
-    ids: string[],
-    options?: BaseMutateOptions
-  ): Promise<IApiBatchResponse> {
-    if (!ids || !Array.isArray(ids) || ids.length === 0)
-      throw new ValidationError('Ids field cannot be empty');
-
-    // Single bulk delete
-    let q = this.model.deleteMany({ _id: { $in: ids } });
-    this.applyMutateOptions(q, options);
-
-    const result = await q.exec();
-    if (!result.acknowledged) {
+    if (!doc && (options?.throwError ?? true)) {
       throw new InternalServerError(
-        `Batch delete failed for ${this.model.modelName}`
+        `${this.model.modelName} could not be created`
       );
     }
 
-    // All IDs that were successfully deleted
-    const successIds = ids.slice(0, result.deletedCount);
-    const failedIds = ids.slice(result.deletedCount);
+    if (options?.populate) {
+      await (doc as any).populate(options.populate as any);
+    }
 
-    return {
-      results: ids.map((id) => ({
-        id,
-        success: successIds.includes(id),
-        message: successIds.includes(id)
-          ? 'Deleted successfully'
-          : 'Document does not exist',
-      })),
-      errors: failedIds.length > 0 ? ['Some documents not found'] : [],
-      failedIds,
-      successIds,
-      totalCount: ids.length,
-      successCount: result.deletedCount,
-      isAllSucceed: result.deletedCount === ids.length,
-    };
+    return doc as TDoc;
   }
 
-  async removeIdFromArrayField(
-    keyName: keyof AnyKeys<TSchema>,
+  // --------------------------------------------------------------------------
+  // Update Operations
+  // --------------------------------------------------------------------------
+
+  async updateOneById<TThrowError extends boolean = true>(
     id: string,
-    options?: BaseMutateOptions
-  ): Promise<UpdateResult> {
-    const q = this.model.updateMany(
-      { [keyName]: { $in: [id] } } as FilterQuery<TSchema>,
-      { $pull: { [keyName]: id } } as
-        | UpdateWithAggregationPipeline
-        | UpdateQuery<TSchema>
+    payload: Partial<TUpdateDto>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
+    const query = this.model.findByIdAndUpdate(
+      id,
+      payload as unknown as UpdateQuery<TSchema>,
+      { new: true }
     );
 
-    this.applyMutateOptions(q, options);
+    const doc = await this.applyMutateOptions(query, options).exec();
 
-    const result = await q.exec();
-
-    if (result.matchedCount === 0) {
+    if (!doc && (options?.throwError ?? true)) {
       throw new NotFoundError(
-        `No ${this.model.modelName} documents found containing id in '${String(
-          keyName
-        )}'`
+        `${this.model.modelName} with id (${id}) not found`
       );
     }
 
-    return result;
+    return doc as TThrowError extends true ? TDoc : TDoc | null;
   }
 
-  async removeIdsFromArrayField(
-    keyName: keyof TSchema,
-    ids: string[],
+  async updateManyByKey(
+    keyName: keyof AnyKeys<TSchema>,
+    matchValue: any,
+    data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    const q = this.model.updateMany(
-      { [keyName]: { $in: ids } } as FilterQuery<TSchema>,
-      { $pull: { [keyName]: { $in: ids } } } as
-        | UpdateWithAggregationPipeline
-        | UpdateQuery<TSchema>
+    const query = this.model.updateMany(
+      { [keyName]: matchValue } as FilterQuery<TSchema>,
+      data
     );
 
-    this.applyMutateOptions(q, options);
-
-    const result = await q.exec();
+    const result = await this.applyMutateOptions(query, options).exec();
 
     if (result.matchedCount === 0) {
       throw new NotFoundError(
-        `No ${this.model.modelName} documents found containing given IDs`
+        `${this.model.modelName} with ${String(keyName)} not found`
+      );
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError(
+        `${this.model.modelName} matched but could not be updated`
       );
     }
 
@@ -170,136 +119,168 @@ export default class BaseMutateService<
     value: TSchema[K],
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    const q = this.model.updateMany(
-      { [referenceKey]: id } as FilterQuery<TSchema>,
-      { [referenceKey]: value } as
-        | UpdateWithAggregationPipeline
-        | UpdateQuery<TSchema>
-    );
-
-    this.applyMutateOptions(q, options);
-
-    const result = await q.exec();
-
-    if (result.matchedCount === 0) {
-      throw new NotFoundError(
-        `No ${this.model.modelName} documents found matching given reference`
-      );
-    }
-
-    return result;
+    return this.updateManyByReferences([id], referenceKey, value, options);
   }
 
   async updateManyByReferences<K extends keyof TSchema>(
-    id: string[],
+    ids: string[],
     referenceKey: K,
     value: TSchema[K],
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    const q = this.model.updateMany(
-      { [referenceKey]: { $in: id } } as FilterQuery<TSchema>,
-      { [referenceKey]: value } as
-        | UpdateWithAggregationPipeline
-        | UpdateQuery<TSchema>
+    const query = this.model.updateMany(
+      { [referenceKey]: { $in: ids } } as FilterQuery<TSchema>,
+      { [referenceKey]: value } as UpdateQuery<TSchema>
     );
 
-    this.applyMutateOptions(q, options);
-
-    const result = await q.exec();
+    const result = await this.applyMutateOptions(query, options).exec();
 
     if (result.matchedCount === 0) {
       throw new NotFoundError(
-        `No ${this.model.modelName} documents found matching given references`
+        `No ${this.model.modelName} documents found with matching references`
       );
     }
 
     return result;
   }
 
-  async create(
-    data: Partial<TCreateDto>,
-    userId?: string,
-    options: BaseMutateOptions = {}
-  ): Promise<TDoc> {
-    const { session } = options;
+  // --------------------------------------------------------------------------
+  // Delete Operations
+  // --------------------------------------------------------------------------
 
-    const doc = (await new this.model({
-      ...data,
-      ...(userId && { creator: userId }),
-    }).save({ session })) as TDoc;
-
-    if (!doc)
-      throw new InternalServerError(
-        `${this.model.modelName} could not be created`
-      );
-
-    return doc;
-  }
-
-  async updateOneById(
+  async deleteOneById<TThrowError extends boolean = true>(
     id: string,
-    payload: Partial<TUpdateDto>,
-    options?: BaseMutateOptions
-  ): Promise<TDoc> {
-    let q: Query<TDoc | null, TDoc> = this.model.findByIdAndUpdate(
-      id,
-      payload as unknown as UpdateQuery<TSchema>,
-      { new: true }
-    );
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? true : boolean> {
+    const query = this.model.deleteOne({ _id: id } as FilterQuery<TSchema>);
+    const result = await this.applyMutateOptions(query, options).exec();
 
-    this.applyMutateOptions(q, options);
+    const deleted = result.deletedCount > 0;
 
-    const doc = await q.exec();
-
-    if (!doc) {
+    if ((options?.throwError ?? true) && !deleted) {
       throw new NotFoundError(
-        `${this.model.modelName} with the given id was not found`
+        `${this.model.modelName} with id (${id}) not found`
       );
     }
 
-    return doc;
+    return ((options?.throwError ?? true) ? true : deleted) as any;
   }
 
-  async updateManyByKey(
+  async deleteManyByKey(
     keyName: keyof AnyKeys<TSchema>,
-    matchValue: TSchema[typeof keyName],
-    data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
+    matchValue: any,
+    options?: BaseMutateOptions
+  ): Promise<DeleteResult> {
+    const query = this.model.deleteMany({
+      [keyName]: matchValue,
+    } as FilterQuery<TSchema>);
+
+    const result = await this.applyMutateOptions(query, options).exec();
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundError(
+        `${this.model.modelName} with ${String(keyName)} not found`
+      );
+    }
+
+    return result;
+  }
+
+  async batchDelete(
+    ids: string[],
+    options?: BaseMutateOptions
+  ): Promise<IApiBatchResponse> {
+    if (!ids?.length) {
+      throw new ValidationError('Ids array cannot be empty');
+    }
+
+    const query = this.model.deleteMany({
+      _id: { $in: ids },
+    } as FilterQuery<TSchema>);
+    const result = await this.applyMutateOptions(query, options).exec();
+
+    if (!result.acknowledged) {
+      throw new InternalServerError(
+        `Batch delete failed for ${this.model.modelName}`
+      );
+    }
+
+    const successIds = ids.slice(0, result.deletedCount);
+    const failedIds = ids.slice(result.deletedCount);
+
+    return {
+      results: ids.map((id) => ({
+        id,
+        success: successIds.includes(id),
+        message: successIds.includes(id)
+          ? 'Deleted successfully'
+          : 'Document not found',
+      })),
+      errors: failedIds.length > 0 ? ['Some documents not found'] : [],
+      failedIds,
+      successIds,
+      totalCount: ids.length,
+      successCount: result.deletedCount,
+      isAllSucceed: result.deletedCount === ids.length,
+    };
+  }
+
+  // --------------------------------------------------------------------------
+  // Array Field Operations
+  // --------------------------------------------------------------------------
+
+  async removeIdFromArrayField(
+    keyName: keyof AnyKeys<TSchema>,
+    id: string,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    const q = this.model.updateMany(
-      { [keyName]: matchValue } as FilterQuery<TSchema>,
-      data
+    return this.removeIdsFromArrayField(keyName, [id], options);
+  }
+
+  async removeIdsFromArrayField(
+    keyName: keyof TSchema,
+    ids: string[],
+    options?: BaseMutateOptions
+  ): Promise<UpdateResult> {
+    const query = this.model.updateMany(
+      { [keyName]: { $in: ids } } as FilterQuery<TSchema>,
+      { $pull: { [keyName]: { $in: ids } } } as UpdateQuery<TSchema>
     );
 
-    this.applyMutateOptions(q, options);
-
-    const result = await q.exec();
+    const result = await this.applyMutateOptions(query, options).exec();
 
     if (result.matchedCount === 0) {
       throw new NotFoundError(
-        `${this.model.modelName} with the given ${String(keyName)} was not found`
-      );
-    }
-
-    if (result.modifiedCount === 0) {
-      throw new InternalServerError(
-        `${this.model.modelName} documents matched but could not be updated`
+        `No ${this.model.modelName} documents found with matching ${String(keyName)}`
       );
     }
 
     return result;
   }
 
-  private applyMutateOptions(
-    query: Query<any, any>,
+  // --------------------------------------------------------------------------
+  // Options Application
+  // --------------------------------------------------------------------------
+
+  /**
+   * Applies common mutate options such as session or lean.
+   * @param query - Mongoose query.
+   * @param options - Session or lean options.
+   * @returns Modified query instance.
+   */
+  protected applyMutateOptions<TResult = any>(
+    query: Query<TResult, any>,
     options?: BaseMutateOptions
-  ): Query<TDoc | null, TDoc> {
-    if (!options) return query;
+  ): Query<any, any> {
+    if (!options) return query as any;
 
-    if (options.session && 'session' in query)
-      query = query.session(options.session);
-    if (options.lean && 'lean' in query) query = query.lean();
+    let q: any = query;
 
-    return query;
+    if (options.session) q = q.session(options.session);
+    if (options.lean) q = q.lean();
+
+    return q;
   }
 }
+
+export default BaseMutateService;

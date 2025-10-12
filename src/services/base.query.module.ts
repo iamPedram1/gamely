@@ -1,136 +1,175 @@
-import type {
-  Model,
-  Query,
-  HydratedDocument,
-  FlattenMaps,
-  FilterQuery,
-} from 'mongoose';
-
-// Utilities
 import paginate from 'utilites/pagination';
+import { NotFoundError } from 'utilites/errors';
 
 // Types
-import type { WithPagination } from 'types/paginate';
-import type {
+import type { Model, Query, HydratedDocument, FilterQuery } from 'mongoose';
+import {
   BaseQueryOptions,
-  IBaseQueryService,
+  FindResult,
+  NullableQueryResult,
 } from 'services/base.service.type';
 
-export default class BaseQueryService<
+/**
+ * Generic base service for query operations (read-only) on Mongoose models.
+ * Provides reusable methods for finding, checking, and listing documents.
+ *
+ * @template TSchema - Mongoose schema type.
+ * @template TDoc - Hydrated document type (defaults to HydratedDocument<TSchema>).
+ */
+class BaseQueryService<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
-> implements IBaseQueryService<TSchema, TDoc>
-{
+> {
   constructor(protected readonly model: Model<TSchema>) {}
 
-  private async exists(filter: FilterQuery<TSchema>): Promise<boolean> {
+  // --------------------------------------------------------------------------
+  // Existence Checks
+  // --------------------------------------------------------------------------
+
+  /**
+   * Checks if a document exists matching a filter.
+   * @param filter - MongoDB query filter.
+   * @returns True if a document exists, false otherwise.
+   */
+  protected async exists(filter: FilterQuery<TSchema>): Promise<boolean> {
     const res = await this.model.exists(filter).exec();
     return !!res;
-  }
-
-  async existsBySlug(slug: string): Promise<boolean> {
-    return this.exists({ slug } as FilterQuery<TSchema>);
   }
 
   async existsById(id: string): Promise<boolean> {
     return this.exists({ _id: id } as FilterQuery<TSchema>);
   }
 
+  async existsBySlug(slug: string): Promise<boolean> {
+    return this.exists({ slug } as FilterQuery<TSchema>);
+  }
+
   async existsByKey<K extends keyof TSchema>(
     key: K,
-    match: TSchema[K] | string
+    match: TSchema[K]
   ): Promise<boolean> {
-    return await this.exists({ [key]: match } as FilterQuery<TSchema>);
+    return this.exists({ [key]: match } as FilterQuery<TSchema>);
   }
 
-  async getBySlug<TLean extends boolean = false>(
+  // --------------------------------------------------------------------------
+  // Single Document Queries
+  // --------------------------------------------------------------------------
+
+  async getOneById<
+    TLean extends boolean = false,
+    TThrowError extends boolean = true,
+  >(
+    id: string,
+    options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
+      lean?: TLean;
+      throwError?: TThrowError;
+    }
+  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+    const query = this.model.findById(id);
+    const result = await this.applyQueryOptions(query, options).exec();
+
+    if (!result && (options?.throwError ?? true)) {
+      throw new NotFoundError(
+        `${this.model.modelName} with id (${id}) not found`
+      );
+    }
+
+    return result as NullableQueryResult<TDoc, TLean, TThrowError>;
+  }
+
+  async getOneBySlug<
+    TLean extends boolean = false,
+    TThrowError extends boolean = true,
+  >(
     slug: string,
-    options?: Omit<BaseQueryOptions<TSchema, TLean>, 'filter'>
-  ): Promise<FlattenMaps<TDoc> | null> {
-    let q: Query<TDoc | null, TDoc> = this.model.findOne({
-      slug,
-    } as FilterQuery<TSchema>);
+    options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
+      lean?: TLean;
+      throwError?: TThrowError;
+    }
+  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+    const query = this.model.findOne({ slug } as FilterQuery<TSchema>);
+    const result = await this.applyQueryOptions(query, options).exec();
 
-    this.applyQueryOptions(q, options);
+    if (!result && (options?.throwError ?? true)) {
+      throw new NotFoundError(
+        `${this.model.modelName} with slug (${slug}) not found`
+      );
+    }
 
-    return (await q.lean().exec()) as FlattenMaps<TDoc> | null;
+    return result as NullableQueryResult<TDoc, TLean, TThrowError>;
   }
+
+  async getOneByKey<
+    K extends keyof TSchema,
+    TLean extends boolean = false,
+    TThrowError extends boolean = true,
+  >(
+    key: K,
+    value: TSchema[K],
+    options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
+      lean?: TLean;
+      throwError?: TThrowError;
+    }
+  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+    const query = this.model.findOne({ [key]: value } as FilterQuery<TSchema>);
+    const result = await this.applyQueryOptions(query, options).exec();
+
+    if (!result && (options?.throwError ?? true)) {
+      throw new NotFoundError(
+        `${this.model.modelName} with ${String(key)} (${value}) not found`
+      );
+    }
+
+    return result as NullableQueryResult<TDoc, TLean, TThrowError>;
+  }
+
+  // --------------------------------------------------------------------------
+  // Multiple Documents Query
+  // --------------------------------------------------------------------------
 
   async find<TLean extends boolean = false, TPaginate extends boolean = true>(
-    options?: BaseQueryOptions<TSchema, boolean> & {
+    options?: BaseQueryOptions<TSchema> & {
       lean?: TLean;
       paginate?: TPaginate;
     }
-  ): Promise<
-    TPaginate extends false
-      ? TLean extends true
-        ? FlattenMaps<TDoc>[]
-        : TDoc[]
-      : WithPagination<TLean extends true ? FlattenMaps<TDoc> : TDoc>
-  > {
-    // Start base query
-    let query = this.model.find(options?.filter || {});
+  ): Promise<FindResult<TDoc, TLean, TPaginate>> {
+    const query = this.model.find(options?.filter || {});
+    const enrichedQuery = this.applyQueryOptions(query, options);
 
-    // Apply dynamic query options
-    query = this.applyQueryOptions(query, options);
-
-    // Conditionally paginate
     if (options?.paginate ?? true) {
-      const result = await paginate<TDoc, TDoc>(
-        query as any,
-        options?.reqQuery
-      );
-      return result as any;
-    } else {
-      const result = await query.exec();
-      return result as any;
+      return paginate<TDoc, TDoc>(enrichedQuery, options?.reqQuery) as any;
     }
+
+    return enrichedQuery.exec();
   }
 
-  async getOneById<TLean extends boolean = false>(
-    id: string,
-    options?: Omit<BaseQueryOptions<TSchema, TLean>, 'filter'>
-  ): Promise<(TLean extends true ? FlattenMaps<TDoc> : TDoc) | null> {
-    let q = this.model.findById(id);
+  // --------------------------------------------------------------------------
+  // Query Options Application
+  // --------------------------------------------------------------------------
 
-    this.applyQueryOptions(q, options);
-
-    const result = options?.lean
-      ? await (
-          q.lean() as unknown as Query<FlattenMaps<TDoc> | null, TDoc>
-        ).exec()
-      : await q.exec();
-
-    return result as (TLean extends true ? FlattenMaps<TDoc> : TDoc) | null;
-  }
-
-  private applyQueryOptions<
-    TSchema,
-    TDoc,
-    TResult,
-    TLean extends boolean = false,
-  >(
-    query: Query<TResult, TDoc>,
-    options?: BaseQueryOptions<TSchema, TLean>
-  ): Query<any, TDoc> {
+  /**
+   * Applies common query modifiers (select, populate, sort, limit, skip, lean).
+   * @param query - Mongoose query instance.
+   * @param options - Query customization options.
+   * @returns The modified query.
+   */
+  protected applyQueryOptions<TResult = any>(
+    query: Query<TResult, any>,
+    options?: BaseQueryOptions<TSchema>
+  ): Query<any, any> {
     if (!options) return query as any;
 
-    let q = query;
+    let q: any = query;
 
-    if (options.select) q = q.select(options.select) as any;
-    if (options.populate) q = q.populate(options.populate as string);
+    if (options.select) q = q.select(options.select);
+    if (options.populate) q = q.populate(options.populate);
     if (options.sort) q = q.sort(options.sort);
     if (options.limit) q = q.limit(options.limit);
     if (options.skip) q = q.skip(options.skip);
-    if (options.lean) q = q.lean() as any;
+    if (options.lean) q = q.lean();
 
-    return q as Query<
-      TLean extends true
-        ? TResult extends (infer R)[]
-          ? FlattenMaps<R>[]
-          : FlattenMaps<TResult>
-        : TResult,
-      TDoc
-    >;
+    return q;
   }
 }
+
+export default BaseQueryService;

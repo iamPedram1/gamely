@@ -1,8 +1,7 @@
-import { DeleteResult } from 'mongoose';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import Game from 'api/game/game.model';
+import Game, { GameDocument } from 'api/game/game.model';
 
 // Dto
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
@@ -21,7 +20,8 @@ export type IGameService = InstanceType<typeof GameService>;
 class GameService extends BaseService<
   IGameEntity,
   CreateGameDto,
-  UpdateGameDto
+  UpdateGameDto,
+  GameDocument
 > {
   constructor(
     @inject(delay(() => PostService)) private postService: PostService
@@ -29,7 +29,7 @@ class GameService extends BaseService<
     super(Game);
   }
 
-  async delete(id: string): Promise<DeleteResult> {
+  async delete(id: string): Promise<true> {
     await this.postService.updateManyByReference(id, 'game', null);
 
     return await this.deleteOneById(id);
