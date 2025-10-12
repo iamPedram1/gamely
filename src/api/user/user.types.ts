@@ -1,14 +1,15 @@
+import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
 import { Types } from 'mongoose';
 
 export interface IUserEntity {
+  _id: Types.ObjectId;
   name: string;
   email: string;
   password: string;
-  createdAt?: string;
-  updatedAt?: string;
-  _id: Types.ObjectId;
+  avatar: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface IUser extends Omit<IUserEntity, '_id' | 'password'> {
-  id: string;
-}
+export type IUser = InstanceType<typeof UserResponseDto>;
+export type IUserSummary = InstanceType<typeof UserSummaryResponseDto>;

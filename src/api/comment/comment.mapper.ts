@@ -1,8 +1,4 @@
-// Model
-import {
-  CommentDocument,
-  CommentLeanDocument,
-} from 'api/comment/comment.model';
+import { singleton } from 'tsyringe';
 
 // Dto
 import {
@@ -13,22 +9,21 @@ import {
 // Mapper
 import { BaseMapper } from 'mapper/base';
 
-export interface ICommentMapper {
-  toDto: (tag: CommentDocument | CommentLeanDocument) => CommentResponseDto;
-  toSummaryDto: (
-    tag: CommentDocument | CommentLeanDocument
-  ) => CommentSummaryResponseDto;
-}
+// Types
+import type {
+  CommentDocument,
+  CommentLeanDocument,
+} from 'api/comment/comment.model';
 
-export class CommentMapper
-  extends BaseMapper<
-    CommentDocument,
-    CommentLeanDocument,
-    CommentResponseDto,
-    CommentSummaryResponseDto
-  >
-  implements ICommentMapper
-{
+export type ICommentMapper = InstanceType<typeof CommentMapper>;
+
+@singleton()
+export class CommentMapper extends BaseMapper<
+  CommentDocument,
+  CommentLeanDocument,
+  CommentResponseDto,
+  CommentSummaryResponseDto
+> {
   constructor() {
     super(CommentResponseDto, CommentSummaryResponseDto);
   }

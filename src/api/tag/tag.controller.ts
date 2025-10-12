@@ -1,7 +1,7 @@
-import type { RequestHandler } from 'express';
+import { delay, inject, injectable } from 'tsyringe';
 
 // Services
-import { ITagService } from 'api/tag/tag.service';
+import TagService from 'api/tag/tag.service';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'utilites/response';
@@ -9,18 +9,19 @@ import sendResponse, { sendBatchResponse } from 'utilites/response';
 // DTO
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 
+// Mapper
+import { TagMapper } from 'api/tag/tag.mapper';
+
 // Types
-import type { ITagMapper } from 'api/tag/tag.mapper';
-import type IRequestQueryBase from 'types/query';
+import type { RequestHandler } from 'express';
+import type { IRequestQueryBase } from 'types/query';
 
+@injectable()
 export default class TagController {
-  private tagService: ITagService;
-  private tagMapper: ITagMapper;
-
-  constructor(tagService: ITagService, tagMapper: ITagMapper) {
-    this.tagMapper = tagMapper;
-    this.tagService = tagService;
-  }
+  constructor(
+    @inject(delay(() => TagService)) private tagService: TagService,
+    @inject(delay(() => TagMapper)) private tagMapper: TagMapper
+  ) {}
 
   getAll: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;

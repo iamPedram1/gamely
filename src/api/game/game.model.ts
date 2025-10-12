@@ -1,4 +1,4 @@
-import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
+import { model, Model, FlattenMaps, HydratedDocument, Schema } from 'mongoose';
 
 // Types
 import type { IGameEntity } from 'api/game/game.type';
@@ -6,10 +6,7 @@ import type { IGameEntity } from 'api/game/game.type';
 export type GameDocument = HydratedDocument<IGameEntity>;
 export type GameLeanDocument = FlattenMaps<GameDocument>;
 
-const gameSchema = new mongoose.Schema<
-  IGameEntity,
-  mongoose.Model<IGameEntity>
->(
+const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
   {
     title: {
       type: String,
@@ -21,6 +18,7 @@ const gameSchema = new mongoose.Schema<
     slug: {
       type: String,
       trim: true,
+      index: true,
       unique: true,
       minlength: 3,
       maxlength: 255,
@@ -28,14 +26,19 @@ const gameSchema = new mongoose.Schema<
       lowercase: true,
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
     },
+    image: {
+      default: null,
+      type: Schema.Types.ObjectId,
+      ref: 'File',
+    },
     creator: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     },
   },
   { timestamps: true }
 );
 
-export const Game = mongoose.model<IGameEntity>('Game', gameSchema);
+export const Game = model<IGameEntity>('Game', gameSchema);
 
 export default Game;

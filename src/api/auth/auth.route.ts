@@ -1,22 +1,19 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
 // Controllers
 import AuthController from 'api/auth/auth.controller';
 
-// Services
-import UserService from 'api/user/user.service';
-
 // Middlewares
-import blockRequestWithToken from 'api/auth/auth.middleware';
 import validateBody from 'middleware/validateBody';
+import { authLimiter } from 'middleware/rateLimitter';
+import blockRequestWithToken from 'api/auth/auth.middleware';
 
 // DTO
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
-import { authLimiter } from 'middleware/rateLimitter';
 
 const authRouter = express.Router();
-const userService = new UserService();
-const authController = new AuthController(userService);
+const authController = container.resolve(AuthController);
 
 authRouter.post('/login', [
   authLimiter,

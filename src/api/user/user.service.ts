@@ -1,12 +1,22 @@
+import { injectable } from 'tsyringe';
 import bcryptjs from 'bcryptjs';
 
-import UserModel, { UserDocument } from 'api/user/user.model';
+// Model
+import UserModel from 'api/user/user.model';
+
+// Utilities
 import { ValidationError } from 'utilites/errors';
+
+// Dto
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
+
+// Types
+import { UserDocument } from 'api/user/user.model';
 
 export type IUserService = InstanceType<typeof UserService>;
 
-export default class UserService implements IUserService {
+@injectable()
+export default class UserService {
   async register(data: RegisterDto): Promise<string> {
     const user = await this.getUserByEmail(data.email);
     if (user)

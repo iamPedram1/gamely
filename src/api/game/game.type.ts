@@ -1,15 +1,15 @@
-import { IUser } from 'api/user/user.types';
-import { IFileEntity } from 'types/file';
+import { Types } from 'mongoose';
+import { GameResponseDto, GameSummaryResponseDto } from 'api/game/game.dto';
 
 export interface IGameEntity {
+  _id: Types.ObjectId;
   title: string;
   slug: string;
-  image: IFileEntity;
-  creator: IUser;
-  createdAt?: string;
-  updatedAt?: string;
+  image: Types.ObjectId | null;
+  creator: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface IGame extends IGameEntity {
-  _id: string;
-}
+export type IGame = InstanceType<typeof GameResponseDto>;
+export type IGameSummary = InstanceType<typeof GameSummaryResponseDto>;

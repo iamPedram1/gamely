@@ -1,4 +1,4 @@
-import { DeleteResult } from 'mongoose';
+import { delay, inject, injectable } from 'tsyringe';
 
 // Models
 import Post from 'api/post/post.model';
@@ -7,36 +7,35 @@ import Post from 'api/post/post.model';
 import { CreatePostDto, UpdatePostDto } from 'api/post/post.dto';
 
 // Services
+import FileService from 'api/file/file.service';
 import BaseService from 'services/base.service.module';
-import { ICommentService } from 'api/comment/comment.service';
+import CommentService from 'api/comment/comment.service';
+
+// Validations
+import { PostValidation } from 'api/post/post.validation';
+
+// Utilities
+import logger from 'utilites/logger';
+import { NotFoundError } from 'utilites/errors';
 
 // Types
+import type { DeleteResult } from 'mongoose';
 import type { IPostEntity } from 'api/post/post.type';
 import type { PostDocument } from 'api/post/post.model';
-import type { PostValidation } from 'api/post/post.validation';
 
 export type IPostService = InstanceType<typeof PostService>;
-
-interface Dependencies {
-  postValidation: PostValidation;
-  commentService: ICommentService;
-}
-
+@injectable()
 class PostService extends BaseService<
   IPostEntity,
   CreatePostDto,
   UpdatePostDto
 > {
-  postValidation: PostValidation;
-  commentService: ICommentService;
-
-  constructor() {
+  constructor(
+    @inject(delay(() => FileService)) private fileService: FileService,
+    @inject(delay(() => CommentService)) private commentService: CommentService,
+    @inject(delay(() => PostValidation)) private postValidation: PostValidation
+  ) {
     super(Post);
-  }
-
-  setDependencies({ postValidation, commentService }: Dependencies) {
-    this.postValidation = postValidation;
-    this.commentService = commentService;
   }
 
   async getPostsBy(
@@ -74,9 +73,32 @@ class PostService extends BaseService<
 
   async deleteOneById(id: string): Promise<DeleteResult> {
     return this.withTransaction(async (session) => {
-      await this.commentService.deleteManyByKey('postId', id, { session });
+      const post = await super.getOneById(id, { lean: true });
+      if (!post)
+        throw new NotFoundError('Post with the given id was not found.');
 
-      return super.deleteOneById(id, { session });
+      // Delete the post itself first
+      const result = await super.deleteOneById(id, { session });
+
+      // Prepare cleanup operations
+      const cleanupTasks: Promise<any>[] = [
+        this.commentService.deleteManyByKey('postId', id, { session }),
+      ];
+
+      if (post.coverImage) {
+        cleanupTasks.push(
+          this.fileService.deleteOneById(post.coverImage.toHexString(), {
+            session,
+          })
+        );
+      }
+
+      // Run all cleanup operations in parallel
+      const results = await Promise.allSettled(cleanupTasks);
+      for (const r of results)
+        if (r.status === 'rejected') logger.error('Cleanup failed:', r.reason);
+
+      return result;
     });
   }
 }

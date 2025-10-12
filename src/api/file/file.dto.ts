@@ -1,31 +1,33 @@
-import { Expose, Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsString,
-  Length,
-  IsOptional,
-  Matches,
-} from 'class-validator';
-
+import { Expose, Transform } from 'class-transformer';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
-import { UserSummaryResponseDto } from 'api/user/user.dto';
+import { IFileLocation } from 'api/file/file.type';
+import { appUrl } from 'utilites/configs';
 
-export class TagResponseDto extends BaseResponseDto {
+export class FileResponseDto extends BaseResponseDto {
   @Expose()
-  title!: string;
-
-  @Expose()
-  slug!: string;
+  location: IFileLocation;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  @Transform(({ obj }) => obj.originalname)
+  filename: string;
+
+  @Expose()
+  size: number;
+
+  @Expose()
+  mimetype: string;
+
+  @Expose()
+  @Transform(({ obj }) => `${appUrl}/${obj.path}`.replace(/\\/g, '/'))
+  path: string;
 }
 
-export class TagSummaryResponseDto extends BaseSummaryResponseDto {
+export class FileSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  title!: string;
+  @Transform(({ obj }) => obj.originalname)
+  filename: string;
 
   @Expose()
-  slug!: string;
+  @Transform(({ obj }) => `${appUrl}/${obj.path}`.replace(/\\/g, '/'))
+  path: string;
 }

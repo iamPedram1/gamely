@@ -1,15 +1,16 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
 // Middlewares
 import auth from 'middleware/auth';
 import upload from 'middleware/upload';
 
 // Module
-import createFileModule from 'api/file/file.module';
+import FileController from 'api/file/file.controller';
 
 // Dto
 const fileRouter = express.Router();
-const { fileController } = createFileModule();
+const fileController = container.resolve(FileController);
 
 // Public Routes
 fileRouter.use(auth);

@@ -1,18 +1,17 @@
-import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
   Length,
   IsOptional,
-  ValidateIf,
   IsMongoId,
-  IsEnum,
 } from 'class-validator';
 
+// Dto/
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
-import { UserSummaryResponseDto } from 'api/user/user.dto';
-import { ICommentEntity } from 'api/comment/comment.type';
-import { IUser } from 'api/user/user.types';
+
+// Types
+import type { ICommentEntity } from 'api/comment/comment.type';
 
 export class CreateCommentDto {
   constructor(comment?: ICommentEntity) {

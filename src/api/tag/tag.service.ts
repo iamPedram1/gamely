@@ -1,3 +1,4 @@
+import { delay, inject, injectable } from 'tsyringe';
 import type { DeleteResult } from 'mongoose';
 
 // Models
@@ -7,30 +8,21 @@ import Tag from 'api/tag/tag.model';
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 
 // Services
+import PostService from 'api/post/post.service';
 import BaseService from 'services/base.service.module';
 
 // Types
 import type { ITagEntity } from 'api/tag/tag.type';
-import type { IPostService } from 'api/post/post.service';
 import type { IApiBatchResponse } from 'utilites/response';
 
 export type ITagService = InstanceType<typeof TagService>;
-interface Dependencies {
-  postService: IPostService;
-}
 
-class TagService
-  extends BaseService<ITagEntity, CreateTagDto, UpdateTagDto>
-  implements ITagService
-{
-  private postService: IPostService;
-
-  constructor() {
+@injectable()
+class TagService extends BaseService<ITagEntity, CreateTagDto, UpdateTagDto> {
+  constructor(
+    @inject(delay(() => PostService)) private postService: PostService
+  ) {
     super(Tag);
-  }
-
-  setDependencies({ postService }: Dependencies) {
-    this.postService = postService;
   }
 
   async deleteOneById(id: string): Promise<DeleteResult> {

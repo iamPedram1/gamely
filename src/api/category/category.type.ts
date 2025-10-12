@@ -1,22 +1,24 @@
-import { Types } from 'mongoose';
-import { IUser } from 'api/user/user.types';
-import { IFileEntity } from 'types/file';
+import type { Types } from 'mongoose';
+import type {
+  CategoryResponseDto,
+  CategorySummaryResponseDto,
+  NestedCategoryResponseDto,
+} from 'api/category/category.dto';
 
 export interface ICategoryEntity {
   title: string;
   slug: string;
   parentId: Types.ObjectId | null;
-  image: IFileEntity;
-  creator: IUser;
-  createdAt?: string;
-  updatedAt?: string;
+  image: Types.ObjectId | null;
+  creator: Types.ObjectId;
+  _id: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
+export type INestedCategoryEntity = ICategoryEntity & {
+  children?: INestedCategoryEntity[];
+};
 
-export interface ICategory extends ICategoryEntity {
-  _id: string;
-}
-
-export interface INestedCategory
-  extends Omit<ICategory, 'creator' | 'updatedAt' | 'createdAt'> {
-  children?: INestedCategory[];
-}
+export type ICategory = InstanceType<typeof CategoryResponseDto>;
+export type ICategorySummary = InstanceType<typeof CategorySummaryResponseDto>;
+export type INestedCategory = InstanceType<typeof NestedCategoryResponseDto>;

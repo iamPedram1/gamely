@@ -1,4 +1,4 @@
-import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
+import { model, Schema, Model, FlattenMaps, HydratedDocument } from 'mongoose';
 
 // Types
 import type { ITagEntity } from 'api/tag/tag.type';
@@ -6,7 +6,7 @@ import type { ITagEntity } from 'api/tag/tag.type';
 export type TagDocument = HydratedDocument<ITagEntity>;
 export type TagLeanDocument = FlattenMaps<TagDocument>;
 
-const tagSchema = new mongoose.Schema<ITagEntity, mongoose.Model<ITagEntity>>(
+const tagSchema = new Schema<ITagEntity, Model<ITagEntity>>(
   {
     title: {
       type: String,
@@ -26,13 +26,13 @@ const tagSchema = new mongoose.Schema<ITagEntity, mongoose.Model<ITagEntity>>(
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
     },
     creator: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     },
   },
   { timestamps: true }
 );
 
-export const Tag = mongoose.model<ITagEntity>('Tag', tagSchema);
+export const Tag = model<ITagEntity>('Tag', tagSchema);
 
 export default Tag;

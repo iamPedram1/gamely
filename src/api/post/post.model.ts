@@ -1,4 +1,11 @@
-import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
+import {
+  model,
+  Model,
+  FlattenMaps,
+  HydratedDocument,
+  Schema,
+  Types,
+} from 'mongoose';
 
 // Types
 import type { IPostEntity } from 'api/post/post.type';
@@ -6,10 +13,7 @@ import type { IPostEntity } from 'api/post/post.type';
 export type PostDocument = HydratedDocument<IPostEntity>;
 export type PostLeanDocument = FlattenMaps<PostDocument>;
 
-const postSchema = new mongoose.Schema<
-  IPostEntity,
-  mongoose.Model<IPostEntity>
->(
+const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
   {
     title: {
       type: String,
@@ -42,22 +46,27 @@ const postSchema = new mongoose.Schema<
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
     },
     creator: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     },
     game: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Game',
       default: null,
     },
     category: {
       required: true,
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Category',
+    },
+    coverImage: {
+      default: null,
+      type: Types.ObjectId,
+      ref: 'File',
     },
     tags: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Tag',
       },
     ],
@@ -65,6 +74,6 @@ const postSchema = new mongoose.Schema<
   { timestamps: true }
 );
 
-export const Post = mongoose.model<IPostEntity>('Post', postSchema);
+export const Post = model<IPostEntity>('Post', postSchema);
 
 export default Post;

@@ -21,11 +21,7 @@ export default class BaseQueryService<
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > implements IBaseQueryService<TSchema, TDoc>
 {
-  protected readonly model: Model<TSchema>;
-
-  constructor(model: Model<TSchema>) {
-    this.model = model;
-  }
+  constructor(protected readonly model: Model<TSchema>) {}
 
   private async exists(filter: FilterQuery<TSchema>): Promise<boolean> {
     const res = await this.model.exists(filter).exec();

@@ -1,29 +1,26 @@
+import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import { ICategoryService } from 'api/category/category.service';
+import CategoryService from 'api/category/category.service';
 
 // Dto
-import { ICategoryMapper } from 'api/category/category.mapper';
+import { CategoryMapper } from 'api/category/category.mapper';
 
 // Utilities
 import sendResponse from 'utilites/response';
 import { InternalServerError } from 'utilites/errors';
 
 // Types
-import IRequestQueryBase from 'types/query';
+import type { IRequestQueryBase } from 'types/query';
 
+@injectable()
 export default class CategoryController {
-  private categoryService: ICategoryService;
-  private categoryMapper: ICategoryMapper;
-
   constructor(
-    categoryService: ICategoryService,
-    categoryMapper: ICategoryMapper
-  ) {
-    this.categoryService = categoryService;
-    this.categoryMapper = categoryMapper;
-  }
+    @inject(delay(() => CategoryMapper)) private categoryMapper: CategoryMapper,
+    @inject(delay(() => CategoryService))
+    private categoryService: CategoryService
+  ) {}
 
   getAll: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;

@@ -1,4 +1,5 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
 // Middlewares
 import auth from 'middleware/auth';
@@ -10,15 +11,15 @@ import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 // Model
 import Game from 'api/game/game.model';
 
-// Module
-import createGameModule from 'api/game/game.module';
+// Controller
+import GameController from 'api/game/game.controller';
 
 // Dto
 import { BaseQueryDto } from 'dto/query';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 const gameRouter = express.Router();
-const { gameController } = createGameModule();
+const gameController = container.resolve(GameController);
 
 // Public Routes
 gameRouter.get('/', [validateQuery(BaseQueryDto), gameController.getAll]);

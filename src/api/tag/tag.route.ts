@@ -1,4 +1,5 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
 // Middlewares
 import auth from 'middleware/auth';
@@ -10,15 +11,15 @@ import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 // Model
 import Tag from 'api/tag/tag.model';
 
-// Module
-import createTagModule from 'api/tag/tag.module';
+// Controller
+import TagController from 'api/tag/tag.controller';
 
 // Dto
 import { BaseQueryDto } from 'dto/query';
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 
 const tagRouter = express.Router();
-const { tagController } = createTagModule();
+const tagController = container.resolve(TagController);
 
 // Public Routes
 tagRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
@@ -48,29 +49,3 @@ tagRouter.patch(
 );
 
 export default tagRouter;
-
-/*
-POST /auth/login
-POST /auth/register
-POST /auth/tags 
-GET /tags 
-GET /summaries
-GET /tags/:id 
-PATCH /tags/:id 
-DELETE /tags/:id 
-GET /categories 
-GET /categories/summaries
-GET /categories/:id 
-PATCH /categories/:id 
-DELETE /categories/:id 
-GET /games 
-GET /games/summaries
-GET /games/:id 
-PATCH /games/:id 
-DELETE /games/:id 
-GET /post 
-GET /post/summaries
-GET /post/:id 
-PATCH /post/:id 
-DELETE /post/:id 
-*/

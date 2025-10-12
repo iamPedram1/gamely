@@ -1,26 +1,25 @@
-import type { RequestHandler } from 'express';
+import { delay, inject, injectable } from 'tsyringe';
 
 // Service
-import { IGameService } from 'api/game/game.service';
+import GameService from 'api/game/game.service';
 
 // Dto
-import { IGameMapper } from 'api/game/game.mapper';
+import { GameMapper } from 'api/game/game.mapper';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'utilites/response';
 import { ValidationError } from 'utilites/errors';
 
 // Types
-import IRequestQueryBase from 'types/query';
+import type { RequestHandler } from 'express';
+import type { IRequestQueryBase } from 'types/query';
 
+@injectable()
 export default class GameController {
-  private gameService: IGameService;
-  private gameMapper: IGameMapper;
-
-  constructor(gameService: IGameService, gameMapper: IGameMapper) {
-    this.gameService = gameService;
-    this.gameMapper = gameMapper;
-  }
+  constructor(
+    @inject(delay(() => GameMapper)) private gameMapper: GameMapper,
+    @inject(delay(() => GameService)) private gameService: GameService
+  ) {}
 
   getAll: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;

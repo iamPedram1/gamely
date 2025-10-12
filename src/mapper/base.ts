@@ -1,5 +1,6 @@
 import { plainToInstance, ClassConstructor } from 'class-transformer';
 import type { Document } from 'mongoose';
+import { singleton } from 'tsyringe';
 
 /**
  * Generic mapper base to reduce duplicate mapper implementations across features.
@@ -7,6 +8,7 @@ import type { Document } from 'mongoose';
  * Usage: extend this class and optionally override `normalize` to handle
  * entity-specific normalization (title/name fallbacks, nested populated fields, etc.).
  */
+@singleton()
 export class BaseMapper<
   TDoc extends Document | Record<string, any>,
   TLean extends Record<string, any>,

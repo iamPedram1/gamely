@@ -1,4 +1,4 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -70,8 +70,6 @@ export class CategoryResponseDto extends BaseResponseDto {
   slug!: string;
 
   @Expose()
-  @IsMongoId()
-  @Transform(({ obj }) => (obj.parentId ? String(obj.parentId) : null))
   parentId!: string | null;
 
   @Expose()
@@ -87,8 +85,6 @@ export class NestedCategoryResponseDto extends BaseSummaryResponseDto {
   slug!: string;
 
   @Expose()
-  @IsMongoId()
-  @Transform(({ obj }) => (obj.parentId ? String(obj.parentId) : null))
   parentId!: string | null;
 
   @Expose()

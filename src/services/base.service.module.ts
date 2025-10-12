@@ -70,7 +70,7 @@ export default abstract class BaseService<
    * Creates a new BaseService instance
    * @param model - Mongoose model for the service
    */
-  constructor(private model: Model<TSchema>) {
+  constructor(model: Model<TSchema>) {
     this.queries = new BaseQueryService<TSchema, TDoc>(model);
     this.mutations = new BaseMutateService(model);
   }
@@ -138,7 +138,9 @@ export default abstract class BaseService<
    */
   async getOneById<TLean extends boolean = false>(
     id: string,
-    options?: Omit<BaseQueryOptions<TSchema, TLean>, 'filter'> | undefined
+    options?: BaseQueryOptions<TSchema, boolean> & {
+      lean?: TLean | undefined;
+    }
   ): Promise<GetOneResult<TLean, TDoc>> {
     return this.queries.getOneById(id, options);
   }

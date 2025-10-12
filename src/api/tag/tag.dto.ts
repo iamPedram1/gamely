@@ -7,8 +7,11 @@ import {
   Matches,
 } from 'class-validator';
 
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+// Dto
 import { UserSummaryResponseDto } from 'api/user/user.dto';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+
+// Types
 import { ITagEntity } from 'api/tag/tag.type';
 
 export class CreateTagDto {
@@ -47,10 +50,10 @@ export class UpdateTagDto {
 
 export class TagResponseDto extends BaseResponseDto {
   @Expose()
-  title!: string;
+  title: string;
 
   @Expose()
-  slug!: string;
+  slug: string;
 
   @Expose()
   @Type(() => UserSummaryResponseDto)

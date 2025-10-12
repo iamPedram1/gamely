@@ -1,4 +1,5 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
 // Middlewares
 import auth from 'middleware/auth';
@@ -10,8 +11,8 @@ import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 // Model
 import Category from 'api/category/category.model';
 
-// Services
-import createCategoryModule from 'api/category/category.module';
+// Controller
+import CategoryController from 'api/category/category.controller';
 
 // Dto
 import { BaseQueryDto } from 'dto/query';
@@ -21,7 +22,7 @@ import {
 } from 'api/category/category.dto';
 
 const categoryRouter = express.Router();
-const { categoryController } = createCategoryModule();
+const categoryController = container.resolve(CategoryController);
 
 // Public Routes
 categoryRouter.get('/', validateQuery(BaseQueryDto), categoryController.getAll);

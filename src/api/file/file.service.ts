@@ -1,34 +1,66 @@
-import fs from 'fs';
+import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import { singleton } from 'tsyringe';
+import type { DeleteResult } from 'mongoose';
 
 // Models
-import File from 'api/file/file.model';
+import File, { FileDocument } from 'api/file/file.model';
 
 // Services
 import BaseService from 'services/base.service.module';
 
 // Utilities
-import { BadRequestError } from 'utilites/errors';
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+} from 'utilites/errors';
 
 // Types
+import type { BaseMutateOptions } from 'services/base.service.type';
 import type { IFileEntity, IFileLocation } from 'api/file/file.type';
 
 export type IFileService = InstanceType<typeof FileService>;
 
-class FileService
-  extends BaseService<IFileEntity, undefined, undefined>
-  implements IFileService
-{
+@singleton()
+class FileService extends BaseService<IFileEntity, undefined, undefined> {
   constructor() {
     super(File);
+  }
+
+  async deleteOneById(
+    id: string,
+    options?: BaseMutateOptions
+  ): Promise<DeleteResult> {
+    const file = await super.getOneById(id, { lean: true });
+    if (!file) throw new NotFoundError('File with the given id was not found.');
+
+    try {
+      await fsPromises.access(file.path);
+      await fsPromises.rm(file.path);
+    } catch (err: any) {
+      if (err.code !== 'ENOENT') {
+        throw new InternalServerError(
+          err?.message || 'An error occurred while deleting file.'
+        );
+      }
+    }
+
+    const result = await super.deleteOneById(id, options);
+    if (result.deletedCount === 0)
+      throw new InternalServerError(
+        'An unexpected error occured while deleting file.'
+      );
+
+    return result;
   }
 
   async uploadOne(
     location: IFileLocation,
     file: Express.Multer.File,
     userId?: string
-  ): Promise<IFileEntity> {
+  ): Promise<FileDocument> {
     if (!file) throw new BadRequestError('No file provided.');
     if (!location) throw new BadRequestError('No location provided.');
 
@@ -59,7 +91,7 @@ class FileService
     const doc = await new File({
       filename,
       destination: uploadPath,
-      path: path.join('img', path.basename(uploadPath), filename),
+      path: path.join('images', path.basename(uploadPath), filename),
       mimetype: file.mimetype,
       size: file.size,
       originalname: file.originalname,

@@ -9,14 +9,16 @@ import {
 } from 'class-validator';
 
 // Dto
-import { UserSummaryResponseDto } from 'api/user/user.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 import { TagResponseDto } from 'api/tag/tag.dto';
 import { GameResponseDto } from 'api/game/game.dto';
+import { FileSummaryResponseDto } from 'api/file/file.dto';
+import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { CategoryResponseDto } from 'api/category/category.dto';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 
 // Types
 import type { IPostEntity } from 'api/post/post.type';
+import type { IFileSummary } from 'api/file/file.type';
 
 export class CreatePostDto {
   constructor(post?: Pick<IPostEntity, 'title' | 'slug'>) {
@@ -117,6 +119,10 @@ export class PostResponseDto extends BaseResponseDto {
   @Expose()
   @Type(() => CategoryResponseDto)
   category: CategoryResponseDto;
+
+  @Expose()
+  @Type(() => FileSummaryResponseDto)
+  coverImage!: IFileSummary;
 
   @Expose()
   @Type(() => TagResponseDto)

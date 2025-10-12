@@ -1,4 +1,4 @@
-import mongoose, { FlattenMaps, HydratedDocument } from 'mongoose';
+import { model, Schema, Model, FlattenMaps, HydratedDocument } from 'mongoose';
 
 // Types
 import type { ICommentEntity } from 'api/comment/comment.type';
@@ -6,10 +6,7 @@ import type { ICommentEntity } from 'api/comment/comment.type';
 export type CommentDocument = HydratedDocument<ICommentEntity>;
 export type CommentLeanDocument = FlattenMaps<CommentDocument>;
 
-const commentSchema = new mongoose.Schema<
-  ICommentEntity,
-  mongoose.Model<ICommentEntity>
->(
+const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
   {
     comment: {
       type: String,
@@ -24,26 +21,26 @@ const commentSchema = new mongoose.Schema<
       default: 'main',
     },
     replyToCommentId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Comment',
       required: function () {
         return this.type === 'reply';
       },
     },
     threadId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Comment',
       required: function () {
         return this.type === 'reply';
       },
     },
     postId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Post',
       required: true,
     },
     creator: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -51,6 +48,6 @@ const commentSchema = new mongoose.Schema<
   { timestamps: true }
 );
 
-export const Comment = mongoose.model<ICommentEntity>('Comment', commentSchema);
+export const Comment = model<ICommentEntity>('Comment', commentSchema);
 
 export default Comment;

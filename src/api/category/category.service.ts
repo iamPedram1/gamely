@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import type { ClientSession, DeleteResult } from 'mongoose';
+import type { ClientSession, DeleteResult, Document, Types } from 'mongoose';
+import { delay, inject, injectable } from 'tsyringe';
 
 // Models
 import Category from 'api/category/category.model';
@@ -11,6 +11,7 @@ import {
 } from 'api/category/category.dto';
 
 // Services
+import PostService from 'api/post/post.service';
 import BaseService from 'services/base.service.module';
 
 // Utilities
@@ -21,39 +22,37 @@ import {
 } from 'utilites/errors';
 
 // Types
-import { IBaseService } from 'services/base.service.type';
-import type { IPostService } from 'api/post/post.service';
+import type { BaseMutateOptions } from 'services/base.service.type';
 import type { CategoryDocument } from 'api/category/category.model';
 import type {
   ICategoryEntity,
-  INestedCategory,
+  INestedCategoryEntity,
 } from 'api/category/category.type';
-
-export interface ICategoryService
-  extends IBaseService<ICategoryEntity, CreateCategoryDto, UpdateCategoryDto> {
-  getAllNested(): Promise<INestedCategory[]>;
-}
 
 type ParentMap = Record<string, number[]>;
 
-interface Dependencies {
-  postService: IPostService;
-}
-class CategoryService
-  extends BaseService<ICategoryEntity, CreateCategoryDto, UpdateCategoryDto>
-  implements ICategoryService
-{
-  private postService: IPostService;
-
-  constructor() {
+export type ICategoryService = InstanceType<typeof CategoryService>;
+@injectable()
+class CategoryService extends BaseService<
+  ICategoryEntity,
+  CreateCategoryDto,
+  UpdateCategoryDto
+> {
+  constructor(
+    @inject(delay(() => PostService)) private postService: PostService
+  ) {
     super(Category);
   }
 
-  setDependencies({ postService }: Dependencies) {
-    this.postService = postService;
-  }
-
-  async create(data: CreateCategoryDto) {
+  async create(
+    data: Partial<CreateCategoryDto>,
+    userId?: string,
+    options?: BaseMutateOptions
+  ): Promise<
+    Document<unknown, {}, ICategoryEntity, {}, {}> &
+      ICategoryEntity &
+      Required<{ _id: Types.ObjectId }> & { __v: number }
+  > {
     if (data.parentId) {
       const parentExists = await super.existsBySlug(data.parentId);
       if (!parentExists)
@@ -61,7 +60,7 @@ class CategoryService
           'Category with the provided categoryId does not exist'
         );
     }
-    return await super.create(data);
+    return await super.create(data, userId, options);
   }
 
   async updateOneById(categoryId: string, payload: UpdateCategoryDto) {
@@ -106,7 +105,7 @@ class CategoryService
     const categories = (await super.find({
       lean: true,
       paginate: false,
-    })) as unknown as INestedCategory[];
+    })) as unknown as INestedCategoryEntity[];
 
     const parentMap: Record<string, number[]> = {};
 
@@ -164,8 +163,8 @@ class CategoryService
   }
 
   private getChildren(
-    category: INestedCategory,
-    categories: INestedCategory[],
+    category: INestedCategoryEntity,
+    categories: INestedCategoryEntity[],
     parentMap: ParentMap
   ) {
     const id = category?._id ? String(category._id) : '';

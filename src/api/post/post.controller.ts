@@ -1,26 +1,25 @@
+import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import { IPostService } from 'api/post/post.service';
+import PostService from 'api/post/post.service';
 
 // Dto
-import { IPostMapper } from 'api/post/post.mapper';
+import { PostMapper } from 'api/post/post.mapper';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'utilites/response';
 import { ValidationError } from 'utilites/errors';
 
 // Types
-import IRequestQueryBase from 'types/query';
+import type { IRequestQueryBase } from 'types/query';
 
+@injectable()
 export default class PostController {
-  private postService: IPostService;
-  private postMapper: IPostMapper;
-
-  constructor(postService: IPostService, postMapper: IPostMapper) {
-    this.postMapper = postMapper;
-    this.postService = postService;
-  }
+  constructor(
+    @inject(delay(() => PostMapper)) private postMapper: PostMapper,
+    @inject(delay(() => PostService)) private postService: PostService
+  ) {}
 
   getAll: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;
@@ -31,6 +30,7 @@ export default class PostController {
         { path: 'category', populate: { path: 'creator' } },
         { path: 'game' },
         { path: 'tags' },
+        { path: 'coverImage' },
         { path: 'creator' },
       ],
     });

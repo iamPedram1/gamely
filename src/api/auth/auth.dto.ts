@@ -1,5 +1,5 @@
 import * as validator from 'class-validator';
-import type { IUser, IUserEntity } from 'api/user/user.types';
+import type { IUserEntity } from 'api/user/user.types';
 
 export class RegisterDto {
   constructor(user: IUserEntity) {

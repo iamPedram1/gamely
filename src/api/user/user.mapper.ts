@@ -1,5 +1,4 @@
-// Model
-import { UserDocument, UserLeanDocument } from 'api/user/user.model';
+import { singleton } from 'tsyringe';
 
 // Dto
 import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
@@ -7,22 +6,18 @@ import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
 // Mapper
 import { BaseMapper } from 'mapper/base';
 
-export interface IUserMapper {
-  toDto: (tag: UserDocument | UserLeanDocument) => UserResponseDto;
-  toSummaryDto: (
-    tag: UserDocument | UserLeanDocument
-  ) => UserSummaryResponseDto;
-}
+// Types
+import type { UserDocument, UserLeanDocument } from 'api/user/user.model';
 
-export class UserMapper
-  extends BaseMapper<
-    UserDocument,
-    UserLeanDocument,
-    UserResponseDto,
-    UserSummaryResponseDto
-  >
-  implements IUserMapper
-{
+export type IUserMapper = InstanceType<typeof UserMapper>;
+
+@singleton()
+export class UserMapper extends BaseMapper<
+  UserDocument,
+  UserLeanDocument,
+  UserResponseDto,
+  UserSummaryResponseDto
+> {
   constructor() {
     super(UserResponseDto, UserSummaryResponseDto);
   }

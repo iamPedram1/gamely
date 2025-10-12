@@ -1,7 +1,8 @@
+import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import { IUserService } from 'api/user/user.service';
+import UserService from 'api/user/user.service';
 
 // DTO
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
@@ -10,12 +11,11 @@ import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 import { jwtCookieName } from 'utilites/configs';
 import { setTokenCookie } from 'utilites/helperPack';
 
-export default class UserController {
-  private userService: IUserService;
-
-  constructor(userService: IUserService) {
-    this.userService = userService;
-  }
+@injectable()
+export default class AuthController {
+  constructor(
+    @inject(delay(() => UserService)) private userService: UserService
+  ) {}
 
   register: RequestHandler = async (req, res) => {
     const dto = req.body as RegisterDto;

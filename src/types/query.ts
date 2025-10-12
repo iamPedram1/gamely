@@ -1,4 +1,4 @@
-export default interface IRequestQueryBase {
+export interface IRequestQueryBase {
   sort: string;
   limit: number;
   page: number;

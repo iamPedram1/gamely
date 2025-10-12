@@ -1,27 +1,24 @@
+import { singleton } from 'tsyringe';
+
 // Model
-import { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
+import { FileDocument, FileLeanDocument } from 'api/file/file.model';
 
 // Dto
-import { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
+import { FileResponseDto, FileSummaryResponseDto } from 'api/file/file.dto';
 
 // Mapper
 import { BaseMapper } from 'mapper/base';
 
-export interface ITagMapper {
-  toDto: (tag: TagDocument | TagLeanDocument) => TagResponseDto;
-  toSummaryDto: (tag: TagDocument | TagLeanDocument) => TagSummaryResponseDto;
-}
+export type IFileMapper = InstanceType<typeof FileMapper>;
 
-export class TagMapper
-  extends BaseMapper<
-    TagDocument,
-    TagLeanDocument,
-    TagResponseDto,
-    TagSummaryResponseDto
-  >
-  implements ITagMapper
-{
+@singleton()
+export class FileMapper extends BaseMapper<
+  FileDocument,
+  FileLeanDocument,
+  FileResponseDto,
+  FileSummaryResponseDto
+> {
   constructor() {
-    super(TagResponseDto, TagSummaryResponseDto);
+    super(FileResponseDto, FileSummaryResponseDto);
   }
 }

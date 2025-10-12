@@ -1,3 +1,6 @@
+import { singleton } from 'tsyringe';
+import { plainToInstance } from 'class-transformer';
+
 // Model
 import {
   CategoryDocument,
@@ -13,33 +16,25 @@ import {
 
 // Mapper
 import { BaseMapper } from 'mapper/base';
-import { INestedCategory } from 'api/category/category.type';
-import { plainToInstance } from 'class-transformer';
+import {
+  INestedCategory,
+  INestedCategoryEntity,
+} from 'api/category/category.type';
 
-export interface ICategoryMapper {
-  toNestedDto: (category: INestedCategory) => NestedCategoryResponseDto;
-  toDto: (
-    category: CategoryDocument | CategoryLeanDocument
-  ) => CategoryResponseDto;
-  toSummaryDto: (
-    category: CategoryDocument | CategoryLeanDocument
-  ) => CategorySummaryResponseDto;
-}
+export type ICategoryMapper = InstanceType<typeof CategoryMapper>;
 
-export class CategoryMapper
-  extends BaseMapper<
-    CategoryDocument,
-    CategoryLeanDocument,
-    CategoryResponseDto,
-    CategorySummaryResponseDto
-  >
-  implements ICategoryMapper
-{
+@singleton()
+export class CategoryMapper extends BaseMapper<
+  CategoryDocument,
+  CategoryLeanDocument,
+  CategoryResponseDto,
+  CategorySummaryResponseDto
+> {
   constructor() {
     super(CategoryResponseDto, CategorySummaryResponseDto);
   }
 
-  toNestedDto(doc: INestedCategory) {
+  toNestedDto(doc: INestedCategory | INestedCategoryEntity) {
     return plainToInstance(NestedCategoryResponseDto, doc, {
       excludeExtraneousValues: true,
     });

@@ -1,25 +1,21 @@
+import { delay, inject, injectable } from 'tsyringe';
+
 // Utilities
 import { NotFoundError } from 'utilites/errors';
 
-// Types
-import type { ITagService } from 'api/tag/tag.service';
-import type { IGameService } from 'api/game/game.service';
-import type { ICategoryService } from 'api/category/category.service';
+// Services
+import TagService from 'api/tag/tag.service';
+import GameService from 'api/game/game.service';
+import CategoryService from 'api/category/category.service';
 
+@injectable()
 export class PostValidation {
-  private tagService: ITagService;
-  private gameService: IGameService;
-  private categoryService: ICategoryService;
-
   constructor(
-    tagService: ITagService,
-    gameService: IGameService,
-    categoryService: ICategoryService
-  ) {
-    this.tagService = tagService;
-    this.gameService = gameService;
-    this.categoryService = categoryService;
-  }
+    @inject(delay(() => TagService)) private tagService: TagService,
+    @inject(delay(() => GameService)) private gameService: GameService,
+    @inject(delay(() => CategoryService))
+    private categoryService: CategoryService
+  ) {}
 
   async validateCategory(category: string) {
     const exist = await this.categoryService.existsById(category);

@@ -1,4 +1,5 @@
 // Types
+import { FileResponseDto, FileSummaryResponseDto } from 'api/file/file.dto';
 import type { IUser } from 'api/user/user.types';
 
 export type IFileLocation = 'game' | 'post' | 'user';
@@ -6,8 +7,8 @@ export type IFileLocation = 'game' | 'post' | 'user';
 export interface IFileEntity {
   _id: string;
   creator: IUser;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
   location: IFileLocation;
   originalname: string;
   size: number;
@@ -17,9 +18,5 @@ export interface IFileEntity {
   path: string;
 }
 
-export interface IFile
-  extends Omit<IFileEntity, '_id' | 'createdAt' | 'updatedAt'> {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type IFile = InstanceType<typeof FileResponseDto>;
+export type IFileSummary = InstanceType<typeof FileSummaryResponseDto>;

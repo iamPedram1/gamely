@@ -10,7 +10,7 @@ import BaseQueryService from 'services/base.query.module';
 import BaseMutateService from 'services/base.mutate.module';
 
 // Types
-import type IRequestQueryBase from 'types/query';
+import type { IRequestQueryBase } from 'types/query';
 import type { WithPagination } from 'types/paginate';
 import BaseService from 'services/base.service.module';
 

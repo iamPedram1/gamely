@@ -31,11 +31,7 @@ export default class BaseMutateService<
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > implements IBaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>
 {
-  protected readonly model: Model<TSchema>;
-
-  constructor(model: Model<TSchema>) {
-    this.model = model;
-  }
+  constructor(protected readonly model: Model<TSchema>) {}
 
   async deleteOneById(
     id: string,

@@ -4,10 +4,10 @@ import { Expose } from 'class-transformer';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 
 // Types
-import type { IUser } from 'api/user/user.types';
+import type { IUserEntity } from 'api/user/user.types';
 
-export class UserResponseDto extends BaseResponseDto implements IUser {
-  constructor(data: Partial<IUser>) {
+export class UserResponseDto extends BaseResponseDto {
+  constructor(data: Partial<IUserEntity>) {
     super();
     Object.assign(this, data);
   }
@@ -19,10 +19,7 @@ export class UserResponseDto extends BaseResponseDto implements IUser {
   readonly name!: string;
 }
 
-export class UserSummaryResponseDto
-  extends BaseSummaryResponseDto
-  implements Pick<IUser, 'name' | 'id'>
-{
+export class UserSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   readonly name!: string;
 }

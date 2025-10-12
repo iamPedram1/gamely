@@ -42,6 +42,11 @@ const userSchema = new Schema<
         validator: (v: string) => isEmail(v),
       },
     },
+    avatar: {
+      default: null,
+      type: Schema.Types.ObjectId,
+      ref: 'File',
+    },
     password: {
       type: String,
       minlength: 8,

@@ -1,25 +1,22 @@
 import express from 'express';
+import { container } from 'tsyringe';
 
 // Middlewares
 import auth from 'middleware/auth';
 import validateBody from 'middleware/validateBody';
-import validateQuery from 'middleware/validateQuery';
 import validateObjectId from 'middleware/validateObjectId';
-import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
 
 // Model
 import Post from 'api/post/post.model';
-import Comment from 'api/comment/comment.model';
 
-// Module
-import createCommentModule from 'api/comment/comment.module';
+// Controller
+import CommentController from 'api/comment/comment.controller';
 
 // Dto
-import { BaseQueryDto } from 'dto/query';
 import { CreateCommentDto } from 'api/comment/comment.dto';
 
 const commentRouter = express.Router();
-const { commentController } = createCommentModule();
+const commentController = container.resolve(CommentController);
 
 // Public Routes
 commentRouter.get(

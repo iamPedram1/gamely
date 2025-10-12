@@ -1,5 +1,9 @@
 // Types
 import type { Types } from 'mongoose';
+import type {
+  CommentResponseDto,
+  CommentSummaryResponseDto,
+} from 'api/comment/comment.dto';
 
 export type CommentType = 'main' | 'reply';
 
@@ -15,12 +19,5 @@ export interface ICommentEntity {
   createdAt: Date;
 }
 
-export interface IComment
-  extends Omit<
-    ICommentEntity,
-    'postId' | 'replyToCommentId' | '_id' | 'createdAt'
-  > {
-  id: string;
-  replies: IComment[];
-  createdAt: string;
-}
+export type IComment = InstanceType<typeof CommentResponseDto>;
+export type ICommentSummary = InstanceType<typeof CommentSummaryResponseDto>;

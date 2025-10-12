@@ -1,3 +1,5 @@
+import { singleton } from 'tsyringe';
+
 // Model
 import { GameDocument, GameLeanDocument } from 'api/game/game.model';
 
@@ -7,22 +9,15 @@ import { GameResponseDto, GameSummaryResponseDto } from 'api/game/game.dto';
 // Mapper
 import { BaseMapper } from 'mapper/base';
 
-export interface IGameMapper {
-  toDto: (game: GameDocument | GameLeanDocument) => GameResponseDto;
-  toSummaryDto: (
-    game: GameDocument | GameLeanDocument
-  ) => GameSummaryResponseDto;
-}
+export type IGameMapper = InstanceType<typeof GameMapper>;
 
-export class GameMapper
-  extends BaseMapper<
-    GameDocument,
-    GameLeanDocument,
-    GameResponseDto,
-    GameSummaryResponseDto
-  >
-  implements IGameMapper
-{
+@singleton()
+export class GameMapper extends BaseMapper<
+  GameDocument,
+  GameLeanDocument,
+  GameResponseDto,
+  GameSummaryResponseDto
+> {
   constructor() {
     super(GameResponseDto, GameSummaryResponseDto);
   }

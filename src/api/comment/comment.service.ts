@@ -1,4 +1,4 @@
-import type { Types } from 'mongoose';
+import type { Document, Types } from 'mongoose';
 
 // Models
 import Comment from 'api/comment/comment.model';
@@ -13,14 +13,18 @@ import BaseService from 'services/base.service.module';
 import { NotFoundError } from 'utilites/errors';
 
 // Types
-import type IRequestQueryBase from 'types/query';
-import type { IBaseService } from 'services/base.service.type';
+import type { IRequestQueryBase } from 'types/query';
+import type {
+  BaseMutateOptions,
+  IBaseService,
+} from 'services/base.service.type';
 import type { WithPagination } from 'types/paginate';
 import type { CommentType, ICommentEntity } from 'api/comment/comment.type';
 import type {
   CommentDocument,
   CommentLeanDocument,
 } from 'api/comment/comment.model';
+import { singleton } from 'tsyringe';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;
@@ -41,10 +45,12 @@ type CommentWithReplies = CommentLeanDocument & {
   replies: CommentWithReplies[];
 };
 
-class CommentService
-  extends BaseService<ICommentEntity, CreateCommentInput, UpdateCommentDto>
-  implements ICommentService
-{
+@singleton()
+class CommentService extends BaseService<
+  ICommentEntity,
+  CreateCommentInput,
+  UpdateCommentDto
+> {
   constructor() {
     super(Comment);
   }
@@ -73,7 +79,6 @@ class CommentService
       ...replies,
     ] as CommentWithReplies[];
 
-    // Remove Every Categories expect First Level.
     return {
       docs: this.attachReplies(allComments),
       pagination: firstLevel.pagination,
@@ -81,9 +86,14 @@ class CommentService
   }
 
   async create(
-    data: CreateCommentInput,
-    userId: string
-  ): Promise<CommentDocument> {
+    data: Partial<CreateCommentInput>,
+    userId?: string,
+    options?: BaseMutateOptions
+  ): Promise<
+    Document<unknown, {}, ICommentEntity, {}, {}> &
+      ICommentEntity &
+      Required<{ _id: Types.ObjectId }> & { __v: number }
+  > {
     if (data.replyToCommentId) {
       const comment = await this.getOneById(data.replyToCommentId, {
         lean: true,
@@ -94,7 +104,7 @@ class CommentService
       data.threadId = comment.threadId || comment._id;
     } else data.type = 'main';
 
-    return super.create(data, userId);
+    return super.create(data, userId, options);
   }
 
   private getReplies(

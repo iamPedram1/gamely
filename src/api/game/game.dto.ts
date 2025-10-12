@@ -5,10 +5,16 @@ import {
   Length,
   IsOptional,
   Matches,
+  IsMongoId,
 } from 'class-validator';
 
+// Dto
 import { UserSummaryResponseDto } from 'api/user/user.dto';
+import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+
+// Types
+import type { IFileSummary } from 'api/file/file.type';
 import type { IGameEntity } from 'api/game/game.type';
 
 export class CreateGameDto {
@@ -20,6 +26,10 @@ export class CreateGameDto {
   @IsString()
   @Length(3, 255)
   title: string;
+
+  @IsOptional()
+  @IsMongoId()
+  coverImage: string | null;
 
   @IsNotEmpty()
   @IsString()
@@ -39,6 +49,10 @@ export class UpdateGameDto {
   title: string;
 
   @IsOptional()
+  @IsMongoId()
+  coverImage: string | null;
+
+  @IsOptional()
   @IsString()
   @Length(3, 255)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
@@ -51,6 +65,10 @@ export class GameResponseDto extends BaseResponseDto {
 
   @Expose()
   slug!: string;
+
+  @Expose()
+  @Type(() => FileSummaryResponseDto)
+  coverImage!: IFileSummary;
 
   @Expose()
   @Type(() => UserSummaryResponseDto)

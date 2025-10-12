@@ -1,26 +1,27 @@
+import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Services
-import { ICommentService } from 'api/comment/comment.service';
+import CommentService from 'api/comment/comment.service';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'utilites/response';
+
+// Mapper
+import { CommentMapper } from 'api/comment/comment.mapper';
 
 // DTO
 import { CreateCommentDto, UpdateCommentDto } from 'api/comment/comment.dto';
 
 // Types
-import type { ICommentMapper } from 'api/comment/comment.mapper';
-import type IRequestQueryBase from 'types/query';
+import type { IRequestQueryBase } from 'types/query';
 
+@injectable()
 export default class CommentController {
-  private commentService: ICommentService;
-  private commentMapper: ICommentMapper;
-
-  constructor(commentService: ICommentService, commentMapper: ICommentMapper) {
-    this.commentMapper = commentMapper;
-    this.commentService = commentService;
-  }
+  constructor(
+    @inject(delay(() => CommentMapper)) private commentMapper: CommentMapper,
+    @inject(delay(() => CommentService)) private commentService: CommentService
+  ) {}
 
   getPostComments: RequestHandler = async (req, res) => {
     const id = req.params.id as string;

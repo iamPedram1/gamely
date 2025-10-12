@@ -1,17 +1,23 @@
-import type { RequestHandler } from 'express';
+import { delay, inject, injectable } from 'tsyringe';
+
+// Services
+import FileService from 'api/file/file.service';
 
 // Utilities
 import sendResponse from 'utilites/response';
 
+// Dto
+import { FileMapper } from 'api/file/file.mapper';
+
 // Types
-import type { IFileService } from 'api/file/file.service';
+import type { RequestHandler } from 'express';
 
+@injectable()
 export default class FileController {
-  private fileService: IFileService;
-
-  constructor(fileService: IFileService) {
-    this.fileService = fileService;
-  }
+  constructor(
+    @inject(delay(() => FileMapper)) private fileMapper: FileMapper,
+    @inject(delay(() => FileService)) private fileService: FileService
+  ) {}
 
   uploadOne: RequestHandler = async (req, res) => {
     const location = req.params?.location as any;
@@ -23,10 +29,12 @@ export default class FileController {
       req.user?._id
     );
 
-    sendResponse(res, 200, {
+    sendResponse(res, doc ? 201 : 400, {
       httpMethod: 'POST',
-      featureName: 'File Upload successfully',
-      body: { data: doc },
+      body: {
+        message: doc ? 'File uploaded successfully' : 'File upload failed',
+        data: doc ? this.fileMapper.toDto(doc) : null,
+      },
     });
   };
 }
