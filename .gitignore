@@ -22,3 +22,6 @@ build/
 
 # VSCode config (optional)
 .vscode/
+
+# Files
+public/

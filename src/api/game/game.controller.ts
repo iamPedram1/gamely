@@ -26,7 +26,7 @@ export default class GameController {
     const { pagination, docs } = await this.gameService.find({
       reqQuery,
       lean: true,
-      populate: ['coverImage', 'creator'],
+      populate: 'coverImage creator',
     });
 
     sendResponse(res, 200, {
@@ -104,8 +104,8 @@ export default class GameController {
       featureName: 'Game',
       body: {
         data: result,
-        isSuccess: result.isAllSucceed,
         errors: result.errors,
+        isSuccess: result.isAllSucceed,
         message: result.isAllSucceed
           ? 'Batch operation completed successfuly'
           : 'Operation completed with some errors',

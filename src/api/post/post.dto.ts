@@ -42,6 +42,10 @@ export class CreatePostDto {
   slug: string;
 
   @IsNotEmpty()
+  @IsMongoId()
+  coverImage: string;
+
+  @IsNotEmpty()
   @IsString()
   @Length(1)
   content: string;
@@ -88,6 +92,10 @@ export class UpdatePostDto {
   @IsOptional()
   @IsMongoId()
   game: string;
+
+  @IsOptional()
+  @IsMongoId()
+  coverImage: string;
 
   @IsOptional()
   @IsMongoId({ each: true })

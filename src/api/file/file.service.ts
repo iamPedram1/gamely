@@ -2,7 +2,6 @@ import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import { singleton } from 'tsyringe';
-import type { DeleteResult } from 'mongoose';
 
 // Models
 import File, { FileDocument } from 'api/file/file.model';
@@ -11,11 +10,7 @@ import File, { FileDocument } from 'api/file/file.model';
 import BaseService from 'services/base.service.module';
 
 // Utilities
-import {
-  BadRequestError,
-  InternalServerError,
-  NotFoundError,
-} from 'utilites/errors';
+import { BadRequestError, InternalServerError } from 'utilites/errors';
 
 // Types
 import type { BaseMutateOptions } from 'services/base.service.type';
@@ -70,12 +65,12 @@ class FileService extends BaseService<
     const uploadPath = folderMap[location];
     if (!uploadPath) throw new BadRequestError('Invalid location provided.');
 
-    // ✅ Ensure directory exists
+    // Ensure directory exists
     const absolutePath = path.join(process.cwd(), uploadPath);
     if (!fs.existsSync(absolutePath))
       fs.mkdirSync(absolutePath, { recursive: true });
 
-    // ✅ Process image with Sharp
+    // Process image with Sharp
     const nameWithoutExt = path.parse(file.originalname).name;
     const safeName = nameWithoutExt.replace(/\s+/g, '-').toLowerCase(); // 3-001
     const filename = `${Date.now()}-${safeName}.webp`;
@@ -83,7 +78,7 @@ class FileService extends BaseService<
 
     await sharp(file.buffer).webp().toFile(filepath);
 
-    // ✅ Save file metadata in DB
+    // Save file metadata in DB
     const doc = await new File({
       filename,
       destination: uploadPath,
@@ -98,6 +93,26 @@ class FileService extends BaseService<
     if (!doc) throw new BadRequestError('Uploading image failed.');
 
     return doc;
+  }
+
+  async uploadMany(
+    location: IFileLocation,
+    files: Express.Multer.File[],
+    userId?: string
+  ) {
+    const result = await Promise.allSettled(
+      files.map((file) => this.uploadOne(location, file, userId))
+    );
+
+    const successes: PromiseFulfilledResult<FileDocument>[] = [];
+    const fails: PromiseRejectedResult[] = [];
+
+    for (let res of result) {
+      if (res.status === 'fulfilled') successes.push(res);
+      else fails.push(res);
+    }
+
+    return { successes, fails };
   }
 }
 

@@ -1,4 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
+import { MulterError } from 'multer';
+
+// Utilities
 import logger from 'utilites/logger';
 import sendResponse from 'utilites/response';
 import {
@@ -9,6 +11,9 @@ import {
   UnauthorizedError,
   ValidationError,
 } from 'utilites/errors';
+
+// Types
+import type { Request, Response, NextFunction } from 'express';
 
 /**
  * Global error-handling middleware for Express.
@@ -40,6 +45,7 @@ export default function errorMiddleware(
 
   const isNotFoundError = error instanceof NotFoundError;
   const isForbiddenError = error instanceof ForbiddenError;
+  const isMulterError = error instanceof MulterError;
   const isValidationError = error instanceof ValidationError;
   const isBadRequestError = error instanceof BadRequestError;
   const isInternalServerError = error instanceof InternalServerError;
@@ -52,10 +58,18 @@ export default function errorMiddleware(
     isInternalServerError ||
     isUnauthorizedError;
 
-  sendResponse(res, isHandledError ? error.status || 500 : 500, {
+  sendResponse(res, isHandledError ? error.status : isMulterError ? 400 : 500, {
     body: {
-      errors: isHandledError ? error.cause : ['Internal server error'],
-      message: isHandledError ? error.message : 'Internal server error',
+      message: isHandledError
+        ? error.message
+        : isMulterError
+          ? error.message
+          : 'Internal server error',
+      errors: isHandledError
+        ? error.cause
+        : isMulterError
+          ? [error.message]
+          : ['Internal server error'],
     },
   });
 }

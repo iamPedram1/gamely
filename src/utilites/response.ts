@@ -79,9 +79,9 @@ const sendResponse = <T>(
 
   const response: IApiResponse<T> = {
     isSuccess,
-    errors,
     message,
     data,
+    errors,
   };
 
   res.status(status).json(response);

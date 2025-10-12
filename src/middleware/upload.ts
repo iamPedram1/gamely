@@ -1,15 +1,82 @@
-import multer from 'multer';
-import { ValidationError } from 'utilites/errors';
+import multer, { MulterError } from 'multer';
+import { BadRequestError } from 'utilites/errors';
 
-const upload = multer({
-  storage: multer.memoryStorage(), // ✅ Keep file in memory for Sharp
-  limits: {
-    fileSize: 2 * 1024 * 1024, // 2 MB
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else new ValidationError('Provided file is not of type image');
-  },
-});
+type UploadOptions = {
+  fieldName: string;
+  maxFiles?: number;
+  maxSize?: number; // in bytes
+};
 
-export default upload;
+export const uploadOneFile = ({
+  fieldName,
+  maxSize = 2 * 1024 * 1024,
+}: Omit<UploadOptions, 'maxFiles'>) => {
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: maxSize },
+  });
+
+  return (req: any, res: any, next: any) => {
+    upload.single(fieldName)(req, res, (err: any) => {
+      if (err instanceof MulterError) {
+        switch (err.code) {
+          case 'LIMIT_FILE_SIZE':
+            return next(
+              new BadRequestError(
+                `File too large. Max size is ${maxSize} bytes`
+              )
+            );
+          case 'LIMIT_UNEXPECTED_FILE':
+            return next(
+              new BadRequestError(`Unexpected file in field ${fieldName}`)
+            );
+          default:
+            return next(new BadRequestError(err.message));
+        }
+      }
+      if (err) return next(new BadRequestError('File upload failed'));
+      next();
+    });
+  };
+};
+export const uploadManyFiles = ({
+  fieldName,
+  maxFiles = 3,
+  maxSize = 2 * 1024 * 1024,
+}: UploadOptions) => {
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { files: maxFiles, fileSize: maxSize },
+  });
+
+  return (req: any, res: any, next: any) => {
+    upload.array(fieldName)(req, res, (err: any) => {
+      if (err instanceof MulterError) {
+        switch (err.code) {
+          case 'LIMIT_UNEXPECTED_FILE':
+            return next(
+              new BadRequestError(`Unexpected file in field ${fieldName}`)
+            );
+
+          case 'LIMIT_FILE_COUNT':
+            return next(
+              new BadRequestError(
+                `Too many files. Maximum allowed is ${maxFiles}`
+              )
+            );
+
+          case 'LIMIT_FILE_SIZE':
+            return next(
+              new BadRequestError(
+                `File too large. Max size is ${maxSize} bytes`
+              )
+            );
+          default:
+            return next(new BadRequestError(err.message));
+        }
+      }
+      if (err) return next(new BadRequestError('File upload failed'));
+      next();
+    });
+  };
+};
