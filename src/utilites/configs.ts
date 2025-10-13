@@ -10,6 +10,6 @@ export const prefixBaseUrl = (url: string) => `/api/v${apiVersion}${url}`;
 export const jwtCookieName = config.get('jwtCookieName') as string;
 export const jwtPrivateKey = process.env.JwtPrivateKey as string;
 export const jwtTokenExpiresIn = config.get('jwtTokenExpiresIn') as string;
-export const jwtCookieExpiresInSeconds = config.get(
-  'jwtCookieExpiresInSeconds'
+export const jwtCookieExpiresInMinuets = config.get(
+  'jwtCookieExpiresInMinuets'
 ) as number;

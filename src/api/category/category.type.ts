@@ -5,7 +5,7 @@ import type {
   NestedCategoryResponseDto,
 } from 'api/category/category.dto';
 
-export interface ICategoryEntity {
+export interface ICategoryEntity extends Document {
   title: string;
   slug: string;
   parentId: Types.ObjectId | null;

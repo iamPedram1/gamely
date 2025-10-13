@@ -166,10 +166,10 @@ class BaseMutateService<
     return ((options?.throwError ?? true) ? true : deleted) as any;
   }
 
-  async deleteManyByKey(
+  async deleteManyByKey<TThrowError extends boolean = false>(
     keyName: keyof AnyKeys<TSchema>,
     matchValue: any,
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<DeleteResult> {
     const query = this.model.deleteMany({
       [keyName]: matchValue,
@@ -177,9 +177,9 @@ class BaseMutateService<
 
     const result = await this.applyMutateOptions(query, options).exec();
 
-    if (result.deletedCount === 0) {
+    if ((options?.throwError ?? false) && result.deletedCount === 0) {
       throw new NotFoundError(
-        `${this.model.modelName} with ${String(keyName)} not found`
+        `No ${this.model.modelName.toLowerCase()} with ${String(keyName)}=${matchValue} was found`
       );
     }
 
@@ -247,15 +247,7 @@ class BaseMutateService<
       { $pull: { [keyName]: { $in: ids } } } as UpdateQuery<TSchema>
     );
 
-    const result = await this.applyMutateOptions(query, options).exec();
-
-    if (result.matchedCount === 0) {
-      throw new NotFoundError(
-        `No ${this.model.modelName} documents found with matching ${String(keyName)}`
-      );
-    }
-
-    return result;
+    return await this.applyMutateOptions(query, options).exec();
   }
 
   // --------------------------------------------------------------------------
@@ -276,8 +268,8 @@ class BaseMutateService<
 
     let q: any = query;
 
-    if (options.session) q = q.session(options.session);
-    if (options.lean) q = q.lean();
+    if (options.session && 'session' in q) q = q.session(options.session);
+    if (options.lean && 'lean' in q) q = q.lean();
 
     return q;
   }

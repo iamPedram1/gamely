@@ -8,8 +8,8 @@ import UserService from 'api/user/user.service';
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 
 // Utilities
+import sendResponse from 'utilites/response';
 import { jwtCookieName } from 'utilites/configs';
-import { setTokenCookie } from 'utilites/helperPack';
 
 @injectable()
 export default class AuthController {
@@ -21,17 +21,23 @@ export default class AuthController {
     const dto = req.body as RegisterDto;
 
     const token = await this.userService.register(dto);
-    setTokenCookie(res, token);
-
-    res.status(204).header(jwtCookieName, token).send();
+    res.header(jwtCookieName, token);
+    sendResponse(res, 200, {
+      body: {
+        data: { token },
+      },
+    });
   };
 
   login: RequestHandler = async (req, res) => {
     const dto = req.body as LoginDto;
 
     const token = await this.userService.login(dto);
-    setTokenCookie(res, token);
-
-    res.status(200).header(jwtCookieName, token).send();
+    res.header(jwtCookieName, token);
+    sendResponse(res, 200, {
+      body: {
+        data: { token },
+      },
+    });
   };
 }

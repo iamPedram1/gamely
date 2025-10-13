@@ -22,6 +22,12 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       maxlength: 255,
       required: true,
     },
+    readingTime: {
+      type: Number,
+      min: 1,
+      default: 1,
+      required: true,
+    },
     abstract: {
       type: String,
       trim: true,
@@ -38,6 +44,7 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
     slug: {
       type: String,
       trim: true,
+      index: true,
       unique: true,
       minlength: 3,
       maxlength: 255,
@@ -46,15 +53,18 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
     },
     creator: {
+      index: true,
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
     game: {
       type: Schema.Types.ObjectId,
       ref: 'Game',
+      index: true,
       default: null,
     },
     category: {
+      index: true,
       required: true,
       type: Schema.Types.ObjectId,
       ref: 'Category',
@@ -67,6 +77,7 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
     tags: [
       {
         type: Schema.Types.ObjectId,
+        index: true,
         ref: 'Tag',
       },
     ],

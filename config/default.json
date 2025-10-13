@@ -2,7 +2,7 @@
   "port": 3000,
   "version": 1,
   "jwtTokenExpiresIn": "90d",
-  "jwtCookieExpiresInSeconds": 30,
+  "jwtCookieExpiresInMinuets": 30,
   "jwtCookieName": "X-API-KEY",
   "appName": {
     "en": "Gamely",

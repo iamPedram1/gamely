@@ -1,9 +1,8 @@
-// middleware/rate-limiters.ts
 import { rateLimit } from 'express-rate-limit';
 
 export const authLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  limit: 5, // max 5 requests per 5 minutes per IP
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  limit: 5, // max 5 requests per 1 minutes per IP
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: {

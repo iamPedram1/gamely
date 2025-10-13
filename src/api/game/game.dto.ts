@@ -6,6 +6,7 @@ import {
   IsOptional,
   Matches,
   IsMongoId,
+  IsISO8601,
 } from 'class-validator';
 
 // Dto
@@ -26,6 +27,15 @@ export class CreateGameDto {
   @IsString()
   @Length(3, 255)
   title: string;
+
+  @IsNotEmpty()
+  @IsISO8601()
+  releaseDate: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(10, 500)
+  description: string;
 
   @IsOptional()
   @IsMongoId()
@@ -53,6 +63,15 @@ export class UpdateGameDto {
   coverImage: string | null;
 
   @IsOptional()
+  @IsISO8601()
+  releaseDate: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(10, 500)
+  description: string;
+
+  @IsOptional()
   @IsString()
   @Length(3, 255)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
@@ -61,14 +80,20 @@ export class UpdateGameDto {
 
 export class GameResponseDto extends BaseResponseDto {
   @Expose()
-  title!: string;
+  title: string;
 
   @Expose()
-  slug!: string;
+  slug: string;
+
+  @Expose()
+  description: string;
+
+  @Expose()
+  releaseDate: string;
 
   @Expose()
   @Type(() => FileSummaryResponseDto)
-  coverImage!: IFileSummary;
+  coverImage: IFileSummary;
 
   @Expose()
   @Type(() => UserSummaryResponseDto)

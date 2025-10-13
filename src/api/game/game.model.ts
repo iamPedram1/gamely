@@ -15,6 +15,13 @@ const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
       maxlength: 255,
       required: true,
     },
+    description: {
+      type: String,
+      trim: true,
+      minlength: 10,
+      maxlength: 500,
+      required: true,
+    },
     slug: {
       type: String,
       trim: true,
@@ -25,6 +32,10 @@ const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
       required: true,
       lowercase: true,
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
+    },
+    releaseDate: {
+      type: Date,
+      required: true,
     },
     coverImage: {
       default: null,

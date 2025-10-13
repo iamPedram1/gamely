@@ -30,6 +30,12 @@ const userSchema = new Schema<
       maxlength: 255,
       required: true,
     },
+    bio: {
+      type: String,
+      trim: true,
+      minlength: 1,
+      maxlength: 255,
+    },
     email: {
       type: String,
       trim: true,

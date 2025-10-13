@@ -1,9 +1,49 @@
 import type { WithPagination } from 'types/paginate';
-import type { Query, Document, FlattenMaps } from 'mongoose';
+import type { Query, Document, FlattenMaps, Aggregate, Model } from 'mongoose';
 
 interface IPaginationConfig {
   page: number;
   limit: number;
+}
+
+/**
+ * Paginates a Mongoose aggregation pipeline.
+ * @param model - Mongoose model to execute aggregation on
+ * @param pipeline - Aggregation pipeline array
+ * @param configs - Pagination configs (page, limit)
+ * @returns Paginated result with docs and pagination info
+ */
+export async function paginateAggregate<TResult>(
+  model: Model<any>,
+  pipeline: any[],
+  configs?: Partial<IPaginationConfig>
+): Promise<WithPagination<TResult>> {
+  const currentPage = configs?.page || 1;
+  const limit = configs?.limit || 20;
+  const skip = calculateSkip(limit, currentPage);
+
+  // Count total documents
+  const countPipeline = [...pipeline, { $count: 'totalDocs' }];
+  const countResult = await model.aggregate(countPipeline).exec();
+  const totalDocs = countResult[0]?.totalDocs || 0;
+
+  // Apply skip & limit to original pipeline
+  const paginatedPipeline = [...pipeline, { $skip: skip }, { $limit: limit }];
+  const docs = await model.aggregate<TResult>(paginatedPipeline).exec();
+
+  const totalPages = Math.ceil(totalDocs / limit);
+
+  return {
+    docs,
+    pagination: {
+      totalDocs,
+      totalPages,
+      currentPage,
+      limit,
+      hasPrevPage: calculateHasPrevPage(currentPage),
+      hasNextPage: calculateHasNextPage(totalPages, currentPage),
+    },
+  };
 }
 
 export default async function paginate<TResult, TDoc>(

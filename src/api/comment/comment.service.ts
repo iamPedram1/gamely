@@ -9,9 +9,6 @@ import { CreateCommentDto, UpdateCommentDto } from 'api/comment/comment.dto';
 // Services
 import BaseService from 'services/base.service.module';
 
-// Utils
-import { NotFoundError } from 'utilites/errors';
-
 // Types
 import type { Document, Types } from 'mongoose';
 import type { WithPagination } from 'types/paginate';

@@ -1,13 +1,20 @@
-import paginate from 'utilites/pagination';
+import paginate, { paginateAggregate } from 'utilites/pagination';
 import { NotFoundError } from 'utilites/errors';
 
 // Types
-import type { Model, Query, HydratedDocument, FilterQuery } from 'mongoose';
+import type {
+  Model,
+  Query,
+  HydratedDocument,
+  FilterQuery,
+  PipelineStage,
+} from 'mongoose';
 import {
   BaseQueryOptions,
   FindResult,
   NullableQueryResult,
 } from 'services/base.service.type';
+import { WithPagination } from 'types/paginate';
 
 /**
  * Generic base service for query operations (read-only) on Mongoose models.
@@ -141,6 +148,38 @@ class BaseQueryService<
     }
 
     return enrichedQuery.exec();
+  }
+
+  async aggregate<TPaginate extends boolean = true>(
+    pipeline: PipelineStage[],
+    options?: BaseQueryOptions<TSchema> & {
+      paginate?: TPaginate;
+    }
+  ) {
+    // Clone pipeline so original is not modified
+    const aggPipeline = [...pipeline];
+
+    // Apply sort
+    if (options?.sort) {
+      aggPipeline.push({ $sort: options.sort });
+    }
+
+    // Apply skip/limit for non-paginated queries
+    if (options?.skip) aggPipeline.push({ $skip: options.skip });
+    if (options?.limit) aggPipeline.push({ $limit: options.limit });
+
+    // Execute paginated aggregation if requested
+    if (options?.paginate ?? true) {
+      return paginateAggregate<TDoc>(
+        this.model,
+        aggPipeline,
+        options?.reqQuery
+      );
+    }
+
+    const docs: TDoc[] = await this.model.aggregate<TDoc>(aggPipeline).exec();
+
+    return docs;
   }
 
   // --------------------------------------------------------------------------

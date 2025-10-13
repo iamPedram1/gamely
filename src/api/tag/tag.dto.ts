@@ -66,4 +66,7 @@ export class TagSummaryResponseDto extends BaseSummaryResponseDto {
 
   @Expose()
   slug!: string;
+
+  @Expose()
+  postsCount!: number;
 }

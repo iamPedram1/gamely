@@ -4,11 +4,12 @@ import type {
   PostSummaryResponseDto,
 } from 'api/post/post.dto';
 
-export interface IPostEntity {
+export interface IPostEntity extends Document {
   title: string;
   slug: string;
   content: string;
   abstract: string;
+  readingTime: number;
   _id: Types.ObjectId;
   tags: Types.ObjectId[];
   creator: Types.ObjectId;

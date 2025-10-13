@@ -8,13 +8,9 @@ export class BaseResponseDto {
   id: string;
 
   @Expose()
-  @IsNotEmpty()
-  @IsISO8601()
   createdAt!: string;
 
   @Expose()
-  @IsNotEmpty()
-  @IsISO8601()
   updatedAt!: string;
 }
 

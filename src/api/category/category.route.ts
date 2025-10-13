@@ -26,12 +26,12 @@ const categoryController = container.resolve(CategoryController);
 
 // Public Routes
 categoryRouter.get('/', validateQuery(BaseQueryDto), categoryController.getAll);
-categoryRouter.get('/nested', categoryController.getAllNested);
 categoryRouter.get(
   '/summaries',
   validateQuery(BaseQueryDto),
   categoryController.getAllSummaries
 );
+categoryRouter.get('/nested', categoryController.getAllNested);
 categoryRouter.get(
   '/:id',
   validateObjectId(Category),

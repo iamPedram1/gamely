@@ -18,6 +18,7 @@ import type {
   AnyKeys,
   UpdateWithAggregationPipeline,
   UpdateQuery,
+  PipelineStage,
 } from 'mongoose';
 import type {
   BaseMutateOptions,
@@ -146,7 +147,16 @@ export default abstract class BaseService<
         })
       | undefined
   ): Promise<FindResult<TDoc, TLean, TPaginate>> {
-    return this.queries.find(options);
+    return await this.queries.find(options);
+  }
+
+  async aggregate<TPaginate extends boolean = true>(
+    pipeline: PipelineStage[],
+    options?: BaseQueryOptions<TSchema> & {
+      paginate?: TPaginate;
+    }
+  ) {
+    return this.queries.aggregate(pipeline, options);
   }
 
   /**
@@ -353,10 +363,10 @@ export default abstract class BaseService<
    * @returns MongoDB delete result.
    * @throws {NotFoundError} If no documents found.
    */
-  async deleteManyByKey<K extends keyof TSchema>(
-    keyName: K,
+  async deleteManyByKey<TThrowError extends boolean = false>(
+    keyName: keyof AnyKeys<TSchema>,
     matchValue: any,
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<DeleteResult> {
     return this.mutations.deleteManyByKey(keyName, matchValue, options);
   }

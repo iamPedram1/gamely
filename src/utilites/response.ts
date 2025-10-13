@@ -14,6 +14,7 @@ interface IApiResponse<T = null> {
   isSuccess: boolean;
   errors?: string[];
   data: T | null;
+  statusCode: number;
 }
 export type IApiBatchResult = {
   id: string;
@@ -67,6 +68,7 @@ const sendResponse = <T>(
   config?: ApiResponseConfig<T>
 ): void => {
   const isSuccess = config?.body?.isSuccess || (status >= 200 && status < 300);
+  const statusCode = status || 500;
   const data = config?.body?.data ?? null;
   const errors = config?.body?.errors ?? [];
   const message = config?.body?.message
@@ -81,6 +83,7 @@ const sendResponse = <T>(
     isSuccess,
     message,
     data,
+    statusCode,
     errors,
   };
 

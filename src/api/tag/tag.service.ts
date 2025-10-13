@@ -29,6 +29,39 @@ class TagService extends BaseService<
     super(Tag);
   }
 
+  async getWithPostsCount() {
+    return await super.aggregate(
+      [
+        {
+          $lookup: {
+            from: 'posts',
+            let: { tagId: '$_id' },
+            pipeline: [
+              { $match: { $expr: { $in: ['$$tagId', '$tags'] } } },
+              { $group: { _id: null, count: { $sum: 1 } } },
+            ],
+            as: 'postCountArr',
+          },
+        },
+        {
+          $addFields: {
+            postsCount: {
+              $ifNull: [{ $arrayElemAt: ['$postCountArr.count', 0] }, 0],
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            slug: 1,
+            postsCount: 1,
+          },
+        },
+      ],
+      { paginate: false }
+    );
+  }
   async deleteOneById(id: string): Promise<true> {
     return this.withTransaction(async (session) => {
       const result = await super.deleteOneById(id, { session });

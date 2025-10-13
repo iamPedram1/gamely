@@ -43,8 +43,9 @@ export default class GameController {
 
   getAllSummaries: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.gameService.find({
+    const docs = await this.gameService.find({
       reqQuery,
+      paginate: false,
       lean: true,
     });
 
@@ -52,10 +53,7 @@ export default class GameController {
       httpMethod: 'GET',
       featureName: 'Games',
       body: {
-        data: {
-          pagination,
-          docs: docs.map((doc) => this.gameMapper.toSummaryDto(doc)),
-        },
+        data: docs.map((doc) => this.gameMapper.toDto(doc)),
       },
     });
   };

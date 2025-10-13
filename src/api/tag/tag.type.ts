@@ -2,7 +2,7 @@
 import type { Types } from 'mongoose';
 import type { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
 
-export interface ITagEntity {
+export interface ITagEntity extends Document {
   title: string;
   slug: string;
   _id: Types.ObjectId;

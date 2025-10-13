@@ -1,4 +1,4 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -6,6 +6,8 @@ import {
   IsOptional,
   Matches,
   IsMongoId,
+  IsNumber,
+  Min,
 } from 'class-validator';
 
 // Dto
@@ -46,6 +48,11 @@ export class CreatePostDto {
   coverImage: string;
 
   @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
+  readingTime: number;
+
+  @IsNotEmpty()
   @IsString()
   @Length(1)
   content: string;
@@ -79,6 +86,11 @@ export class UpdatePostDto {
   abstract: string;
 
   @IsOptional()
+  @IsNumber()
+  @Min(1)
+  readingTime: number;
+
+  @IsOptional()
   @IsString()
   @Length(3)
   content: string;
@@ -108,17 +120,24 @@ export class UpdatePostDto {
 
 export class PostResponseDto extends BaseResponseDto {
   @Expose()
-  title!: string;
+  title: string;
 
   @Expose()
   abstract: string;
 
   @Expose()
-  slug!: string;
+  slug: string;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  content: string;
+
+  @Expose()
+  @Transform(({ obj }) =>
+    plainToInstance(UserSummaryResponseDto, obj.creator, {
+      excludeExtraneousValues: true,
+    })
+  )
+  author: UserSummaryResponseDto;
 
   @Expose()
   @Type(() => GameResponseDto)
@@ -130,7 +149,7 @@ export class PostResponseDto extends BaseResponseDto {
 
   @Expose()
   @Type(() => FileSummaryResponseDto)
-  coverImage!: IFileSummary;
+  coverImage: IFileSummary;
 
   @Expose()
   @Type(() => TagSummaryResponseDto)
@@ -139,8 +158,8 @@ export class PostResponseDto extends BaseResponseDto {
 
 export class PostSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  title!: string;
+  title: string;
 
   @Expose()
-  slug!: string;
+  slug: string;
 }

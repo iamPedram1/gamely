@@ -4,7 +4,7 @@ import type { IUser } from 'api/user/user.types';
 
 export type IFileLocation = 'game' | 'post' | 'user';
 
-export interface IFileEntity {
+export interface IFileEntity extends Omit<Document, 'location'> {
   _id: string;
   creator: IUser;
   createdAt: Date;

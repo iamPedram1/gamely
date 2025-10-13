@@ -21,8 +21,8 @@ export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/tags'), tagRouter);
   app.use(prefixBaseUrl('/games'), gameRouter);
   app.use(prefixBaseUrl('/categories'), categoryRouter);
-  app.use(prefixBaseUrl('/posts'), commentRouter);
   app.use(prefixBaseUrl('/posts'), postRouter);
+  app.use(prefixBaseUrl('/posts'), commentRouter);
   app.use(prefixBaseUrl('/upload'), fileRouter);
   app.use(notFound);
   app.use(error);

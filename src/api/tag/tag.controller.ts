@@ -44,19 +44,13 @@ export default class TagController {
 
   getAllSummaries: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.tagService.find({
-      reqQuery,
-      lean: true,
-    });
+    const docs = await this.tagService.getWithPostsCount();
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Tags',
       body: {
-        data: {
-          pagination,
-          docs: docs.map((doc) => this.tagMapper.toSummaryDto(doc)),
-        },
+        data: docs.map((doc) => this.tagMapper.toSummaryDto(doc)),
       },
     });
   };

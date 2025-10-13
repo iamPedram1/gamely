@@ -54,20 +54,18 @@ export default class CategoryController {
 
   getAllSummaries: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.categoryService.find({
+    const docs = await this.categoryService.find({
       reqQuery,
       lean: true,
-      select: 'title slug parentId',
+      paginate: false,
+      select: 'title slug',
     });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'Categories',
       body: {
-        data: {
-          pagination,
-          docs: docs.map((doc) => this.categoryMapper.toSummaryDto(doc)),
-        },
+        data: docs.map((doc) => this.categoryMapper.toSummaryDto(doc)),
       },
     });
   };

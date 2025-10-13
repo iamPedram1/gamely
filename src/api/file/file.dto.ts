@@ -19,7 +19,7 @@ export class FileResponseDto extends BaseResponseDto {
 
   @Expose()
   @Transform(({ obj }) => `${appUrl}/${obj.path}`.replace(/\\/g, '/'))
-  path: string;
+  url: string;
 }
 
 export class FileSummaryResponseDto extends BaseSummaryResponseDto {
@@ -29,5 +29,5 @@ export class FileSummaryResponseDto extends BaseSummaryResponseDto {
 
   @Expose()
   @Transform(({ obj }) => `${appUrl}/${obj.path}`.replace(/\\/g, '/'))
-  path: string;
+  url: string;
 }

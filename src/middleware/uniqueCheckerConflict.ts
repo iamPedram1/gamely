@@ -2,50 +2,48 @@ import type { Request, Response, NextFunction } from 'express';
 import type { Model } from 'mongoose';
 import { ValidationError } from 'utilites/errors';
 
+type DocumentKeys = keyof Document | '_id' | '__v' | '$locals';
+
+type EntityKeys<T> = Exclude<keyof T, DocumentKeys>;
+
 /**
- * Middleware factory to check for uniqueness conflicts on a specified field in a MongoDB collection.
+ * Express middleware factory to ensure a field value is unique in a Mongoose collection.
  *
- * It checks if a document with the same field value exists, excluding the current document by ID (if provided).
- * If a conflict is found, it passes a ValidationError to the next error handler.
- *
- * @param Model - Mongoose model to query against
- * @param fieldName - The field name in the document to check uniqueness for (e.g. 'slug', 'email')
- * @param bodyFieldKey - Optional key name in `req.body` that holds the value to check; defaults to `fieldName`
- * @param paramIdKey - Optional key name in `req.params` that holds the current document's ID to exclude; defaults to 'id'
- *
- * @returns Express middleware function (req, res, next) => void
+ * @template T - Mongoose document type
+ * @param model - Mongoose model to check
+ * @param fieldName - Name of the field to enforce uniqueness (e.g., 'slug', 'email')
+ * @param bodyFieldKey - Optional: key in req.body that holds the value (defaults to fieldName)
+ * @param paramIdKey - Optional: key in req.params for the current document ID (defaults to 'id')
  */
-export default function validateUniqueConflict(
-  Model: Model<any>,
-  fieldName: string,
-  bodyFieldKey = fieldName,
+export default function validateUniqueConflict<T extends Document>(
+  model: Model<T>,
+  fieldName: EntityKeys<T> & string,
+  bodyFieldKey: string = fieldName,
   paramIdKey = 'id'
 ) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const value = req.body?.[bodyFieldKey];
+      if (value === undefined || value === null) return next();
+
       const excludeId = req.params?.[paramIdKey];
 
-      if (!value) return next();
-
-      const conflict = await Model.findOne({
+      const conflict = await model.exists({
         [fieldName]: value,
-        _id: { $ne: excludeId },
-      })
-        .lean()
-        .exec();
+        ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+      });
 
       if (conflict) {
-        return next(
+        next(
           new ValidationError(
-            `${fieldName} '${value}' is already taken by another ${Model.modelName.toLocaleLowerCase()}.`
+            `${String(fieldName)} '${value}' is already taken by another ${model.modelName.toLowerCase()}.`
           )
         );
       }
 
       next();
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      next(err);
     }
   };
 }

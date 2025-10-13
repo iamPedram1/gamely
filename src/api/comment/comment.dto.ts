@@ -7,7 +7,8 @@ import {
   IsMongoId,
 } from 'class-validator';
 
-// Dto/
+// Dto
+import { FileResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 
 // Types
@@ -38,19 +39,28 @@ export class UpdateCommentDto {
     Object.assign(this, comment);
   }
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  @Length(3, 255)
-  title: string;
+  @Length(10, 500)
+  comment: string;
+
+  @IsOptional()
+  @IsMongoId()
+  replyToCommentId: string;
 }
 
 export class CommentResponseDto extends BaseResponseDto {
   @Expose()
-  comment!: string;
+  @Transform(({ obj }) => obj.comment)
+  content: string;
 
   @Expose()
   @Transform(({ obj }) => obj.creator.name)
   username: string;
+
+  @Expose()
+  @Transform(({ obj }) => obj.creator.avatar)
+  avatar: FileResponseDto;
 
   @Expose()
   @Type(() => CommentResponseDto)
@@ -59,11 +69,16 @@ export class CommentResponseDto extends BaseResponseDto {
 
 export class CommentSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  comment!: string;
+  @Transform(({ obj }) => obj.comment)
+  content: string;
 
   @Expose()
   @Transform(({ obj }) => obj.creator.name)
   username: string;
+
+  @Expose()
+  @Transform(({ obj }) => obj.creator.avatar)
+  avatar: FileResponseDto;
 
   @Expose()
   @Type(() => CommentSummaryResponseDto)

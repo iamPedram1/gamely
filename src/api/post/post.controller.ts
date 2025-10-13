@@ -43,9 +43,10 @@ export default class PostController {
 
   getAllSummaries: RequestHandler = async (req, res) => {
     const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.postService.find({
+    const docs = await this.postService.find({
       reqQuery,
       lean: true,
+      paginate: false,
       populate: 'category game tags coverImage creator',
     });
 
@@ -53,10 +54,7 @@ export default class PostController {
       httpMethod: 'GET',
       featureName: 'Posts',
       body: {
-        data: {
-          pagination,
-          docs: docs.map((doc) => this.postMapper.toSummaryDto(doc)),
-        },
+        data: docs.map((doc) => this.postMapper.toDto(doc)),
       },
     });
   };
