@@ -6,7 +6,7 @@ import request from 'supertest';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtCookieName } from 'utilites/configs';
+import { prefixBaseUrl, jwtTokenName } from 'utilites/configs';
 
 // Types
 import { IUserEntity } from 'api/user/user.types';
@@ -43,12 +43,12 @@ describe('auth routes', () => {
     const exec = async () => {
       return await request(server)
         .post(registerURL)
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send(payload);
     };
 
     it('should return 400 if user have token in header', async () => {
-      token = new User(payload).generateAuthToken();
+      token = new User(payload).generateToken();
 
       const response = await exec();
 
@@ -103,12 +103,12 @@ describe('auth routes', () => {
     const exec = async () => {
       return await request(server)
         .post(loginURL)
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send(payload);
     };
 
     it('should return 400 if user have token', async () => {
-      token = new User({ name: 'User', ...payload }).generateAuthToken();
+      token = new User({ name: 'User', ...payload }).generateToken();
       const result = await exec();
 
       expect(result.status).toBe(400);
@@ -138,7 +138,7 @@ describe('auth routes', () => {
       const result = await exec();
 
       expect(result.status).toBe(200);
-      expect(result.headers).toHaveProperty(jwtCookieName);
+      expect(result.headers).toHaveProperty(jwtTokenName);
     });
   });
 });

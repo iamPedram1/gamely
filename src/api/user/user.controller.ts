@@ -24,7 +24,7 @@ export default class UserController {
   ) {}
 
   getProfile: RequestHandler = async (req, res) => {
-    const user = await this.userService.getUserById(req.user?._id);
+    const user = await this.userService.getOneById(req.user?._id);
 
     if (!user) throw new NotFoundError('User with given id was not found.');
 
@@ -33,6 +33,31 @@ export default class UserController {
       featureName: 'Profile',
       body: {
         data: this.userMapper.toDto(user),
+      },
+    });
+  };
+
+  refreshToken: RequestHandler = async (req, res) => {
+    console.log(req.body);
+    const newAuth = await this.userService.refreshToken(req.body.refreshToken);
+
+    sendResponse(res, 200, {
+      httpMethod: 'POST',
+      body: {
+        message: 'Token refreshed successfully',
+        data: newAuth,
+      },
+    });
+  };
+
+  revokeToken: RequestHandler = async (req, res) => {
+    await this.userService.clearToken(req.user._id);
+
+    sendResponse(res, 200, {
+      httpMethod: 'POST',
+      body: {
+        data: null,
+        message: 'Operation completed successfully',
       },
     });
   };

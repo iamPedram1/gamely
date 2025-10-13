@@ -8,7 +8,7 @@ import { CategoryMapper } from 'api/category/category.mapper';
 
 // Utilities
 import sendResponse from 'utilites/response';
-import { InternalServerError } from 'utilites/errors';
+import { AnonymousError } from 'utilites/errors';
 
 // Types
 import type { RequestHandler } from 'express';
@@ -112,7 +112,12 @@ export default class CategoryController {
       req.body
     );
 
-    if (!body) throw new InternalServerError('Error in updating category');
+    if (!body)
+      throw new AnonymousError(
+        'Error in updating category',
+        'Internal Server Error',
+        500
+      );
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',

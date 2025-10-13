@@ -11,7 +11,6 @@ import blockRequestWithToken from 'api/auth/auth.middleware';
 
 // DTO
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
-
 const authRouter = express.Router();
 const authController = container.resolve(AuthController);
 

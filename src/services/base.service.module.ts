@@ -243,7 +243,7 @@ export default abstract class BaseService<
    * @param userId - Optional creator ID to attach.
    * @param options - Mongoose session or populate options.
    * @returns Created document.
-   * @throws {InternalServerError} If creation fails.
+   * @throws {AnonymousError} If creation fails.
    */
   async create<TThrowError extends boolean = true>(
     data: TCreateDto,
@@ -281,7 +281,7 @@ export default abstract class BaseService<
    * @param options - Mutation options.
    * @returns MongoDB update result.
    * @throws {NotFoundError} If no documents are matched.
-   * @throws {InternalServerError} If matched documents cannot be updated.
+   * @throws {AnonymousError} If matched documents cannot be updated.
    */
   async updateManyByKey(
     keyName: keyof AnyKeys<TSchema>,
@@ -377,7 +377,7 @@ export default abstract class BaseService<
    * @param options - Mutation options.
    * @returns Batch delete result summary.
    * @throws {ValidationError} If `ids` array is empty.
-   * @throws {InternalServerError} If deletion fails.
+   * @throws {AnonymousError} If deletion fails.
    */
   async batchDelete(
     ids: string[],

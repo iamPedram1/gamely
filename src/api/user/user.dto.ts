@@ -1,19 +1,19 @@
 import { Expose, Type } from 'class-transformer';
+import {
+  IsJWT,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  Length,
+} from 'class-validator';
 
 // Dto
 import { FileResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 
 // Types
+import type { Types } from 'mongoose';
 import type { IUserEntity } from 'api/user/user.types';
-import {
-  IsEmail,
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  Length,
-} from 'class-validator';
-import { Types } from 'mongoose';
 
 export class UpdateProfileDto {
   constructor(data: Pick<IUserEntity, 'name' | 'avatar' | 'password' | 'bio'>) {
@@ -35,6 +35,16 @@ export class UpdateProfileDto {
   @IsNotEmpty()
   @IsMongoId()
   avatar: Types.ObjectId;
+}
+
+export class RefreshTokenDto {
+  constructor(data: Pick<IUserEntity, 'refreshToken' | 'token'>) {
+    Object.assign(this, data);
+  }
+
+  @IsNotEmpty()
+  @IsJWT()
+  refreshToken: string;
 }
 
 export class UserResponseDto extends BaseResponseDto {

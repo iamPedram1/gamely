@@ -4,6 +4,7 @@ import { MulterError } from 'multer';
 import logger from 'utilites/logger';
 import sendResponse from 'utilites/response';
 import {
+  AnonymousError,
   BadRequestError,
   ForbiddenError,
   InternalServerError,
@@ -48,28 +49,39 @@ export default function errorMiddleware(
   const isMulterError = error instanceof MulterError;
   const isValidationError = error instanceof ValidationError;
   const isBadRequestError = error instanceof BadRequestError;
-  const isInternalServerError = error instanceof InternalServerError;
+  const isInternalServerError = error instanceof InternalServerError; // We Dont Want to return error message to client.
+  const isAnonymousError = error instanceof AnonymousError;
   const isUnauthorizedError = error instanceof UnauthorizedError;
   const isHandledError =
     isNotFoundError ||
     isForbiddenError ||
     isValidationError ||
-    isBadRequestError ||
     isInternalServerError ||
+    isBadRequestError ||
     isUnauthorizedError;
 
-  sendResponse(res, isHandledError ? error.status : isMulterError ? 400 : 500, {
+  let status = 500;
+  let message = 'Internal server error';
+  let errors = ['Internal server error'];
+
+  if (isHandledError) {
+    status = error.status;
+    message = error.message;
+    errors = error.cause;
+  } else if (isMulterError) {
+    status = 400;
+    message = error.message;
+    errors = [error.message];
+  } else if (isAnonymousError) {
+    status = error.status;
+    message = error.mask;
+    errors = [error.mask];
+  }
+
+  sendResponse(res, status, {
     body: {
-      message: isHandledError
-        ? error.message
-        : isMulterError
-          ? error.message
-          : 'Internal server error',
-      errors: isHandledError
-        ? error.cause
-        : isMulterError
-          ? [error.message]
-          : ['Internal server error'],
+      message,
+      errors,
     },
   });
 }

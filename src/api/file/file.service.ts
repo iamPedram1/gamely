@@ -10,7 +10,7 @@ import File, { FileDocument } from 'api/file/file.model';
 import BaseService from 'services/base.service.module';
 
 // Utilities
-import { BadRequestError, InternalServerError } from 'utilites/errors';
+import { AnonymousError, BadRequestError } from 'utilites/errors';
 
 // Types
 import type { BaseMutateOptions } from 'services/base.service.type';
@@ -38,9 +38,7 @@ class FileService extends BaseService<
       await fsPromises.rm(file.path);
     } catch (err: any) {
       if (err.code !== 'ENOENT') {
-        throw new InternalServerError(
-          err?.message || 'An error occurred while deleting file.'
-        );
+        throw new AnonymousError(err?.message);
       }
     }
 

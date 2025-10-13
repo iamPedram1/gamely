@@ -1,40 +1,37 @@
-import * as validator from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 import type { IUserEntity } from 'api/user/user.types';
 
 export class RegisterDto {
   constructor(user: IUserEntity) {
-    this.name = user?.name || '';
-    this.email = user?.email || '';
-    this.password = user?.password || '';
+    Object.assign(this, user);
   }
 
-  @validator.IsNotEmpty()
-  @validator.IsString()
-  @validator.Length(3, 255)
+  @IsNotEmpty()
+  @IsString()
+  @Length(3, 255)
   name: string;
 
-  @validator.IsNotEmpty()
-  @validator.IsEmail()
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
 
-  @validator.IsNotEmpty()
-  @validator.IsString()
-  @validator.Length(8, 255)
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 255)
   password: string;
 }
 
 export class LoginDto {
   constructor(user: Pick<IUserEntity, 'email' | 'password'>) {
-    this.email = user?.email || '';
-    this.password = user?.password || '';
+    Object.assign(this, user);
   }
 
-  @validator.IsNotEmpty()
-  @validator.IsEmail()
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
 
-  @validator.IsNotEmpty()
-  @validator.IsString()
-  @validator.Length(8, 255)
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 255)
   password: string;
 }

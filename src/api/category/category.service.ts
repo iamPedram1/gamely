@@ -15,11 +15,7 @@ import PostService from 'api/post/post.service';
 import BaseService from 'services/base.service.module';
 
 // Utilities
-import {
-  BadRequestError,
-  InternalServerError,
-  NotFoundError,
-} from 'utilites/errors';
+import { BadRequestError, NotFoundError } from 'utilites/errors';
 
 // Types
 import type { BaseMutateOptions } from 'services/base.service.type';

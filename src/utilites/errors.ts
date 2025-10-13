@@ -32,6 +32,27 @@ export class NotFoundError extends Error {
   }
 }
 
+export class AnonymousError extends Error {
+  cause: string[];
+  status = 400;
+  mask: string;
+
+  constructor(
+    message: string,
+    mask: string = 'Internal server error',
+    status: number = 400,
+    options?: CustomErrorOptions
+  ) {
+    super(message);
+
+    this.name = 'AnonymousError';
+    this.mask = mask;
+    this.status = status;
+    this.cause = options?.cause || [];
+    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+  }
+}
+
 export class BadRequestError extends Error {
   status = 400;
   cause: string[];
@@ -41,7 +62,7 @@ export class BadRequestError extends Error {
 
     this.name = 'BadRequestError';
     this.cause = options?.cause || [];
-    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+    if (Error.captureStackTrace) Error.captureStackTrace(this, BadRequestError);
   }
 }
 
@@ -54,7 +75,8 @@ export class InternalServerError extends Error {
 
     this.name = 'InternalServerError';
     this.cause = options?.cause || [];
-    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+    if (Error.captureStackTrace)
+      Error.captureStackTrace(this, InternalServerError);
   }
 }
 
@@ -67,7 +89,7 @@ export class ForbiddenError extends Error {
 
     this.name = 'ForbiddenError';
     this.cause = options?.cause || [];
-    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+    if (Error.captureStackTrace) Error.captureStackTrace(this, ForbiddenError);
   }
 }
 
@@ -80,6 +102,7 @@ export class UnauthorizedError extends Error {
 
     this.name = 'UnauthorizedError';
     this.cause = options?.cause || [];
-    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+    if (Error.captureStackTrace)
+      Error.captureStackTrace(this, UnauthorizedError);
   }
 }

@@ -7,7 +7,7 @@ import Tag from 'api/tag/tag.model';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtCookieName } from 'utilites/configs';
+import { prefixBaseUrl, jwtTokenName } from 'utilites/configs';
 
 // Types
 import { ITagEntity } from 'api/tag/tag.type';
@@ -35,7 +35,7 @@ describe('tag routes', () => {
       }).save();
 
       userId = user._id.toHexString();
-      token = user.generateAuthToken();
+      token = user.generateToken();
       payload = { title: 'Action', slug: 'action' };
     });
 
@@ -48,7 +48,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .post(prefixBaseUrl('/tags'))
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send(payload);
     };
 
@@ -108,7 +108,7 @@ describe('tag routes', () => {
 
       tagId = '';
       userId = user._id.toHexString();
-      token = user.generateAuthToken();
+      token = user.generateToken();
       payload = { title: 'Action', slug: 'action' };
       const tag = await new Tag({ ...payload, creator: userId }).save();
       tagId = tag._id.toHexString();
@@ -123,7 +123,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .patch(prefixBaseUrl(`/tags/${tagId}`))
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send(payload);
     };
 
@@ -183,7 +183,7 @@ describe('tag routes', () => {
         name: 'Test',
       }).save();
       userId = user._id.toHexString();
-      token = user.generateAuthToken();
+      token = user.generateToken();
       const tag = await new Tag({
         title: 'Drama',
         slug: 'drama',
@@ -201,7 +201,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .delete(prefixBaseUrl(`/tags/${tagId}`))
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send();
     };
 

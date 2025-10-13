@@ -7,7 +7,7 @@ import Game from 'api/game/game.model';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtCookieName } from 'utilites/configs';
+import { prefixBaseUrl, jwtTokenName } from 'utilites/configs';
 
 // Types
 import { IGameEntity } from 'api/game/game.type';
@@ -35,7 +35,7 @@ describe('game routes', () => {
       }).save();
 
       userId = user._id.toHexString();
-      token = user.generateAuthToken();
+      token = user.generateToken();
       payload = { title: 'Red Dead Redemption 2', slug: 'rdr2' };
     });
 
@@ -47,7 +47,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .post(prefixBaseUrl('/games'))
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send(payload);
     };
 
@@ -108,7 +108,7 @@ describe('game routes', () => {
 
       gameId = '';
       userId = user._id.toHexString();
-      token = user.generateAuthToken();
+      token = user.generateToken();
       payload = { title: 'Red Dead Redemption 2', slug: 'rdr2' };
       const game = await new Game({ ...payload, creator: userId }).save();
       gameId = game._id.toHexString();
@@ -122,7 +122,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .patch(prefixBaseUrl(`/games/${gameId}`))
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send(payload);
     };
 
@@ -183,7 +183,7 @@ describe('game routes', () => {
         name: 'Test',
       }).save();
       userId = user._id.toHexString();
-      token = user.generateAuthToken();
+      token = user.generateToken();
       const game = await new Game({
         title: 'Red Dead Redemption 2',
         slug: 'rdr2',
@@ -200,7 +200,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .delete(prefixBaseUrl(`/games/${gameId}`))
-        .set(jwtCookieName, token)
+        .set(jwtTokenName, token)
         .send();
     };
 

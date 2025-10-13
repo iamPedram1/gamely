@@ -4,22 +4,24 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'middleware/auth';
 import validateBody from 'middleware/validateBody';
-import validateObjectId from 'middleware/validateObjectId';
-
-// Model
-import User from 'api/user/user.model';
 
 // Controller
 import UserController from 'api/user/user.controller';
 
 // Dto
-import { UpdateProfileDto } from 'api/user/user.dto';
+import { RefreshTokenDto, UpdateProfileDto } from 'api/user/user.dto';
 
 const userRouter = express.Router();
 const userController = container.resolve(UserController);
 
 // Protected Routes
+userRouter.post(
+  '/token/refresh',
+  validateBody(RefreshTokenDto),
+  userController.refreshToken
+);
 userRouter.use(auth);
+userRouter.post('/token/revoke', userController.revokeToken);
 userRouter.get('/profile', userController.getProfile);
 userRouter.patch(
   '/profile',

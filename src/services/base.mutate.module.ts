@@ -12,7 +12,7 @@ import type {
 
 // Utilities
 import {
-  InternalServerError,
+  AnonymousError,
   NotFoundError,
   ValidationError,
 } from 'utilites/errors';
@@ -47,9 +47,7 @@ class BaseMutateService<
     } as any).save({ session: options?.session });
 
     if (!doc && (options?.throwError ?? true)) {
-      throw new InternalServerError(
-        `${this.model.modelName} could not be created`
-      );
+      throw new AnonymousError(`${this.model.modelName} could not be created`);
     }
 
     if (options?.populate) {
@@ -105,7 +103,7 @@ class BaseMutateService<
     }
 
     if (result.modifiedCount === 0) {
-      throw new InternalServerError(
+      throw new AnonymousError(
         `${this.model.modelName} matched but could not be updated`
       );
     }
@@ -200,7 +198,7 @@ class BaseMutateService<
     const result = await this.applyMutateOptions(query, options).exec();
 
     if (!result.acknowledged) {
-      throw new InternalServerError(
+      throw new AnonymousError(
         `Batch delete failed for ${this.model.modelName}`
       );
     }

@@ -1,11 +1,15 @@
-import { injectable } from 'tsyringe';
+import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
+import { injectable } from 'tsyringe';
 
 // Model
-import UserModel from 'api/user/user.model';
+import User, { IRefreshToken } from 'api/user/user.model';
+
+// Service
+import BaseService from 'services/base.service.module';
 
 // Utilities
-import { NotFoundError, ValidationError } from 'utilites/errors';
+import { AnonymousError, ValidationError } from 'utilites/errors';
 
 // Dto
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
@@ -14,46 +18,108 @@ import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 import { UserDocument } from 'api/user/user.model';
 import { UpdateProfileDto } from 'api/user/user.dto';
 import { IUserEntity } from 'api/user/user.types';
+import { jwtRefreshTokenKey } from 'utilites/configs';
+
+type AuthTokens = Pick<IUserEntity, 'refreshToken' | 'token'>;
 
 export type IUserService = InstanceType<typeof UserService>;
 
 @injectable()
-export default class UserService {
-  async register(data: RegisterDto): Promise<string> {
-    const user = await this.getUserByEmail(data.email);
+export default class UserService extends BaseService<
+  IUserEntity,
+  RegisterDto & Partial<AuthTokens>,
+  UpdateProfileDto & Partial<AuthTokens>,
+  UserDocument
+> {
+  constructor() {
+    super(User);
+  }
+
+  async register(data: RegisterDto): Promise<IUserEntity> {
+    const user = await this.existsByKey('email', data.email);
 
     if (user)
       throw new ValidationError('A user with the given email already exist.');
 
     data.password = await this.hashPassword(data.password);
 
-    return (await this.create({ ...data })).generateAuthToken();
+    return await this.create({ ...data });
   }
 
   async update(userId: string, data: UpdateProfileDto): Promise<IUserEntity> {
-    const user = (await UserModel.findByIdAndUpdate(userId, {
-      ...data,
-      ...(data.password && {
-        password: await this.hashPassword(data.password),
-      }),
-    }).lean()) as IUserEntity;
-
-    if (!user) throw new NotFoundError('User with given id was not found.');
+    const user = await this.updateOneById(
+      userId,
+      {
+        ...data,
+        ...(data.password && {
+          password: await this.hashPassword(data.password),
+        }),
+      },
+      { lean: true }
+    );
 
     return user;
   }
 
   async login(data: LoginDto) {
-    const message = 'Email or password is incorrect.';
+    const user = await this.getOneByKey('email', data.email.toLowerCase(), {
+      select: '+password',
+      throwError: false,
+    });
 
-    const user = await this.getUserByEmail(data.email.toLowerCase(), true);
+    const mask = 'Email or password is incorrect';
 
-    if (!user) throw new ValidationError(message);
+    if (!user) throw new AnonymousError('User not found', mask);
 
     const isPasswordCorrect = await user.comparePassword(data.password);
-    if (!isPasswordCorrect) throw new ValidationError(message);
+    if (!isPasswordCorrect) throw new Error();
 
-    return user.generateAuthToken();
+    const { token, refreshToken } = user.generateAuthToken();
+
+    user.set('token', token);
+    user.set('refreshToken', refreshToken);
+
+    const res = await user.save();
+    if (!res)
+      throw new AnonymousError('Error occured while saving tokens', mask);
+
+    return { token, refreshToken };
+  }
+
+  async refreshToken(refreshToken: string) {
+    const { userId } = jwt.verify(
+      refreshToken,
+      jwtRefreshTokenKey
+    ) as IRefreshToken;
+    const user = await this.getOneById(userId, { select: '+refreshToken' });
+
+    if (user.refreshToken !== refreshToken)
+      throw new ValidationError('Invalid refresh token');
+
+    const newAuth = user.generateAuthToken();
+
+    user.set('token', newAuth.token);
+    user.set('refreshToken', newAuth.refreshToken);
+
+    const res = await user.save();
+
+    if (!res)
+      throw new AnonymousError('An error occured while generating token.');
+
+    return newAuth;
+  }
+
+  async clearToken(userId: string) {
+    const user = await this.getOneById(userId);
+    user.set('token', null);
+    user.set('refreshToken', null);
+
+    const res = await user.save();
+
+    if (!res)
+      throw new AnonymousError('An error occured while cleaning up token.');
+
+    return true;
   }
 
   async comparePassword(password: string, hash: string) {
@@ -64,34 +130,5 @@ export default class UserService {
     const salt = await bcryptjs.genSalt();
     const hash = await bcryptjs.hash(password, salt);
     return hash;
-  }
-
-  async create(data: RegisterDto): Promise<UserDocument> {
-    const user = new UserModel(data);
-
-    await user.save();
-
-    return user;
-  }
-
-  async getUserByEmail(
-    email: string,
-    selectPassword?: boolean
-  ): Promise<UserDocument | null> {
-    return selectPassword
-      ? await UserModel.findOne({ email }).select('+password').exec()
-      : await UserModel.findOne({ email }).exec();
-  }
-
-  async getUserById(_id: string): Promise<UserDocument | null> {
-    return await UserModel.findOne({ _id }).populate('avatar').exec();
-  }
-
-  async getUsers(): Promise<UserDocument[]> {
-    return await UserModel.find();
-  }
-
-  async emailExist(email: string): Promise<boolean> {
-    return Boolean(await UserModel.exists({ email }));
   }
 }

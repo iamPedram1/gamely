@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 
 // Utilites
-import { jwtCookieName } from 'utilites/configs';
+import { jwtTokenName } from 'utilites/configs';
 import { BadRequestError } from 'utilites/errors';
 
 export default function blockRequestWithToken(
@@ -9,7 +9,7 @@ export default function blockRequestWithToken(
   res: Response,
   next: NextFunction
 ) {
-  const token = req.header(jwtCookieName);
+  const token = req.header(jwtTokenName);
   if (token) throw new BadRequestError('Bad Request');
 
   next();

@@ -1,9 +1,11 @@
 {
   "port": 3000,
   "version": 1,
-  "jwtTokenExpiresIn": "90d",
+  "jwtTokenExpiresIn": "5m",
+  "jwtRefreshTokenExpiresIn": "30d",
   "jwtCookieExpiresInMinuets": 30,
-  "jwtCookieName": "X-API-KEY",
+  "jwtTokenName": "X-API-KEY",
+  "jwtRefreshTokenName": "X-API-REFRESH-TOKEN",
   "appName": {
     "en": "Gamely",
     "fa": "گیم‌لی"
