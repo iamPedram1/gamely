@@ -57,7 +57,7 @@ interface BaseCommonOptions<TLean extends boolean = boolean> {
   /** Return plain JS object instead of Mongoose document */
   lean?: TLean;
   /** Fields to populate */
-  populate?: PopulateOptions | string | string[];
+  populate?: PopulateOptions[] | string | string[];
 }
 
 /** Query options for BaseQueryService */

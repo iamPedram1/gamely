@@ -132,6 +132,9 @@ export class PostResponseDto extends BaseResponseDto {
   content: string;
 
   @Expose()
+  readingTime: number;
+
+  @Expose()
   @Transform(({ obj }) =>
     plainToInstance(UserSummaryResponseDto, obj.creator, {
       excludeExtraneousValues: true,

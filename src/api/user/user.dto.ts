@@ -6,6 +6,36 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
 
 // Types
 import type { IUserEntity } from 'api/user/user.types';
+import {
+  IsEmail,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  Length,
+} from 'class-validator';
+import { Types } from 'mongoose';
+
+export class UpdateProfileDto {
+  constructor(data: Pick<IUserEntity, 'name' | 'avatar' | 'password' | 'bio'>) {
+    Object.assign(this, data);
+  }
+
+  @IsOptional()
+  @Length(3, 255)
+  name: string;
+
+  @IsOptional()
+  @Length(1, 255)
+  bio: string;
+
+  @IsOptional()
+  @Length(8, 255)
+  password: string;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  avatar: Types.ObjectId;
+}
 
 export class UserResponseDto extends BaseResponseDto {
   constructor(data: Partial<IUserEntity>) {

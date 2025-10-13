@@ -26,7 +26,13 @@ export default class PostController {
     const { pagination, docs } = await this.postService.find({
       reqQuery,
       lean: true,
-      populate: 'category game tags coverImage creator',
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'category' },
+        { path: 'game' },
+        { path: 'tags' },
+        { path: 'coverImage' },
+      ],
     });
 
     sendResponse(res, 200, {
@@ -47,7 +53,6 @@ export default class PostController {
       reqQuery,
       lean: true,
       paginate: false,
-      populate: 'category game tags coverImage creator',
     });
 
     sendResponse(res, 200, {
@@ -62,7 +67,13 @@ export default class PostController {
   getOne: RequestHandler = async (req, res) => {
     const post = await this.postService.getOneById(req.params.id, {
       lean: true,
-      populate: 'category game tags coverImage creator',
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'category' },
+        { path: 'game' },
+        { path: 'tags' },
+        { path: 'coverImage' },
+      ],
     });
 
     sendResponse(res, post ? 200 : 400, {
@@ -77,7 +88,13 @@ export default class PostController {
   create: RequestHandler = async (req, res) => {
     const post = await this.postService.create(req.body, req.user._id, {
       lean: true,
-      populate: 'category game tags coverImage creator',
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'category' },
+        { path: 'game' },
+        { path: 'tags' },
+        { path: 'coverImage' },
+      ],
     });
 
     sendResponse(res, post ? 201 : 400, {
@@ -116,7 +133,13 @@ export default class PostController {
   update: RequestHandler = async (req, res) => {
     const body = await this.postService.updateOneById(req.params.id, req.body, {
       lean: true,
-      populate: 'category game tags coverImage creator',
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'category' },
+        { path: 'game' },
+        { path: 'tags' },
+        { path: 'coverImage' },
+      ],
     });
 
     if (!body) throw new ValidationError('Error in updating post');

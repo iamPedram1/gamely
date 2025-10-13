@@ -26,7 +26,10 @@ export default class GameController {
     const { pagination, docs } = await this.gameService.find({
       reqQuery,
       lean: true,
-      populate: 'coverImage creator',
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'coverImage' },
+      ],
     });
 
     sendResponse(res, 200, {
@@ -75,7 +78,10 @@ export default class GameController {
 
   create: RequestHandler = async (req, res) => {
     const game = await this.gameService.create(req.body, req.user._id, {
-      populate: 'coverImage creator',
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'coverImage' },
+      ],
     });
 
     sendResponse(res, game ? 201 : 400, {
@@ -113,8 +119,11 @@ export default class GameController {
 
   update: RequestHandler = async (req, res) => {
     const body = await this.gameService.updateOneById(req.params.id, req.body, {
-      populate: 'coverImage creator',
       lean: true,
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'coverImage' },
+      ],
     });
 
     if (!body) throw new ValidationError('Error in updating game');

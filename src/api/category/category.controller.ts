@@ -27,7 +27,7 @@ export default class CategoryController {
     const { pagination, docs } = await this.categoryService.find({
       reqQuery,
       lean: true,
-      populate: 'creator',
+      populate: [{ path: 'creator', populate: 'avatar' }],
     });
 
     sendResponse(res, 200, {
@@ -72,8 +72,8 @@ export default class CategoryController {
 
   getOne: RequestHandler = async (req, res) => {
     const category = await this.categoryService.getOneById(req.params.id, {
-      populate: 'creator',
       lean: true,
+      populate: [{ path: 'creator', populate: 'avatar' }],
     });
 
     sendResponse(res, 200, {

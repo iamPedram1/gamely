@@ -59,9 +59,15 @@ class CommentService extends BaseService<
   ): Promise<WithPagination<CommentLeanDocument>> {
     const firstLevel = await super.find({
       reqQuery,
-      filter: { postId, type: 'main' },
-      populate: 'creator',
       lean: true,
+      filter: { postId, type: 'main' },
+      populate: [
+        { path: 'creator', populate: 'avatar' },
+        { path: 'category' },
+        { path: 'game' },
+        { path: 'tags' },
+        { path: 'coverImage' },
+      ],
     });
 
     const ids = firstLevel.docs.map((doc) => String(doc._id));

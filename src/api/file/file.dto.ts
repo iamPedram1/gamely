@@ -18,8 +18,10 @@ export class FileResponseDto extends BaseResponseDto {
   mimetype: string;
 
   @Expose()
-  @Transform(({ obj }) => `${appUrl}/${obj.path}`.replace(/\\/g, '/'))
-  url: string;
+  @Transform(({ obj }) => {
+    return obj.path ? `${appUrl}/${obj.path}`.replace(/\\/g, '/') : null;
+  })
+  url: string | null;
 }
 
 export class FileSummaryResponseDto extends BaseSummaryResponseDto {

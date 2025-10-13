@@ -51,7 +51,7 @@ export default async function paginate<TResult, TDoc>(
   configs?: Partial<IPaginationConfig>
 ): Promise<WithPagination<FlattenMaps<TResult>>> {
   const currentPage = configs?.page || 1;
-  const limit = configs?.limit || 20;
+  const limit = getValidLimit(configs?.limit || 20);
   const skip = calculateSkip(limit, currentPage);
 
   const model = query.model;
@@ -80,7 +80,7 @@ export default async function paginate<TResult, TDoc>(
 }
 
 function getValidLimit(limit: number) {
-  const allowed = [2, 10, 20, 40, 60, 80, 100];
+  const allowed = [10, 20, 40, 60, 80, 100];
   return allowed.includes(limit) ? limit : 20;
 }
 

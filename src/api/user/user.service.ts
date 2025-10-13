@@ -5,13 +5,15 @@ import bcryptjs from 'bcryptjs';
 import UserModel from 'api/user/user.model';
 
 // Utilities
-import { ValidationError } from 'utilites/errors';
+import { NotFoundError, ValidationError } from 'utilites/errors';
 
 // Dto
 import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
 
 // Types
 import { UserDocument } from 'api/user/user.model';
+import { UpdateProfileDto } from 'api/user/user.dto';
+import { IUserEntity } from 'api/user/user.types';
 
 export type IUserService = InstanceType<typeof UserService>;
 
@@ -19,12 +21,26 @@ export type IUserService = InstanceType<typeof UserService>;
 export default class UserService {
   async register(data: RegisterDto): Promise<string> {
     const user = await this.getUserByEmail(data.email);
+
     if (user)
       throw new ValidationError('A user with the given email already exist.');
 
     data.password = await this.hashPassword(data.password);
 
     return (await this.create({ ...data })).generateAuthToken();
+  }
+
+  async update(userId: string, data: UpdateProfileDto): Promise<IUserEntity> {
+    const user = (await UserModel.findByIdAndUpdate(userId, {
+      ...data,
+      ...(data.password && {
+        password: await this.hashPassword(data.password),
+      }),
+    }).lean()) as IUserEntity;
+
+    if (!user) throw new NotFoundError('User with given id was not found.');
+
+    return user;
   }
 
   async login(data: LoginDto) {
@@ -68,7 +84,7 @@ export default class UserService {
   }
 
   async getUserById(_id: string): Promise<UserDocument | null> {
-    return await UserModel.findOne({ _id });
+    return await UserModel.findOne({ _id }).populate('avatar').exec();
   }
 
   async getUsers(): Promise<UserDocument[]> {

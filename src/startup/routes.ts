@@ -6,6 +6,7 @@ import authRouter from 'api/auth/auth.route';
 import fileRouter from 'api/file/file.route';
 import postRouter from 'api/post/post.route';
 import gameRouter from 'api/game/game.route';
+import userRouter from 'api/user/user.route';
 import commentRouter from 'api/comment/comment.route';
 import categoryRouter from 'api/category/category.route';
 
@@ -17,6 +18,7 @@ import notFound from 'middleware/notFound';
 import { prefixBaseUrl } from 'utilites/configs';
 
 export default function routesStartup(app: Express) {
+  app.use(prefixBaseUrl('/user'), userRouter);
   app.use(prefixBaseUrl('/auth'), authRouter);
   app.use(prefixBaseUrl('/tags'), tagRouter);
   app.use(prefixBaseUrl('/games'), gameRouter);
