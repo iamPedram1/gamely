@@ -22,7 +22,7 @@ export default class AuthController {
     await this.userService.register(dto);
 
     sendResponse(res, 200, {
-      body: { message: 'Registration completed successfully' },
+      body: { message: req.t('messages.auth.register_success') },
     });
   };
 
@@ -34,7 +34,7 @@ export default class AuthController {
     sendResponse(res, 200, {
       body: {
         data: { token, refreshToken },
-        message: 'Successfully logged in to account',
+        message: req.t('messages.auth.login_success'),
       },
     });
   };

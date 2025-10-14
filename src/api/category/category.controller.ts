@@ -32,7 +32,7 @@ export default class CategoryController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Categories',
+      featureName: 'models.Category.plural',
       body: {
         data: {
           pagination,
@@ -47,7 +47,7 @@ export default class CategoryController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Categories',
+      featureName: 'models.Category.plural',
       body: { data: docs.map((doc) => this.categoryMapper.toNestedDto(doc)) },
     });
   };
@@ -63,7 +63,7 @@ export default class CategoryController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Categories',
+      featureName: 'models.Category.plural',
       body: {
         data: docs.map((doc) => this.categoryMapper.toSummaryDto(doc)),
       },
@@ -78,7 +78,7 @@ export default class CategoryController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Category',
+      featureName: 'models.Category.singular',
       body: {
         data: this.categoryMapper.toDto(category),
       },
@@ -86,13 +86,13 @@ export default class CategoryController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const category = await this.categoryService.create(req.body, req.user._id, {
+    const category = await this.categoryService.create(req.body, req.user.id, {
       lean: true,
     });
 
     sendResponse(res, 201, {
       httpMethod: 'POST',
-      featureName: 'Category',
+      featureName: 'models.Category.singular',
       body: { data: this.categoryMapper.toDto(category) },
     });
   };
@@ -102,7 +102,7 @@ export default class CategoryController {
 
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Category',
+      featureName: 'models.Category.singular',
     });
   };
 
@@ -115,13 +115,13 @@ export default class CategoryController {
     if (!body)
       throw new AnonymousError(
         'Error in updating category',
-        'Internal Server Error',
+        req.t('common.internal_server_error'),
         500
       );
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
-      featureName: 'Category',
+      featureName: 'models.Category.singular',
       body: { data: this.categoryMapper.toDto(body) },
     });
   };

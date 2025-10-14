@@ -37,7 +37,7 @@ export default class PostController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Posts',
+      featureName: 'models.Post.plural',
       body: {
         data: {
           pagination,
@@ -57,7 +57,7 @@ export default class PostController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Posts',
+      featureName: 'models.Post.plural',
       body: {
         data: docs.map((doc) => this.postMapper.toDto(doc)),
       },
@@ -78,7 +78,7 @@ export default class PostController {
 
     sendResponse(res, post ? 200 : 400, {
       httpMethod: 'GET',
-      featureName: 'Post',
+      featureName: 'models.Post.singular',
       body: {
         data: post ? this.postMapper.toDto(post) : null,
       },
@@ -86,7 +86,7 @@ export default class PostController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const post = await this.postService.create(req.body, req.user._id, {
+    const post = await this.postService.create(req.body, req.user.id, {
       lean: true,
       populate: [
         { path: 'creator', populate: 'avatar' },
@@ -99,7 +99,7 @@ export default class PostController {
 
     sendResponse(res, post ? 201 : 400, {
       httpMethod: 'POST',
-      featureName: 'Post',
+      featureName: 'models.Post.singular',
       body: { data: post ? this.postMapper.toDto(post) : null },
     });
   };
@@ -109,7 +109,7 @@ export default class PostController {
 
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Post',
+      featureName: 'models.Post.singular',
     });
   };
 
@@ -118,14 +118,14 @@ export default class PostController {
 
     sendBatchResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Post',
+      featureName: 'models.Post.singular',
       body: {
         data: result,
         isSuccess: result.isAllSucceed,
         errors: result.errors,
         message: result.isAllSucceed
-          ? 'Batch operation completed successfuly'
-          : 'Operation completed with some errors',
+          ? req.t('messages.batch.completed')
+          : req.t('messages.batch.completed_with_error'),
       },
     });
   };
@@ -142,11 +142,9 @@ export default class PostController {
       ],
     });
 
-    if (!body) throw new ValidationError('Error in updating post');
-
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
-      featureName: 'Post',
+      featureName: 'models.Post.singular',
       body: { data: this.postMapper.toDto(body) },
     });
   };

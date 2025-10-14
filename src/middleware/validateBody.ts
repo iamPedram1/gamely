@@ -29,7 +29,9 @@ export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
       const messages = errors.flatMap((err) =>
         Object.values(err.constraints || {})
       );
-      throw new ValidationError('Validation failed.', { cause: messages });
+      throw new ValidationError(req.t('error.validation_failed'), {
+        cause: messages,
+      });
     }
 
     Object.defineProperty(req, 'body', {

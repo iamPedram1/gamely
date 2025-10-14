@@ -40,8 +40,8 @@ export async function paginateAggregate<TResult>(
       totalPages,
       currentPage,
       limit,
-      hasPrevPage: calculateHasPrevPage(currentPage),
-      hasNextPage: calculateHasNextPage(totalPages, currentPage),
+      hasPrevPage: currentPage > 1,
+      hasNextPage: currentPage < totalPages,
     },
   };
 }

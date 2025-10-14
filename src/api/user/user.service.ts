@@ -38,8 +38,7 @@ export default class UserService extends BaseService<
   async register(data: RegisterDto): Promise<IUserEntity> {
     const user = await this.existsByKey('email', data.email);
 
-    if (user)
-      throw new ValidationError('A user with the given email already exist.');
+    if (user) throw new ValidationError(this.t('messages.auth.email_exists'));
 
     data.password = await this.hashPassword(data.password);
 
@@ -94,7 +93,7 @@ export default class UserService extends BaseService<
     const user = await this.getOneById(userId, { select: '+refreshToken' });
 
     if (user.refreshToken !== refreshToken)
-      throw new ValidationError('Invalid refresh token');
+      throw new ValidationError(this.t('error.refresh_token_invalid'));
 
     const newAuth = user.generateAuthToken();
 
@@ -104,7 +103,7 @@ export default class UserService extends BaseService<
     const res = await user.save();
 
     if (!res)
-      throw new AnonymousError('An error occured while generating token.');
+      throw new AnonymousError('An error occured while generating token');
 
     return newAuth;
   }
@@ -117,7 +116,7 @@ export default class UserService extends BaseService<
     const res = await user.save();
 
     if (!res)
-      throw new AnonymousError('An error occured while cleaning up token.');
+      throw new AnonymousError('An error occured while cleaning up token');
 
     return true;
   }

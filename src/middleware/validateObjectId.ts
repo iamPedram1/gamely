@@ -1,6 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
 import { isValidObjectId, Model } from 'mongoose';
 import { NotFoundError, ValidationError } from 'utilites/errors';
+
+// Types
+import type { Request, Response, NextFunction } from 'express';
+import type { TranslationKeys } from 'types/i18n';
 
 /**
  * Middleware factory to validate the `id` parameter in the request URL.
@@ -25,14 +28,18 @@ export default function validateObjectId<T>(Model: Model<T>) {
   return async function (req: Request, res: Response, next: NextFunction) {
     const id = req.params.id;
 
-    if (!id) throw new ValidationError('The id paramater is required');
+    if (!id) throw new ValidationError(req.t('error.id_required'));
 
-    if (!isValidObjectId(id)) throw new ValidationError('Invalid id format');
+    if (!isValidObjectId(id))
+      throw new ValidationError(req.t('error.id_invalid'));
 
     const count = await Model.exists({ _id: id });
     if (!count)
       throw new NotFoundError(
-        `No ${Model.modelName.toLowerCase()} with given id was found`
+        req.t('error.not_found_by_id', {
+          id,
+          model: req.t(`models.${Model.modelName}.singular` as TranslationKeys),
+        })
       );
 
     next();

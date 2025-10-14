@@ -1,10 +1,7 @@
 import { delay, inject, injectable } from 'tsyringe';
 
-// Services
-import TagService from 'api/tag/tag.service';
-
 // Utilities
-import sendResponse, { sendBatchResponse } from 'utilites/response';
+import sendResponse from 'utilites/response';
 
 // DTO
 import UserService from 'api/user/user.service';
@@ -13,7 +10,6 @@ import UserService from 'api/user/user.service';
 import { UserMapper } from 'api/user/user.mapper';
 import { RequestHandler } from 'express';
 import { UpdateProfileDto } from 'api/user/user.dto';
-import { NotFoundError } from 'utilites/errors';
 
 // Types
 @injectable()
@@ -24,13 +20,11 @@ export default class UserController {
   ) {}
 
   getProfile: RequestHandler = async (req, res) => {
-    const user = await this.userService.getOneById(req.user?._id);
-
-    if (!user) throw new NotFoundError('User with given id was not found.');
+    const user = await this.userService.getOneById(req.user.id);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Profile',
+      customName: 'Profile',
       body: {
         data: this.userMapper.toDto(user),
       },
@@ -38,37 +32,36 @@ export default class UserController {
   };
 
   refreshToken: RequestHandler = async (req, res) => {
-    console.log(req.body);
     const newAuth = await this.userService.refreshToken(req.body.refreshToken);
 
     sendResponse(res, 200, {
       httpMethod: 'POST',
       body: {
-        message: 'Token refreshed successfully',
+        message: req.t('messages.auth.token_refresh_success'),
         data: newAuth,
       },
     });
   };
 
   revokeToken: RequestHandler = async (req, res) => {
-    await this.userService.clearToken(req.user._id);
+    await this.userService.clearToken(req.user.id);
 
     sendResponse(res, 200, {
       httpMethod: 'POST',
       body: {
         data: null,
-        message: 'Operation completed successfully',
+        message: req.t('common.operation_completed_successfully'),
       },
     });
   };
 
   update: RequestHandler = async (req, res) => {
     const dto = req.body as UpdateProfileDto;
-    const user = await this.userService.update(req.user?._id, dto);
+    const user = await this.userService.update(req.user.id, dto);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Profile',
+      customName: 'Profile',
       body: {
         data: this.userMapper.toDto(user),
       },

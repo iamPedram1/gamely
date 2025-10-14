@@ -34,7 +34,7 @@ import type { Request, Response, NextFunction } from 'express';
  */
 export default function errorMiddleware(
   error: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ) {
@@ -59,10 +59,9 @@ export default function errorMiddleware(
     isInternalServerError ||
     isBadRequestError ||
     isUnauthorizedError;
-
   let status = 500;
-  let message = 'Internal server error';
-  let errors = ['Internal server error'];
+  let message = req.t('common.internal_server_error');
+  let errors = [req.t('common.internal_server_error')];
 
   if (isHandledError) {
     status = error.status;

@@ -2,6 +2,7 @@ import { validate } from 'class-validator';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import type { Request, Response, NextFunction } from 'express';
 
+// Utilities
 import { ValidationError } from 'utilites/errors';
 
 export default function validateQuery<T>(DtoClass: ClassConstructor<T>) {
@@ -15,7 +16,9 @@ export default function validateQuery<T>(DtoClass: ClassConstructor<T>) {
       const messages = errors.flatMap((e) =>
         Object.values(e.constraints || {})
       );
-      throw new ValidationError('Validation failed.', { cause: messages });
+      throw new ValidationError(req.t('error.validation_failed'), {
+        cause: messages,
+      });
     }
 
     Object.defineProperty(req, 'query', {

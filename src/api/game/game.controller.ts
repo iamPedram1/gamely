@@ -8,7 +8,6 @@ import { GameMapper } from 'api/game/game.mapper';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'utilites/response';
-import { ValidationError } from 'utilites/errors';
 
 // Types
 import type { RequestHandler } from 'express';
@@ -34,7 +33,7 @@ export default class GameController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Games',
+      featureName: 'models.Game.plural',
       body: {
         data: {
           pagination,
@@ -54,7 +53,7 @@ export default class GameController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Games',
+      featureName: 'models.Game.plural',
       body: {
         data: docs.map((doc) => this.gameMapper.toDto(doc)),
       },
@@ -69,7 +68,7 @@ export default class GameController {
 
     sendResponse(res, game ? 200 : 400, {
       httpMethod: 'GET',
-      featureName: 'Game',
+      featureName: 'models.Game.singular',
       body: {
         data: game ? this.gameMapper.toDto(game) : null,
       },
@@ -77,7 +76,7 @@ export default class GameController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const game = await this.gameService.create(req.body, req.user._id, {
+    const game = await this.gameService.create(req.body, req.user.id, {
       populate: [
         { path: 'creator', populate: 'avatar' },
         { path: 'coverImage' },
@@ -86,7 +85,7 @@ export default class GameController {
 
     sendResponse(res, game ? 201 : 400, {
       httpMethod: 'POST',
-      featureName: 'Game',
+      featureName: 'models.Game.singular',
       body: { data: game ? this.gameMapper.toDto(game) : null },
     });
   };
@@ -96,7 +95,7 @@ export default class GameController {
 
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Game',
+      featureName: 'models.Game.singular',
     });
   };
 
@@ -105,14 +104,14 @@ export default class GameController {
 
     sendBatchResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Game',
+      featureName: 'models.Game.singular',
       body: {
         data: result,
         errors: result.errors,
         isSuccess: result.isAllSucceed,
         message: result.isAllSucceed
-          ? 'Batch operation completed successfuly'
-          : 'Operation completed with some errors',
+          ? req.t('messages.batch.completed')
+          : req.t('messages.batch.completed_with_error'),
       },
     });
   };
@@ -126,11 +125,9 @@ export default class GameController {
       ],
     });
 
-    if (!body) throw new ValidationError('Error in updating game');
-
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
-      featureName: 'Game',
+      featureName: 'models.Game.singular',
       body: { data: this.gameMapper.toDto(body) },
     });
   };

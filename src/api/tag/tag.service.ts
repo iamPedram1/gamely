@@ -13,6 +13,8 @@ import BaseService from 'services/base.service.module';
 // Types
 import type { ITagEntity } from 'api/tag/tag.type';
 import type { IApiBatchResponse } from 'utilites/response';
+import { PipelineStage } from 'mongoose';
+import { BaseQueryOptions, AggregateReturn } from 'services/base.service.type';
 
 export type ITagService = InstanceType<typeof TagService>;
 
@@ -29,7 +31,7 @@ class TagService extends BaseService<
     super(Tag);
   }
 
-  async getWithPostsCount() {
+  async getWithPostsCount(): Promise<ITagEntity[]> {
     return await super.aggregate(
       [
         {
@@ -62,6 +64,7 @@ class TagService extends BaseService<
       { paginate: false }
     );
   }
+
   async deleteOneById(id: string): Promise<true> {
     return this.withTransaction(async (session) => {
       const result = await super.deleteOneById(id, { session });

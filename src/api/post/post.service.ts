@@ -68,14 +68,22 @@ class PostService extends BaseService<
     return await super.create(data, userId, options);
   }
 
-  async updateOneById(
+  async updateOneById<TThrowError extends boolean = true>(
     id: string,
     payload: Partial<UpdatePostDto>,
-    options?: BaseMutateOptions
+    options?:
+      | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
+      | undefined
   ): Promise<
-    Document<unknown, {}, IPostEntity, {}, {}> &
-      IPostEntity &
-      Required<{ _id: Types.ObjectId }> & { __v: number }
+    TThrowError extends true
+      ? Document<unknown, {}, IPostEntity, {}, {}> &
+          IPostEntity &
+          Required<{ _id: Types.ObjectId }> & { __v: number }
+      :
+          | (Document<unknown, {}, IPostEntity, {}, {}> &
+              IPostEntity &
+              Required<{ _id: Types.ObjectId }> & { __v: number })
+          | null
   > {
     await Promise.all([
       ...(payload.game ? [this.postValidation.validateGame(payload.game)] : []),

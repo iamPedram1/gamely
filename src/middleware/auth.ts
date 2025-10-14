@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 
 // Models
-import User, { IRefreshToken, IToken } from 'api/user/user.model';
+import User from 'api/user/user.model';
+
+// Middlewares
+import { requestContext, t } from 'utilites/request-context';
 
 // Utilities
 import { AnonymousError, UnauthorizedError } from 'utilites/errors';
@@ -13,18 +16,19 @@ import {
 
 // Types
 import type { Request, Response, NextFunction } from 'express';
+import type { IRefreshToken, IToken } from 'api/user/user.model';
 
 export default async function auth(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const mask = 'Access denied. Invalid or expired token.';
+  const mask = req.t('error.token_generic_error');
 
   try {
     const token = req.header(jwtTokenName);
     if (!token) {
-      return next(new UnauthorizedError('Access denied. No token provided.'));
+      return next(new UnauthorizedError(req.t('error.token_missing')));
     }
 
     // Step 1: Verify access token
@@ -65,7 +69,12 @@ export default async function auth(
     }
 
     // ✅ Authenticated successfully
-    req.user = { _id: payload.userId, email: payload.userEmail };
+    req.user = { id: payload.userId, email: payload.userEmail };
+
+    // Update AsyncLocalStorage context immediately
+    const ctx = requestContext.getStore();
+    if (ctx) ctx.user = req.user;
+
     return next();
   } catch (error) {
     return next(handleJwtError(error, mask));
@@ -93,8 +102,8 @@ function isRefreshTokenLinked(refreshToken: string, token: string): boolean {
 
 function handleJwtError(error: Error, mask: string): Error {
   if (error instanceof jwt.TokenExpiredError)
-    return new UnauthorizedError('Token is expired');
+    return new UnauthorizedError(t('error.token_expired'));
   if (error instanceof jwt.JsonWebTokenError)
-    return new UnauthorizedError('Token is invalid');
+    return new UnauthorizedError(t('error.token_invalid'));
   return new AnonymousError(error.message, mask);
 }

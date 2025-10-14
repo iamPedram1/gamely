@@ -7,7 +7,7 @@ import type {
 
 export type CommentType = 'main' | 'reply';
 
-export interface ICommentEntity extends Document {
+export interface ICommentEntity {
   _id: Types.ObjectId;
   type: CommentType;
   comment: string;

@@ -3,7 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 const notFound = (req: Request, res: Response, next: NextFunction) => {
   sendResponse(res, 404, {
-    body: { message: `The requested path '${req.url}' could not be found.` },
+    body: { message: req.t('error.invalid_route', { url: req.url }) },
   });
 };
 

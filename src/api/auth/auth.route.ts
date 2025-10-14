@@ -6,7 +6,7 @@ import AuthController from 'api/auth/auth.controller';
 
 // Middlewares
 import validateBody from 'middleware/validateBody';
-import { authLimiter } from 'middleware/rateLimitter';
+import { limitier } from 'middleware/rateLimitter';
 import blockRequestWithToken from 'api/auth/auth.middleware';
 
 // DTO
@@ -15,13 +15,13 @@ const authRouter = express.Router();
 const authController = container.resolve(AuthController);
 
 authRouter.post('/login', [
-  authLimiter,
+  limitier,
   blockRequestWithToken,
   validateBody(LoginDto),
   authController.login,
 ]);
 authRouter.post('/register', [
-  authLimiter,
+  limitier,
   blockRequestWithToken,
   validateBody(RegisterDto),
   authController.register,

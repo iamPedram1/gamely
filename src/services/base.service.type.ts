@@ -41,6 +41,11 @@ export type NullableQueryResult<
   ? QueryResult<TDoc, TLean>
   : QueryResult<TDoc, TLean> | null;
 
+export type AggregateReturn<
+  TResult,
+  TPaginate extends boolean | undefined,
+> = TPaginate extends true ? WithPagination<TResult> : TResult[];
+
 export type ArrayQueryResult<TDoc, TLean extends boolean> = TLean extends true
   ? FlattenMaps<TDoc>[]
   : TDoc[];

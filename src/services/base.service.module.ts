@@ -5,9 +5,12 @@ import BaseQueryService from 'services/base.query.module';
 import BaseMutateService from 'services/base.mutate.module';
 
 // Utilities
+import { AnonymousError } from 'utilites/errors';
 import { IApiBatchResponse } from 'utilites/response';
+import { t as translator } from 'utilites/request-context';
 
 // Types
+import type { TranslationKeys, TranslationVariables } from 'types/i18n';
 import type {
   Model,
   HydratedDocument,
@@ -42,6 +45,11 @@ type M<
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = IBaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>;
 
+export type BaseTFunction = <T extends TranslationKeys>(
+  key: TranslationKeys,
+  options?: Partial<TranslationVariables<T>>
+) => string;
+
 /**
  * BaseService
  *
@@ -65,10 +73,35 @@ export default abstract class BaseService<
   private mutations: M<TSchema, TCreateDto, TUpdateDto, TDoc>;
 
   constructor(private model: Model<TSchema>) {
-    this.queries = new BaseQueryService<TSchema, TDoc>(model);
-    this.mutations = new BaseMutateService(model);
+    this.queries = new BaseQueryService<TSchema, TDoc>(model, this.t);
+    this.mutations = new BaseMutateService(model, this.t);
   }
 
+  /**
+   * Translates a given key using the current request's translation function.
+   *
+   * ******* Model name automatically passed to options argument in base service *******
+   *
+   * Throws an {@link AnonymousError} if no translation function is available.
+   *
+   * @template T - A translation key type.
+   * @param {T} key - The translation key to look up.
+   * @param {Partial<TranslationVariables<T>>} [options] - Optional variables for interpolation.
+   * @returns {string} The translated string.
+   *
+   * @throws {AnonymousError} If no translation context is available.
+   */
+  protected t<T extends TranslationKeys>(
+    key: T,
+    options?: Partial<TranslationVariables<T>>
+  ): string {
+    const opts = {
+      model: `models.${this.model.modelName}`,
+      ...options,
+    } as unknown as TranslationVariables<T>;
+
+    return translator(key, opts);
+  }
   /**
    * Run a callback inside a MongoDB transaction
    *

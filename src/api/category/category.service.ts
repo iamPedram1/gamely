@@ -49,7 +49,7 @@ class CategoryService extends BaseService<
       const exists = await super.existsBySlug(data.parentId);
       if (!exists)
         throw new NotFoundError(
-          'Category with the provided categoryId does not exist'
+          this.t('error.not_exists_by_id', { id: data.parentId })
         );
     }
     return await super.create(data, userId, options);
@@ -71,12 +71,10 @@ class CategoryService extends BaseService<
         : false;
 
     if (isIdChanged && descendants.includes(payload.parentId as string))
-      throw new BadRequestError('parentId: Circular relationship detected');
+      throw new BadRequestError(this.t('error.category_circular_relationship'));
 
     if (payload.parentId === id)
-      throw new BadRequestError(
-        'parentId: A category cannot be its own parent.'
-      );
+      throw new BadRequestError(this.t('error.category_self_parent'));
 
     if (payload.title) category.set('title', payload.title);
     if (payload.slug) category.set('slug', payload.slug);

@@ -1,0 +1,35 @@
+const errosTranslations = {
+  bad_request: 'Bad request',
+  token_invalid: 'Token is invalid',
+  token_expired: 'Token is expired',
+  token_missing: 'Token is missing',
+  refresh_token_invalid: 'Refresh token is invalid',
+  refresh_token_expired: 'Refresh token is expired',
+  refresh_token_missing: 'Refresh token is not provided',
+  validation_failed: 'Validation failed',
+  id_required: 'The id paramater is required',
+  id_invalid: 'The id paramater is required',
+  token_generic_error: 'Access denied, token is invalid or expired',
+  uniqueness_error:
+    "{{field}} '${value}' is already taken by another {{name}}`",
+  too_many_request: 'Too many attempts, Please try again later',
+  update_failed: 'An error occured in updating {{name}}',
+  create_failed: 'An error occured in creating {{name}}',
+  delete_failed: 'An error occured in deleting {{name}}',
+  invalid_route: "The requested path '{{url}}' could not be found",
+  invalid_credentials: 'Invalid email or password',
+  not_found_by_id: '{{model}} with id ({{id}}) was not found',
+  not_found_by_key: '{{model}} with {{key}} was not found',
+  not_exists_by_key: '{{model}} with {{key}} does not exist',
+  not_exists_by_id: '{{model}} with id {{id}} does not exist',
+  found_but_update_failed: '{{model}} was matched but could not be updated',
+  no_documents_with_references:
+    'No {{model}} documents found with matching references',
+  not_found_by_key_value: 'No {{model}} with {{key}}={{value}} was found',
+  ids_array_empty: 'Ids array cannot be empty',
+  batch_delete_failed: 'Batch delete failed for {{model}}',
+  category_self_parent: 'parentId: A category cannot be its own parent',
+  category_circular_relationship: 'parentId: Circular relationship detected',
+} as const;
+
+export default errosTranslations;

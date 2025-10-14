@@ -1,5 +1,6 @@
 import multer, { MulterError } from 'multer';
 import { BadRequestError } from 'utilites/errors';
+import { t } from 'utilites/request-context';
 
 type UploadOptions = {
   fieldName: string;
@@ -23,18 +24,17 @@ export const uploadOneFile = ({
           case 'LIMIT_FILE_SIZE':
             return next(
               new BadRequestError(
-                `File too large. Max size is ${maxSize} bytes`
+                t('messages.file.too_large', { size: String(maxSize) })
               )
             );
           case 'LIMIT_UNEXPECTED_FILE':
-            return next(
-              new BadRequestError(`Unexpected file in field ${fieldName}`)
-            );
+            return next(t('messages.file.unexpected_file'));
           default:
-            return next(new BadRequestError(err.message));
+            return next(new BadRequestError(t('messages.file.upload_failed')));
         }
       }
-      if (err) return next(new BadRequestError('File upload failed'));
+      if (err)
+        return next(new BadRequestError(t('messages.file.upload_failed')));
       next();
     });
   };
@@ -61,21 +61,24 @@ export const uploadManyFiles = ({
           case 'LIMIT_FILE_COUNT':
             return next(
               new BadRequestError(
-                `Too many files. Maximum allowed is ${maxFiles}`
+                t('messages.file.too_many_files', { size: String(maxFiles) })
               )
             );
 
           case 'LIMIT_FILE_SIZE':
             return next(
               new BadRequestError(
-                `File too large. Max size is ${maxSize} bytes`
+                t('messages.file.too_large', { size: String(maxSize) })
               )
             );
           default:
-            return next(new BadRequestError(err.message));
+            return next(t('messages.file.upload_failed_plural'));
         }
       }
-      if (err) return next(new BadRequestError('File upload failed'));
+      if (err)
+        return next(
+          new BadRequestError(t('messages.file.upload_failed_plural'))
+        );
       next();
     });
   };

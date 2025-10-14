@@ -18,8 +18,10 @@ import {
 } from 'utilites/errors';
 
 // Types
+import type { TypedTFunction } from 'types/i18n';
 import type { IApiBatchResponse } from 'utilites/response';
 import type { BaseMutateOptions } from './base.service.type';
+import type { BaseTFunction } from 'services/base.service.module';
 
 /**
  * Base service for CRUD and mutation operations on Mongoose models.
@@ -30,7 +32,10 @@ class BaseMutateService<
   TUpdateDto = Partial<TSchema>,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > {
-  constructor(protected readonly model: Model<TSchema>) {}
+  constructor(
+    protected readonly model: Model<TSchema>,
+    protected readonly t: BaseTFunction
+  ) {}
 
   // --------------------------------------------------------------------------
   // Create
@@ -75,9 +80,7 @@ class BaseMutateService<
     const doc = await this.applyMutateOptions(query, options).exec();
 
     if (!doc && (options?.throwError ?? true)) {
-      throw new NotFoundError(
-        `${this.model.modelName} with id (${id}) not found`
-      );
+      throw new NotFoundError(this.t('error.not_found_by_id', { id }));
     }
 
     return doc as TThrowError extends true ? TDoc : TDoc | null;
@@ -98,7 +101,7 @@ class BaseMutateService<
 
     if (result.matchedCount === 0) {
       throw new NotFoundError(
-        `${this.model.modelName} with ${String(keyName)} not found`
+        this.t('error.not_found_by_key', { key: String(keyName) })
       );
     }
 
@@ -134,9 +137,7 @@ class BaseMutateService<
     const result = await this.applyMutateOptions(query, options).exec();
 
     if (result.matchedCount === 0) {
-      throw new NotFoundError(
-        `No ${this.model.modelName} documents found with matching references`
-      );
+      throw new NotFoundError(this.t('error.no_documents_with_references'));
     }
 
     return result;
@@ -156,9 +157,7 @@ class BaseMutateService<
     const deleted = result.deletedCount > 0;
 
     if ((options?.throwError ?? true) && !deleted) {
-      throw new NotFoundError(
-        `${this.model.modelName} with id (${id}) not found`
-      );
+      throw new NotFoundError(this.t('error.not_found_by_id', { id }));
     }
 
     return ((options?.throwError ?? true) ? true : deleted) as any;
@@ -177,7 +176,10 @@ class BaseMutateService<
 
     if ((options?.throwError ?? false) && result.deletedCount === 0) {
       throw new NotFoundError(
-        `No ${this.model.modelName.toLowerCase()} with ${String(keyName)}=${matchValue} was found`
+        this.t('error.not_found_by_key_value', {
+          key: String(keyName),
+          value: String(matchValue),
+        })
       );
     }
 
@@ -189,7 +191,7 @@ class BaseMutateService<
     options?: BaseMutateOptions
   ): Promise<IApiBatchResponse> {
     if (!ids?.length) {
-      throw new ValidationError('Ids array cannot be empty');
+      throw new ValidationError(this.t('error.ids_array_empty'));
     }
 
     const query = this.model.deleteMany({
@@ -211,10 +213,11 @@ class BaseMutateService<
         id,
         success: successIds.includes(id),
         message: successIds.includes(id)
-          ? 'Deleted successfully'
-          : 'Document not found',
+          ? this.t('common.deleted_successfully')
+          : this.t('error.not_found_by_id', { id }),
       })),
-      errors: failedIds.length > 0 ? ['Some documents not found'] : [],
+      errors:
+        failedIds.length > 0 ? [this.t('common.some_documents_not_found')] : [],
       failedIds,
       successIds,
       totalCount: ids.length,

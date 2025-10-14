@@ -1,10 +1,8 @@
-import type { Request, Response, NextFunction } from 'express';
-import type { Model } from 'mongoose';
+import { t } from 'utilites/request-context';
 import { ValidationError } from 'utilites/errors';
-
-type DocumentKeys = keyof Document | '_id' | '__v' | '$locals';
-
-type EntityKeys<T> = Exclude<keyof T, DocumentKeys>;
+import type { Model } from 'mongoose';
+import type { TranslationKeys } from 'types/i18n';
+import type { Request, Response, NextFunction } from 'express';
 
 /**
  * Express middleware factory to ensure a field value is unique in a Mongoose collection.
@@ -15,9 +13,9 @@ type EntityKeys<T> = Exclude<keyof T, DocumentKeys>;
  * @param bodyFieldKey - Optional: key in req.body that holds the value (defaults to fieldName)
  * @param paramIdKey - Optional: key in req.params for the current document ID (defaults to 'id')
  */
-export default function validateUniqueConflict<T extends Document>(
+export default function validateUniqueConflict<T>(
   model: Model<T>,
-  fieldName: EntityKeys<T> & string,
+  fieldName: string,
   bodyFieldKey: string = fieldName,
   paramIdKey = 'id'
 ) {
@@ -36,7 +34,10 @@ export default function validateUniqueConflict<T extends Document>(
       if (conflict) {
         next(
           new ValidationError(
-            `${String(fieldName)} '${value}' is already taken by another ${model.modelName.toLowerCase()}.`
+            t('error.uniqueness_error', {
+              field: fieldName,
+              name: t(`models.${model.modelName}.singular` as TranslationKeys),
+            })
           )
         );
       }

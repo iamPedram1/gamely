@@ -4,7 +4,7 @@ import type {
   PostSummaryResponseDto,
 } from 'api/post/post.dto';
 
-export interface IPostEntity extends Document {
+export interface IPostEntity {
   title: string;
   slug: string;
   content: string;

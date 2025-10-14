@@ -33,7 +33,7 @@ export default class CommentController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Comments',
+      featureName: 'models.Comment.plural',
       body: {
         data: {
           pagination,
@@ -50,7 +50,7 @@ export default class CommentController {
 
     sendResponse(res, comment ? 200 : 400, {
       httpMethod: 'GET',
-      featureName: 'Comment',
+      featureName: 'models.Comment.singular',
       body: {
         data: comment ? this.commentMapper.toDto(comment) : null,
       },
@@ -62,12 +62,12 @@ export default class CommentController {
 
     const comment = await this.commentService.create(
       { ...dto, postId: req.params.id },
-      req.user._id
+      req.user.id
     );
 
     sendResponse(res, comment ? 201 : 400, {
       httpMethod: 'POST',
-      featureName: 'Comment',
+      featureName: 'models.Comment.singular',
       body: { data: this.commentMapper.toDto(comment) },
     });
   };
@@ -77,7 +77,7 @@ export default class CommentController {
 
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Comment',
+      featureName: 'models.Comment.singular',
     });
   };
 
@@ -86,14 +86,14 @@ export default class CommentController {
 
     sendBatchResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Comment',
+      featureName: 'models.Comment.singular',
       body: {
         data: result,
         isSuccess: result.isAllSucceed,
         errors: result.errors,
         message: result.isAllSucceed
-          ? 'Batch operation completed successfuly'
-          : 'Operation completed with some errors',
+          ? req.t('messages.batch.completed')
+          : req.t('messages.batch.completed_with_error'),
       },
     });
   };
@@ -104,7 +104,7 @@ export default class CommentController {
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
-      featureName: 'Comment',
+      featureName: 'models.Comment.singular',
       body: { data: body },
     });
   };

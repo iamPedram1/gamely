@@ -10,7 +10,10 @@ export default function blockRequestWithToken(
   next: NextFunction
 ) {
   const token = req.header(jwtTokenName);
-  if (token) throw new BadRequestError('Bad Request');
+
+  if (token) throw new BadRequestError(req.t('error.bad_request'));
 
   next();
 }
+
+// ---  Extract Placeholders ---

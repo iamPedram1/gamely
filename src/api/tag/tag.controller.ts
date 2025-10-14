@@ -32,7 +32,7 @@ export default class TagController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Tags',
+      featureName: 'models.Tag.plural',
       body: {
         data: {
           pagination,
@@ -43,12 +43,11 @@ export default class TagController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
     const docs = await this.tagService.getWithPostsCount();
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Tags',
+      featureName: 'models.Tag.plural',
       body: {
         data: docs.map((doc) => this.tagMapper.toSummaryDto(doc)),
       },
@@ -60,7 +59,7 @@ export default class TagController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      featureName: 'Tag',
+      featureName: 'models.Tag.singular',
       body: {
         data: this.tagMapper.toDto(tag),
       },
@@ -69,11 +68,11 @@ export default class TagController {
 
   create: RequestHandler = async (req, res) => {
     const dto = req.body as CreateTagDto;
-    const tag = await this.tagService.create(dto, req.user._id);
+    const tag = await this.tagService.create(dto, req.user.id);
 
     sendResponse(res, 201, {
       httpMethod: 'POST',
-      featureName: 'Tag',
+      featureName: 'models.Tag.singular',
       body: { data: this.tagMapper.toDto(tag) },
     });
   };
@@ -83,7 +82,7 @@ export default class TagController {
 
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Tag',
+      featureName: 'models.Tag.singular',
     });
   };
 
@@ -92,14 +91,14 @@ export default class TagController {
 
     sendBatchResponse(res, 200, {
       httpMethod: 'DELETE',
-      featureName: 'Tag',
+      featureName: 'models.Tag.singular',
       body: {
         data: result,
         isSuccess: result.isAllSucceed,
         errors: result.errors,
         message: result.isAllSucceed
-          ? 'Batch operation completed successfuly'
-          : 'Operation completed with some errors',
+          ? req.t('messages.batch.completed')
+          : req.t('messages.batch.completed_with_error'),
       },
     });
   };
@@ -110,7 +109,7 @@ export default class TagController {
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
-      featureName: 'Tag',
+      featureName: 'models.Tag.singular',
       body: { data: body },
     });
   };

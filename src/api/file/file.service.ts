@@ -10,6 +10,7 @@ import File, { FileDocument } from 'api/file/file.model';
 import BaseService from 'services/base.service.module';
 
 // Utilities
+import { t } from 'utilites/request-context';
 import { AnonymousError, BadRequestError } from 'utilites/errors';
 
 // Types
@@ -50,8 +51,9 @@ class FileService extends BaseService<
     file: Express.Multer.File,
     userId?: string
   ): Promise<FileDocument> {
-    if (!file) throw new BadRequestError('No file provided.');
-    if (!location) throw new BadRequestError('No location provided.');
+    if (!file) throw new BadRequestError(t('messages.file.not_provided'));
+    if (!location)
+      throw new BadRequestError(t('messages.file.location_not_provided'));
 
     // ✅ Compute destination folder
     const folderMap: Record<IFileLocation, string> = {
@@ -61,7 +63,8 @@ class FileService extends BaseService<
     };
 
     const uploadPath = folderMap[location];
-    if (!uploadPath) throw new BadRequestError('Invalid location provided.');
+    if (!uploadPath)
+      throw new BadRequestError(t('messages.file.location_invalid'));
 
     // Ensure directory exists
     const absolutePath = path.join(process.cwd(), uploadPath);
@@ -88,7 +91,7 @@ class FileService extends BaseService<
       ...(userId && { creator: userId }),
     }).save();
 
-    if (!doc) throw new BadRequestError('Uploading image failed.');
+    if (!doc) throw new BadRequestError(t('messages.file.upload_failed'));
 
     return doc;
   }

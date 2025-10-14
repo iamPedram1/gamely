@@ -70,7 +70,7 @@ const userSchema = new Schema<
       required: true,
       immutable: true,
       validate: {
-        message: 'Invalid email address.',
+        message: 'Invalid email address',
         validator: (v: string) => isEmail(v),
       },
     },

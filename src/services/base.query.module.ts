@@ -10,10 +10,13 @@ import type {
   PipelineStage,
 } from 'mongoose';
 import {
+  AggregateReturn,
   BaseQueryOptions,
   FindResult,
   NullableQueryResult,
 } from 'services/base.service.type';
+import { TypedTFunction } from 'types/i18n';
+import { BaseTFunction } from 'services/base.service.module';
 import { WithPagination } from 'types/paginate';
 
 /**
@@ -27,7 +30,10 @@ class BaseQueryService<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > {
-  constructor(protected readonly model: Model<TSchema>) {}
+  constructor(
+    protected readonly model: Model<TSchema>,
+    protected readonly t: BaseTFunction
+  ) {}
 
   // --------------------------------------------------------------------------
   // Existence Checks
@@ -76,9 +82,7 @@ class BaseQueryService<
     const result = await this.applyQueryOptions(query, options).exec();
 
     if (!result && (options?.throwError ?? true)) {
-      throw new NotFoundError(
-        `${this.model.modelName} with id (${id}) not found`
-      );
+      throw new NotFoundError(this.t('error.not_found_by_id', { id }));
     }
 
     return result as NullableQueryResult<TDoc, TLean, TThrowError>;
@@ -99,7 +103,7 @@ class BaseQueryService<
 
     if (!result && (options?.throwError ?? true)) {
       throw new NotFoundError(
-        `${this.model.modelName} with slug (${slug}) not found`
+        this.t('error.not_found_by_key', { key: 'slug' })
       );
     }
 
@@ -123,7 +127,10 @@ class BaseQueryService<
 
     if (!result && (options?.throwError ?? true)) {
       throw new NotFoundError(
-        `${this.model.modelName} with ${String(key)} (${value}) not found`
+        this.t('error.not_found_by_key_value', {
+          key: String(key),
+          value: String(value),
+        })
       );
     }
 
@@ -150,38 +157,35 @@ class BaseQueryService<
     return enrichedQuery.exec();
   }
 
-  async aggregate<TPaginate extends boolean = true>(
+  async aggregate<
+    TResult = TSchema,
+    TPaginate extends boolean | undefined = true,
+  >(
     pipeline: PipelineStage[],
-    options?: BaseQueryOptions<TSchema> & {
-      paginate?: TPaginate;
-    }
-  ) {
-    // Clone pipeline so original is not modified
+    options?: BaseQueryOptions<TSchema> & { paginate?: TPaginate }
+  ): Promise<AggregateReturn<TResult, TPaginate>> {
     const aggPipeline = [...pipeline];
 
-    // Apply sort
-    if (options?.sort) {
-      aggPipeline.push({ $sort: options.sort });
-    }
-
-    // Apply skip/limit for non-paginated queries
+    // --- Sorting, limiting, skipping ---
+    if (options?.sort) aggPipeline.push({ $sort: options.sort });
     if (options?.skip) aggPipeline.push({ $skip: options.skip });
     if (options?.limit) aggPipeline.push({ $limit: options.limit });
 
-    // Execute paginated aggregation if requested
-    if (options?.paginate ?? true) {
-      return paginateAggregate<TDoc>(
+    const paginate = options?.paginate ?? true;
+
+    if (paginate) {
+      const result = await paginateAggregate<TResult>(
         this.model,
         aggPipeline,
         options?.reqQuery
       );
+
+      return result as AggregateReturn<TResult, TPaginate>;
     }
 
-    const docs: TDoc[] = await this.model.aggregate<TDoc>(aggPipeline).exec();
-
-    return docs;
+    const docs = await this.model.aggregate<TResult>(aggPipeline).exec();
+    return docs as AggregateReturn<TResult, TPaginate>;
   }
-
   // --------------------------------------------------------------------------
   // Query Options Application
   // --------------------------------------------------------------------------

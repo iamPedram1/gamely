@@ -1,4 +1,6 @@
 import type { Response } from 'express';
+import { ModelsTranslationKeys, TranslationKeys } from 'types/i18n';
+import { getContext, t } from 'utilites/request-context';
 
 type HttpMethod =
   | 'GET'
@@ -34,31 +36,38 @@ export interface IApiBatchResponse {
 
 interface ApiResponseConfig<T> {
   httpMethod?: HttpMethod;
-  featureName?: string;
+  featureName?: ModelsTranslationKeys;
+  customName?: string;
   body?: Partial<IApiResponse<T>>;
 }
 
 const generateDefaultMessage = (
   isSuccess: boolean,
   method?: HttpMethod,
-  featureName?: string
+  featureName?: ModelsTranslationKeys,
+  customName?: string
 ): string => {
-  if (!isSuccess) return 'Request failed due to an error.';
+  if (!isSuccess) return t('common.request_failed');
 
-  const name = featureName ?? 'Document';
+  const name = customName
+    ? customName
+    : featureName
+      ? t(featureName)
+      : t('common.document');
 
   switch (method) {
     case 'GET':
-      return `${name} received successfully.`;
+      return t('messages.generics.get', { name });
     case 'POST':
-      return `${name} created successfully.`;
+      return t('messages.generics.post', { name });
     case 'PUT':
+      return t('messages.generics.put', { name });
     case 'PATCH':
-      return `${name} updated successfully.`;
+      return t('messages.generics.patch', { name });
     case 'DELETE':
-      return `${name} deleted successfully.`;
+      return t('messages.generics.delete', { name });
     default:
-      return 'Request processed successfully.';
+      return t('messages.generics.else');
   }
 };
 
@@ -76,12 +85,14 @@ const sendResponse = <T>(
     : generateDefaultMessage(
         isSuccess,
         config?.httpMethod,
-        config?.featureName
+        config?.featureName,
+        config?.customName
       );
 
+  const resolvedLang = getContext()?.i18n?.resolvedLanguage || 'en';
   const response: IApiResponse<T> = {
     isSuccess,
-    message,
+    message: resolvedLang === 'fa' ? `.${message}` : `${message}.`,
     data,
     statusCode,
     errors,

@@ -24,16 +24,14 @@ export default class FileController {
     const location = req.params?.location as IFileLocation;
     const file = req.file;
 
-    const doc = await this.fileService.uploadOne(
-      location,
-      file!,
-      req.user?._id
-    );
+    const doc = await this.fileService.uploadOne(location, file!, req.user?.id);
 
     sendResponse(res, doc ? 201 : 400, {
       httpMethod: 'POST',
       body: {
-        message: doc ? 'File uploaded successfully' : 'File upload failed',
+        message: doc
+          ? req.t('messages.file.upload_success_singular')
+          : req.t('messages.file.upload_failed_singular'),
         data: doc ? this.fileMapper.toDto(doc) : null,
       },
     });
@@ -43,7 +41,7 @@ export default class FileController {
     const result = await this.fileService.uploadMany(
       req.params?.location as IFileLocation,
       req.files as Express.Multer.File[],
-      req.user?._id
+      req.user?.id
     );
 
     sendResponse(res, result.fails.length === 0 ? 201 : 400, {
@@ -52,10 +50,10 @@ export default class FileController {
         errors: result.fails.map((rejectCount) => rejectCount.reason),
         message:
           result.successes.length > 0 && result.fails.length > 0
-            ? 'Some files failed while uploading'
+            ? req.t('messages.file.upload_some_failed')
             : result.successes.length > 0 && result.fails.length === 0
-              ? 'Files uploaded succesfully'
-              : 'Uploading files failed',
+              ? req.t('messages.file.upload_success_plural')
+              : req.t('messages.file.upload_failed_plural'),
         data:
           result.successes.length > 0
             ? result.successes.map((file) => this.fileMapper.toDto(file.value))
