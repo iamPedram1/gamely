@@ -26,6 +26,7 @@ const messageTranslations = {
     else: 'Request processed successfully',
   },
   auth: {
+    recover_password: 'A confirmation email will be sent if the account exists',
     email_exists: 'A user with given email address already exists',
     token_refresh_success: 'Token refreshed successfully',
     login_success: 'Successfully logged in to account',

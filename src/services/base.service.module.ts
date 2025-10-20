@@ -7,7 +7,7 @@ import BaseMutateService from 'services/base.mutate.module';
 // Utilities
 import { AnonymousError } from 'utilites/errors';
 import { IApiBatchResponse } from 'utilites/response';
-import { t as translator } from 'utilites/request-context';
+import { i18nInstance, t as translator } from 'utilites/request-context';
 
 // Types
 import type { TranslationKeys, TranslationVariables } from 'types/i18n';
@@ -32,6 +32,7 @@ import type {
   IBaseService,
   NullableQueryResult,
 } from 'services/base.service.type';
+import { i18n } from 'i18next';
 
 type Q<
   TSchema,
@@ -101,6 +102,13 @@ export default abstract class BaseService<
     } as unknown as TranslationVariables<T>;
 
     return translator(key, opts);
+  }
+
+  /**
+   * i18n Instance
+   **/
+  protected i18n(): i18n {
+    return i18nInstance();
   }
   /**
    * Run a callback inside a MongoDB transaction

@@ -6,9 +6,9 @@ import { isEmail } from 'class-validator';
 // Utils
 import {
   jwtTokenKey,
-  jwtTokenExpiresIn,
+  jwtTokenExpiresInMinutes,
   jwtRefreshTokenKey,
-  jwtRefreshTokenExpiresIn,
+  jwtRefreshTokenExpiresInDays,
 } from 'utilites/configs';
 
 // Types
@@ -44,6 +44,12 @@ const userSchema = new Schema<
       select: false,
     },
     refreshToken: {
+      type: String,
+      default: null,
+      trim: true,
+      select: false,
+    },
+    recoveryKey: {
       type: String,
       default: null,
       trim: true,
@@ -96,7 +102,7 @@ userSchema.methods.generateToken = function () {
     userEmail: this.email,
   };
   return jwt.sign(obj, jwtTokenKey, {
-    expiresIn: jwtTokenExpiresIn as `${number}m`,
+    expiresIn: jwtTokenExpiresInMinutes as `${number}m`,
   });
 };
 
@@ -128,7 +134,7 @@ userSchema.methods.generateRefreshToken = function (token: string) {
     token,
   };
   return jwt.sign(obj, jwtRefreshTokenKey, {
-    expiresIn: jwtRefreshTokenExpiresIn as `${number}d`,
+    expiresIn: `${jwtRefreshTokenExpiresInDays}d`,
   });
 };
 

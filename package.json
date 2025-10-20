@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
+    "@sendinblue/client": "^3.3.1",
     "async_hooks": "^1.0.0",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
@@ -21,7 +23,9 @@
     "mongoose": "^8.17.0",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "nodemailer": "^7.0.9",
     "sharp": "^0.34.4",
+    "sib-api-v3-sdk": "^8.5.0",
     "tsyringe": "^4.10.0",
     "winston": "^3.17.0"
   },
@@ -39,6 +43,7 @@
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.2.0",
+    "@types/nodemailer": "^7.0.2",
     "@types/supertest": "^6.0.3",
     "babel-jest": "^30.0.5",
     "jest": "^30.0.5",

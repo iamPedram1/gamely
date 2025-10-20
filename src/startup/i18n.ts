@@ -40,7 +40,6 @@ export default async function i18nStartup(app: Express) {
     returnObjects: false, // Disable to ensure strings are returned
     keySeparator: '.',
     nsSeparator: '.',
-    debug: process.env.NODE_ENV === 'development',
   });
 
   app.use(middleware.handle(i18next));

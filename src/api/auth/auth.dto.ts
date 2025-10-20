@@ -1,6 +1,16 @@
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 import type { IUserEntity } from 'api/user/user.types';
 
+export class RecoverPasswordDto {
+  constructor(user: IUserEntity) {
+    Object.assign(this, user);
+  }
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+
 export class RegisterDto {
   constructor(user: IUserEntity) {
     Object.assign(this, user);

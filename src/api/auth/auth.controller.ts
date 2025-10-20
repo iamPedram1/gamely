@@ -5,7 +5,7 @@ import type { RequestHandler } from 'express';
 import UserService from 'api/user/user.service';
 
 // DTO
-import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
+import { LoginDto, RecoverPasswordDto, RegisterDto } from 'api/auth/auth.dto';
 
 // Utilities
 import sendResponse from 'utilites/response';
@@ -15,6 +15,19 @@ export default class AuthController {
   constructor(
     @inject(delay(() => UserService)) private userService: UserService
   ) {}
+
+  recoverPassword: RequestHandler = async (req, res) => {
+    const dto = req.body as RecoverPasswordDto;
+
+    await this.userService.recoverPassword(dto);
+
+    sendResponse(res, 200, {
+      body: {
+        isSuccess: true,
+        message: req.t('messages.auth.recover_password'),
+      },
+    });
+  };
 
   register: RequestHandler = async (req, res) => {
     const dto = req.body as RegisterDto;

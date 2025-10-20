@@ -10,7 +10,7 @@ import { limitier } from 'middleware/rateLimitter';
 import blockRequestWithToken from 'api/auth/auth.middleware';
 
 // DTO
-import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
+import { LoginDto, RecoverPasswordDto, RegisterDto } from 'api/auth/auth.dto';
 const authRouter = express.Router();
 const authController = container.resolve(AuthController);
 
@@ -25,6 +25,12 @@ authRouter.post('/register', [
   blockRequestWithToken,
   validateBody(RegisterDto),
   authController.register,
+]);
+authRouter.post('/recover-password', [
+  limitier,
+  blockRequestWithToken,
+  validateBody(RecoverPasswordDto),
+  authController.recoverPassword,
 ]);
 
 export default authRouter;

@@ -1,3 +1,5 @@
+import { t } from 'utilites/request-context';
+
 interface CustomErrorOptions {
   cause: string[];
 }
@@ -70,8 +72,8 @@ export class InternalServerError extends Error {
   status = 500;
   cause: string[];
 
-  constructor(message: string, options?: CustomErrorOptions) {
-    super(message);
+  constructor(message?: string, options?: CustomErrorOptions) {
+    super(message || t('common.internal_server_error'));
 
     this.name = 'InternalServerError';
     this.cause = options?.cause || [];

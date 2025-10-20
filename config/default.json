@@ -1,13 +1,15 @@
 {
-  "port": 3000,
-  "version": 1,
-  "jwtTokenExpiresIn": "5m",
-  "jwtRefreshTokenExpiresIn": "30d",
-  "jwtCookieExpiresInMinuets": 30,
-  "jwtTokenName": "X-API-KEY",
-  "jwtRefreshTokenName": "X-API-REFRESH-TOKEN",
-  "appName": {
-    "en": "Gamely",
+  "PORT": 3000,
+  "User_App_URL": "https://www.gamely.com",
+  "VERSION": 1,
+  "JWT_Token_ExpiresInMinutes": 5,
+  "JWT_RecoverPasswordKey_ExpiresInMinutes": 10,
+  "JWT_RefreshToken_ExpiresInDays": 30,
+  "JWT_Cookie_ExpiresInMinuets": 30,
+  "JWT_Token_Name": "X-API-KEY",
+  "JWT_RefreshToken_Name": "X-API-REFRESH-TOKEN",
+  "AppName": {
+    "en": "GameLy",
     "fa": "گیم‌لی"
   }
 }

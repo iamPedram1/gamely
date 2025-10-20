@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 export interface IUserEntity {
   _id: Types.ObjectId;
   token: string | null;
+  recoveryKey: string | null;
   refreshToken: string | null;
   name: string;
   bio: string;

@@ -1,5 +1,7 @@
 const messageTranslations = {
   auth: {
+    recover_password:
+      'در صورت صحت اطلاعات، ایمیل تأیید به آدرس شما ارسال خواهد شد',
     email_exists: 'این ایمیل توسط کاربر دیگری استفاده شده است',
     token_refresh_success: 'توکن با موفقیت تازه‌سازی شد',
     login_success: 'با موفقیت وارد حساب خود شدید',

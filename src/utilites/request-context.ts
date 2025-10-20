@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import { AnonymousError } from 'utilites/errors';
+import { AnonymousError, InternalServerError } from 'utilites/errors';
 
 // Types
 import type { i18n as I18nType } from 'i18next';
@@ -77,4 +77,12 @@ export const t = <T extends TranslationKeys>(
   if (!ctx?.t) return key;
 
   return ctx.t(key, options);
+};
+
+export const i18nInstance = <T extends TranslationKeys>() => {
+  const ctx = getContext();
+
+  if (!ctx?.i18n) throw new InternalServerError();
+
+  return ctx.i18n;
 };

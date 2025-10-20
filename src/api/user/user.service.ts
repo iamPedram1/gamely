@@ -9,16 +9,29 @@ import User, { IRefreshToken } from 'api/user/user.model';
 import BaseService from 'services/base.service.module';
 
 // Utilities
-import { AnonymousError, ValidationError } from 'utilites/errors';
+import {
+  AnonymousError,
+  InternalServerError,
+  ValidationError,
+} from 'utilites/errors';
 
 // Dto
-import { LoginDto, RegisterDto } from 'api/auth/auth.dto';
+import { LoginDto, RecoverPasswordDto, RegisterDto } from 'api/auth/auth.dto';
+
+// Utilities
+import { sendEmail } from 'utilites/mail';
 
 // Types
 import { UserDocument } from 'api/user/user.model';
 import { UpdateProfileDto } from 'api/user/user.dto';
 import { IUserEntity } from 'api/user/user.types';
-import { jwtRefreshTokenKey } from 'utilites/configs';
+import {
+  jwtRecoverPasswordKey,
+  jwtRecoverPasswordKeyExpiresInMinutes,
+  jwtRefreshTokenKey,
+  userAppUrl,
+} from 'utilites/configs';
+import { getContext } from 'utilites/request-context';
 
 type AuthTokens = Pick<IUserEntity, 'refreshToken' | 'token'>;
 
@@ -43,6 +56,89 @@ export default class UserService extends BaseService<
     data.password = await this.hashPassword(data.password);
 
     return await this.create({ ...data });
+  }
+
+  private generatePasswordRecoveryKey(id: string) {
+    return jwt.sign({ id }, jwtRecoverPasswordKey, {
+      expiresIn: `${jwtRecoverPasswordKeyExpiresInMinutes}m`,
+    });
+  }
+
+  private async sendRecoveryPasswordEmail(
+    name: string,
+    email: string,
+    key: string
+  ) {
+    const recoveryUrl = `${userAppUrl}/recovery/${key}`;
+    const en = `
+  <html>
+    <body style="font-family: Arial, sans-serif; background-color:#f5f5f5; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+        <h2 style="color: #333;">Hello ${name},</h2>
+        <p>You requested to reset your password for your Gamely account.</p>
+        <p>Please click the button below to set a new password. This link is valid for a limited time.</p>
+        <p style="text-align:center; margin: 30px 0;">
+          <a href="${recoveryUrl}" style="background-color: #1a73e8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+        </p>
+        <p>If you didn't request this change, you can safely ignore this email.</p>
+        <p>Thanks,<br/>The Gamely Team</p>
+      </div>
+    </body>
+  </html>
+  `;
+
+    const fa = `
+  <html dir="rtl">
+    <body style="font-family: Tahoma, sans-serif; background-color:#f5f5f5; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); text-align: right;">
+        <h2 style="direction: rtl; color: #333;">سلام ${name} عزیز،</h2>
+        <p  style="direction: rtl;">شما درخواست تغییر رمز عبور برای حساب Gamely خود را داده‌اید.</p>
+        <p  style="direction: rtl;">لطفاً برای تعیین رمز عبور جدید، روی دکمه زیر کلیک کنید. این لینک تنها به مدت 10 دقیقه معتبر است.</p>
+        <p style="text-align:center; margin: 30px 0;">
+          <a href="${recoveryUrl}" style="background-color: #1a73e8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">تغییر رمز عبور</a>
+        </p>
+        <p>اگر شما این درخواست را نداده‌اید، این ایمیل را نادیده بگیرید.</p>
+        <p style="direction: rtl;">با تشکر،<br/>تیم Gamely</p>
+      </div>
+    </body>
+  </html>
+  `;
+
+    return await sendEmail({
+      to: email,
+      subject: 'Gamely - Password Recovery',
+      html: this.i18n().resolvedLanguage === 'fa' ? fa : en,
+    });
+  }
+
+  async recoverPassword(data: RecoverPasswordDto): Promise<boolean> {
+    const email = data.email.toLowerCase();
+    const user = await this.getOneByKey('email', email, { throwError: false });
+    if (!user) return false;
+
+    if (user.recoveryKey) {
+      try {
+        jwt.verify(user.recoveryKey, jwtRecoverPasswordKey);
+        this.sendRecoveryPasswordEmail(
+          user.name,
+          user.email,
+          jwtRecoverPasswordKey
+        );
+        return true;
+      } catch (error) {}
+    }
+
+    return await this.withTransaction(async (session) => {
+      const key = this.generatePasswordRecoveryKey(user._id.toHexString());
+      await user.set('recoveryKey', key).save({ session });
+      const result = await this.sendRecoveryPasswordEmail(
+        user.name,
+        user.email,
+        key
+      );
+      if (!result.success) throw new InternalServerError();
+      return true;
+    });
   }
 
   async update(userId: string, data: UpdateProfileDto): Promise<IUserEntity> {
@@ -122,11 +218,11 @@ export default class UserService extends BaseService<
     return true;
   }
 
-  async comparePassword(password: string, hash: string) {
+  private async comparePassword(password: string, hash: string) {
     return await bcryptjs.compare(password, hash);
   }
 
-  async hashPassword(password: string) {
+  private async hashPassword(password: string) {
     const salt = await bcryptjs.genSalt();
     const hash = await bcryptjs.hash(password, salt);
     return hash;
