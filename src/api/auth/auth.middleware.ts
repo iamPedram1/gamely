@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 // Utilites
 import { jwtTokenName } from 'utilites/configs';
-import { BadRequestError } from 'utilites/errors';
+import { AnonymousError } from 'utilites/errors';
 
 export default function blockRequestWithToken(
   req: Request,
@@ -11,7 +11,12 @@ export default function blockRequestWithToken(
 ) {
   const token = req.header(jwtTokenName);
 
-  if (token) throw new BadRequestError(req.t('error.bad_request'));
+  if (token)
+    throw new AnonymousError(
+      'Client passed token to an endpoint that cannot execute with token',
+      req.t('error.bad_request'),
+      401
+    );
 
   next();
 }

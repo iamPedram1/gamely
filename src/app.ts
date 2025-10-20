@@ -1,14 +1,8 @@
 // Third-party packages
 import 'reflect-metadata';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import hpp from 'hpp';
-import cors from 'cors';
 import express from 'express';
-import morgan from 'morgan';
-import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
+
 dotenv.config({ quiet: true });
 
 // Startup
@@ -22,21 +16,11 @@ import baseStartup from 'startup/baseStartup';
 import i18nStartup from 'startup/i18n';
 
 const app = express();
-// @ts-ignore
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use('/', express.static(path.join(__dirname, '../public')));
-
-// JSON
-app.disable('etag');
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: '10kb' }));
 
 (async () => {
   dbStartup();
-  await i18nStartup(app);
   baseStartup(app);
+  await i18nStartup(app);
   routesStartup(app);
 })();
 

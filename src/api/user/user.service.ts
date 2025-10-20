@@ -66,12 +66,13 @@ export default class UserService extends BaseService<
       throwError: false,
     });
 
-    const mask = 'Email or password is incorrect';
+    const mask = this.t('error.invalid_credentials');
 
     if (!user) throw new AnonymousError('User not found', mask);
 
     const isPasswordCorrect = await user.comparePassword(data.password);
-    if (!isPasswordCorrect) throw new Error();
+    if (!isPasswordCorrect)
+      throw new AnonymousError('Password is not correct', mask);
 
     const { token, refreshToken } = user.generateAuthToken();
 

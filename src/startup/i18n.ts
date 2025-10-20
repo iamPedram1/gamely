@@ -1,7 +1,4 @@
-import path from 'path';
 import i18next from 'i18next';
-import { fileURLToPath } from 'url';
-
 import middleware from 'i18next-http-middleware';
 import type { Express } from 'express';
 
@@ -35,15 +32,15 @@ export default async function i18nStartup(app: Express) {
   };
 
   await i18next.use(middleware.LanguageDetector).init({
-    fallbackLng: 'en',
-    preload: ['en', 'fa'],
+    fallbackLng: 'fa',
+    preload: ['fa'],
     ns: ['error', 'models', 'common', 'messages'],
     defaultNS: 'error',
     resources,
     returnObjects: false, // Disable to ensure strings are returned
     keySeparator: '.',
     nsSeparator: '.',
-    debug: true, // Keep debug for troubleshooting
+    debug: process.env.NODE_ENV === 'development',
   });
 
   app.use(middleware.handle(i18next));
