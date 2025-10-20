@@ -6,6 +6,8 @@ const errosTranslations = {
   refresh_token_invalid: 'Refresh token is invalid',
   refresh_token_expired: 'Refresh token is expired',
   refresh_token_missing: 'Refresh token is not provided',
+  recovery_token_invalid: 'Recovery key is invalid',
+  recovery_token_expired: 'Recovery key is expired',
   validation_failed: 'Validation failed',
   id_required: 'The id paramater is required',
   id_invalid: 'The id paramater is required',

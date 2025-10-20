@@ -11,12 +11,17 @@ import BaseService from 'services/base.service.module';
 // Utilities
 import {
   AnonymousError,
-  InternalServerError,
   ValidationError,
+  InternalServerError,
 } from 'utilites/errors';
 
 // Dto
-import { LoginDto, RecoverPasswordDto, RegisterDto } from 'api/auth/auth.dto';
+import {
+  ChangePasswordDto,
+  LoginDto,
+  RecoverPasswordDto,
+  RegisterDto,
+} from 'api/auth/auth.dto';
 
 // Utilities
 import { sendEmail } from 'utilites/mail';
@@ -31,9 +36,9 @@ import {
   jwtRefreshTokenKey,
   userAppUrl,
 } from 'utilites/configs';
-import { getContext } from 'utilites/request-context';
 
 type AuthTokens = Pick<IUserEntity, 'refreshToken' | 'token'>;
+type RecoveryKey = { userId: string };
 
 export type IUserService = InstanceType<typeof UserService>;
 
@@ -58,8 +63,8 @@ export default class UserService extends BaseService<
     return await this.create({ ...data });
   }
 
-  private generatePasswordRecoveryKey(id: string) {
-    return jwt.sign({ id }, jwtRecoverPasswordKey, {
+  private generatePasswordRecoveryKey(userId: string) {
+    return jwt.sign({ userId }, jwtRecoverPasswordKey, {
       expiresIn: `${jwtRecoverPasswordKeyExpiresInMinutes}m`,
     });
   }
@@ -113,7 +118,10 @@ export default class UserService extends BaseService<
 
   async recoverPassword(data: RecoverPasswordDto): Promise<boolean> {
     const email = data.email.toLowerCase();
-    const user = await this.getOneByKey('email', email, { throwError: false });
+    const user = await this.getOneByKey('email', email, {
+      select: '+recoveryKey',
+      throwError: false,
+    });
     if (!user) return false;
 
     if (user.recoveryKey) {
@@ -139,6 +147,41 @@ export default class UserService extends BaseService<
       if (!result.success) throw new InternalServerError();
       return true;
     });
+  }
+
+  async changePassword(data: ChangePasswordDto): Promise<void> {
+    try {
+      const key = jwt.verify(
+        data.recoveryKey,
+        jwtRecoverPasswordKey
+      ) as RecoveryKey;
+
+      const user = await this.getOneById(key.userId, {
+        select: '+recoveryKey',
+      });
+
+      if (
+        user.recoveryKey !== data.recoveryKey ||
+        user.email !== data.email.trim().toLowerCase()
+      )
+        throw new Error();
+
+      return await this.withTransaction(async (session) => {
+        user.password = await this.hashPassword(data.password);
+        user.token = null;
+        user.recoveryKey = null;
+        user.refreshToken = null;
+        await user.save({ session });
+      });
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError)
+        throw new ValidationError(this.t('error.recovery_token_expired'));
+      if (error instanceof jwt.JsonWebTokenError)
+        throw new ValidationError(this.t('error.recovery_token_invalid'));
+      throw new ValidationError(
+        this.t('messages.auth.email_or_recoveryKey_invalid')
+      );
+    }
   }
 
   async update(userId: string, data: UpdateProfileDto): Promise<IUserEntity> {

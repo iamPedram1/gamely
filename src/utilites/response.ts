@@ -1,6 +1,6 @@
 import type { Response } from 'express';
-import { ModelsTranslationKeys, TranslationKeys } from 'types/i18n';
-import { getContext, t } from 'utilites/request-context';
+import { ModelsTranslationKeys } from 'types/i18n';
+import { t } from 'utilites/request-context';
 
 type HttpMethod =
   | 'GET'
@@ -89,10 +89,9 @@ const sendResponse = <T>(
         config?.customName
       );
 
-  const resolvedLang = getContext()?.i18n?.resolvedLanguage || 'en';
   const response: IApiResponse<T> = {
     isSuccess,
-    message: resolvedLang === 'fa' ? `.${message}` : `${message}.`,
+    message,
     data,
     statusCode,
     errors,

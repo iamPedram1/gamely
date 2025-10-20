@@ -5,7 +5,12 @@ import type { RequestHandler } from 'express';
 import UserService from 'api/user/user.service';
 
 // DTO
-import { LoginDto, RecoverPasswordDto, RegisterDto } from 'api/auth/auth.dto';
+import {
+  LoginDto,
+  RegisterDto,
+  ChangePasswordDto,
+  RecoverPasswordDto,
+} from 'api/auth/auth.dto';
 
 // Utilities
 import sendResponse from 'utilites/response';
@@ -25,6 +30,19 @@ export default class AuthController {
       body: {
         isSuccess: true,
         message: req.t('messages.auth.recover_password'),
+      },
+    });
+  };
+
+  changePassword: RequestHandler = async (req, res) => {
+    const dto = req.body as ChangePasswordDto;
+
+    await this.userService.changePassword(dto);
+
+    sendResponse(res, 200, {
+      body: {
+        isSuccess: true,
+        message: req.t('messages.auth.password_changed'),
       },
     });
   };

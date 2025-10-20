@@ -6,6 +6,8 @@ const errosTranslations = {
   refresh_token_invalid: 'شناسه تازه سازی نامعتبر است',
   refresh_token_expired: 'شناسه تازه سازی منقضی شده است',
   refresh_token_missing: 'شناسه تازه سازی ارسال نشده است',
+  recovery_token_invalid: 'شناسه بازیابی نامعتبر است',
+  recovery_token_expired: 'شناسه بازیابی منقضی شده',
   validation_failed: 'اعتبار سنجی با خطا مواجه شد',
   id_required: 'وارد کردن شناسه اجباریست',
   id_invalid: 'شناسه نامعتبر است',
