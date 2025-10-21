@@ -2,6 +2,7 @@ import paginate, { paginateAggregate } from 'core/utilites/pagination';
 import { NotFoundError } from 'core/utilites/errors';
 
 // Types
+import type { BaseTFunction } from 'core/services/base/base.service';
 import type {
   Model,
   Query,
@@ -15,9 +16,6 @@ import {
   FindResult,
   NullableQueryResult,
 } from 'core/types/base.service.type';
-import { TypedTFunction } from 'core/types/i18n';
-import { BaseTFunction } from 'core/services/base/base.service';
-import { WithPagination } from 'core/types/paginate';
 
 /**
  * Generic base service for query operations (read-only) on Mongoose models.
@@ -49,6 +47,10 @@ class BaseQueryService<
     return !!res;
   }
 
+  async isMadeBySelf(documentId: string, userId: string) {
+    return this.exists({ _id: documentId, creator: userId });
+  }
+
   async existsById(id: string): Promise<boolean> {
     return this.exists({ _id: id } as FilterQuery<TSchema>);
   }
@@ -67,7 +69,6 @@ class BaseQueryService<
   // --------------------------------------------------------------------------
   // Single Document Queries
   // --------------------------------------------------------------------------
-
   async getOneById<
     TLean extends boolean = false,
     TThrowError extends boolean = true,
@@ -140,7 +141,6 @@ class BaseQueryService<
   // --------------------------------------------------------------------------
   // Multiple Documents Query
   // --------------------------------------------------------------------------
-
   async find<TLean extends boolean = false, TPaginate extends boolean = true>(
     options?: BaseQueryOptions<TSchema> & {
       lean?: TLean;

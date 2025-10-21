@@ -13,11 +13,7 @@ import BaseService from 'core/services/base/base.service';
 // Types
 import type { ITagEntity } from 'api/tag/tag.type';
 import type { IApiBatchResponse } from 'core/utilites/response';
-import { PipelineStage } from 'mongoose';
-import {
-  BaseQueryOptions,
-  AggregateReturn,
-} from 'core/types/base.service.type';
+import type { BaseMutateOptions } from 'core/types/base.service.type';
 
 export type ITagService = InstanceType<typeof TagService>;
 
@@ -68,18 +64,36 @@ class TagService extends BaseService<
     );
   }
 
-  async deleteOneById(id: string): Promise<true> {
+  async deleteOneById(tagId: string): Promise<true> {
     return this.withTransaction(async (session) => {
-      const result = await super.deleteOneById(id, { session });
-      await this.postService.removeIdFromArrayField('tags', id, { session });
+      await this.assertOwnership(tagId);
+
+      const result = await super.deleteOneById(tagId, { session });
+      await this.postService.removeIdFromArrayField('tags', tagId, { session });
       return result;
     });
+  }
+
+  async updateOneById<TThrowError extends boolean = true>(
+    id: string,
+    payload: Partial<UpdateTagDto>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? TagDocument : TagDocument | null> {
+    await this.assertOwnership(id);
+
+    return super.updateOneById(id, payload, options);
   }
 
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
     return this.withTransaction(async (session) => {
       await this.postService.removeIdsFromArrayField('tags', ids, { session });
-      return await super.batchDelete(ids, { session });
+      return await super.batchDelete(ids, {
+        session,
+        ...(this.user &&
+          this.user.role === 'author' && {
+            additionalFilter: { creator: this.user.id },
+          }),
+      });
     });
   }
 }

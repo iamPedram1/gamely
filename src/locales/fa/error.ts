@@ -32,6 +32,8 @@ const errosTranslations = {
   jwt_verify_expired: '{{name}} منقضی شده است',
   jwt_verify_invalid: '{{name}} نامعتبر است',
   jwt_verify_missing: '{{name}} وجود ندارد',
+  made_byself_error:
+    'شما سازنده این {{model}} نیستید و دسترسی به عملیات مربوطه را ندارید',
 } as const;
 
 export default errosTranslations;

@@ -40,7 +40,14 @@ class BaseMutateService<
   // --------------------------------------------------------------------------
   // Create
   // --------------------------------------------------------------------------
-
+  /**
+   * Creates a new document.
+   * @param data - Data to create the document with.
+   * @param userId - Optional creator ID to attach.
+   * @param options - Mongoose session or populate options.
+   * @returns Created document.
+   * @throws {AnonymousError} If creation fails.
+   */
   async create<TThrowError extends boolean = true>(
     data: TCreateDto,
     userId?: string,
@@ -65,7 +72,14 @@ class BaseMutateService<
   // --------------------------------------------------------------------------
   // Update Operations
   // --------------------------------------------------------------------------
-
+  /**
+   * Updates a document by ID.
+   * @param id - Document ID.
+   * @param payload - Fields to update.
+   * @param options - Options including session or throwError flag.
+   * @returns Updated document or null.
+   * @throws {NotFoundError} If document is not found and throwError is true.
+   */
   async updateOneById<TThrowError extends boolean = true>(
     id: string,
     payload: Partial<TUpdateDto>,
@@ -86,6 +100,16 @@ class BaseMutateService<
     return doc as TThrowError extends true ? TDoc : TDoc | null;
   }
 
+  /**
+   * Updates multiple documents by a matching key.
+   * @param keyName - Field name to match.
+   * @param matchValue - Value to match against.
+   * @param data - Update data or aggregation pipeline.
+   * @param options - Mutation options.
+   * @returns MongoDB update result.
+   * @throws {NotFoundError} If no documents are matched.
+   * @throws {AnonymousError} If matched documents cannot be updated.
+   */
   async updateManyByKey(
     keyName: keyof AnyKeys<TSchema>,
     matchValue: any,
@@ -114,6 +138,14 @@ class BaseMutateService<
     return result;
   }
 
+  /**
+   * Updates many documents referencing a specific ID.
+   * @param id - Reference ID.
+   * @param referenceKey - Key that holds the reference.
+   * @param value - New value to assign.
+   * @param options - Mutation options.
+   * @returns MongoDB update result.
+   */
   async updateManyByReference<K extends keyof TSchema>(
     id: string,
     referenceKey: K,
@@ -123,6 +155,15 @@ class BaseMutateService<
     return this.updateManyByReferences([id], referenceKey, value, options);
   }
 
+  /**
+   * Updates many documents with multiple reference IDs.
+   * @param ids - List of reference IDs.
+   * @param referenceKey - Key that holds the reference.
+   * @param value - New value to assign.
+   * @param options - Mutation options.
+   * @returns MongoDB update result.
+   * @throws {NotFoundError} If no matching references found.
+   */
   async updateManyByReferences<K extends keyof TSchema>(
     ids: string[],
     referenceKey: K,
@@ -146,7 +187,13 @@ class BaseMutateService<
   // --------------------------------------------------------------------------
   // Delete Operations
   // --------------------------------------------------------------------------
-
+  /**
+   * Deletes a document by ID.
+   * @param id - Document ID.
+   * @param options - Options including session or throwError flag.
+   * @returns True if deleted, otherwise false.
+   * @throws {NotFoundError} If document not found and throwError is true.
+   */
   async deleteOneById<TThrowError extends boolean = true>(
     id: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
@@ -163,6 +210,14 @@ class BaseMutateService<
     return ((options?.throwError ?? true) ? true : deleted) as any;
   }
 
+  /**
+   * Deletes multiple documents by key.
+   * @param keyName - Field name to match.
+   * @param matchValue - Value to match.
+   * @param options - Mutation options.
+   * @returns MongoDB delete result.
+   * @throws {NotFoundError} If no documents found.
+   */
   async deleteManyByKey<TThrowError extends boolean = false>(
     keyName: keyof AnyKeys<TSchema>,
     matchValue: any,
@@ -186,16 +241,31 @@ class BaseMutateService<
     return result;
   }
 
+  /**
+   * Deletes multiple documents in batch by IDs.
+   * @param ids - Array of document IDs.
+   * @param options - Mutation options.
+   * @returns Batch delete result summary.
+   * @throws {ValidationError} If `ids` array is empty.
+   * @throws {AnonymousError} If deletion fails.
+   */
   async batchDelete(
     ids: string[],
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { additionalFilter?: FilterQuery<TSchema> }
   ): Promise<IApiBatchResponse> {
     if (!ids?.length) {
       throw new ValidationError(this.t('error.ids_array_empty'));
     }
 
+    console.log('Batch Delete', {
+      _id: { $in: ids },
+      ...options?.additionalFilter,
+      options,
+    });
+
     const query = this.model.deleteMany({
       _id: { $in: ids },
+      ...options?.additionalFilter,
     } as FilterQuery<TSchema>);
     const result = await this.applyMutateOptions(query, options).exec();
 
@@ -229,7 +299,13 @@ class BaseMutateService<
   // --------------------------------------------------------------------------
   // Array Field Operations
   // --------------------------------------------------------------------------
-
+  /**
+   * Removes an ID from array fields in all matching documents.
+   * @param keyName - Array field name.
+   * @param id - ID to remove.
+   * @param options - Mutation options.
+   * @returns MongoDB update result.
+   */
   async removeIdFromArrayField(
     keyName: keyof AnyKeys<TSchema>,
     id: string,
@@ -238,6 +314,14 @@ class BaseMutateService<
     return this.removeIdsFromArrayField(keyName, [id], options);
   }
 
+  /**
+   * Removes multiple IDs from array fields in all matching documents.
+   * @param keyName - Array field name.
+   * @param ids - IDs to remove.
+   * @param options - Mutation options.
+   * @returns MongoDB update result.
+   * @throws {NotFoundError} If no documents are matched.
+   */
   async removeIdsFromArrayField(
     keyName: keyof TSchema,
     ids: string[],

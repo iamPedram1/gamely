@@ -13,7 +13,7 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type { Types } from 'mongoose';
-import type { IUserEntity } from 'api/user/user.types';
+import type { IUserEntity, UserRole } from 'api/user/user.types';
 
 export class UpdateProfileDto {
   constructor(data: Pick<IUserEntity, 'name' | 'avatar' | 'password' | 'bio'>) {
@@ -55,6 +55,9 @@ export class UserResponseDto extends BaseResponseDto {
 
   @Expose()
   readonly email!: string;
+
+  @Expose()
+  readonly role!: UserRole;
 
   @Expose()
   readonly bio!: string;

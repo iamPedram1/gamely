@@ -3,7 +3,7 @@ import { AnonymousError, InternalServerError } from 'core/utilites/errors';
 
 // Types
 import type { i18n as I18nType } from 'i18next';
-import type { IUser } from 'api/user/user.types';
+import type { IUser, IUserContext } from 'api/user/user.types';
 import type {
   TranslationKeys,
   TranslationVariables,
@@ -22,7 +22,7 @@ export interface RequestContext {
   i18n: I18nType;
 
   /** The authenticated user information (if available) */
-  user?: Pick<IUser, 'id'>;
+  user?: IUserContext;
 }
 
 /**
@@ -88,4 +88,12 @@ export const i18nInstance = <T extends TranslationKeys>() => {
   if (!ctx?.i18n) throw new InternalServerError();
 
   return ctx.i18n;
+};
+
+export const userContext = () => {
+  const ctx = getContext();
+
+  if (!ctx?.user) throw new InternalServerError();
+
+  return ctx.user;
 };

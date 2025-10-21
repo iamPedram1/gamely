@@ -27,3 +27,4 @@ export interface IUserEntity extends PrivateKeys {
 
 export type IUser = InstanceType<typeof UserResponseDto>;
 export type IUserSummary = InstanceType<typeof UserSummaryResponseDto>;
+export type IUserContext = Pick<IUser, 'id' | 'role' | 'name' | 'email'>;

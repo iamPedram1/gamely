@@ -31,7 +31,7 @@ tagRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
 tagRouter.get('/:id', validateObjectId(Tag), tagController.getOne);
 
 // Protected Routes
-tagRouter.use(auth(['user', 'admin']));
+tagRouter.use(auth(['author', 'admin']));
 tagRouter.delete('/batch/delete', tagController.batchDelete);
 tagRouter.delete('/:id', validateObjectId(Tag), tagController.delete);
 tagRouter.post(

@@ -34,6 +34,7 @@ const errosTranslations = {
   jwt_verify_expired: '{{name}} is expired',
   jwt_verify_invalid: '{{name}} is invalid',
   jwt_verify_missing: '{{name}} is missing',
+  made_byself_error: "You didn't create this {{model}}",
 } as const;
 
 export default errosTranslations;

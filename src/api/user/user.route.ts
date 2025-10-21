@@ -15,7 +15,7 @@ const userRouter = express.Router();
 const userController = container.resolve(UserController);
 
 // Protected Routes
-userRouter.use(auth(['user']));
+userRouter.use(auth(['user', 'admin', 'author']));
 userRouter.get('/profile', userController.getProfile);
 userRouter.patch(
   '/profile',

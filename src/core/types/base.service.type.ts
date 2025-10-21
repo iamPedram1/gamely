@@ -15,6 +15,7 @@ import BaseMutateService from 'core/services/base/base.mutate.service';
 import BaseService from 'core/services/base/base.service';
 import type { IRequestQueryBase } from 'core/types/query';
 import type { WithPagination } from 'core/types/paginate';
+import BaseValidationService from 'core/services/base/base.validation.service';
 
 /** Mongoose populate option */
 export interface BaseSessionOptions {
@@ -95,6 +96,11 @@ export type IBaseQueryService<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = BaseQueryService<TSchema, TDoc>;
+
+export type IBaseValidationService<
+  TSchema,
+  TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
+> = BaseValidationService<TSchema, TDoc>;
 
 export type IBaseMutateService<
   TSchema,

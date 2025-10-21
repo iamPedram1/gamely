@@ -3,13 +3,19 @@ import { startSession } from 'mongoose';
 // Services
 import BaseQueryService from 'core/services/base/base.query.service';
 import BaseMutateService from 'core/services/base/base.mutate.service';
+import BaseValidationService from 'core/services/base/base.validation.service';
 
 // Utilities
 import { AnonymousError } from 'core/utilites/errors';
 import { IApiBatchResponse } from 'core/utilites/response';
-import { i18nInstance, t as translator } from 'core/utilites/request-context';
+import {
+  i18nInstance,
+  t as translator,
+  userContext,
+} from 'core/utilites/request-context';
 
 // Types
+import type { IUserContext } from 'api/user/user.types';
 import type { i18n } from 'i18next';
 import type { TranslationKeys, TranslationVariables } from 'core/types/i18n';
 import type {
@@ -23,6 +29,8 @@ import type {
   UpdateWithAggregationPipeline,
   UpdateQuery,
   PipelineStage,
+  Types,
+  FilterQuery,
 } from 'mongoose';
 import type {
   BaseMutateOptions,
@@ -31,6 +39,7 @@ import type {
   IBaseMutateService,
   IBaseQueryService,
   IBaseService,
+  IBaseValidationService,
   NullableQueryResult,
 } from 'core/types/base.service.type';
 
@@ -38,6 +47,11 @@ type Q<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = IBaseQueryService<TSchema, TDoc>;
+
+type V<
+  TSchema,
+  TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
+> = IBaseValidationService<TSchema, TDoc>;
 
 type M<
   TSchema,
@@ -72,10 +86,24 @@ export default abstract class BaseService<
 {
   protected readonly queries: Q<TSchema, TDoc>;
   protected readonly mutations: M<TSchema, TCreateDto, TUpdateDto, TDoc>;
+  protected readonly validations: V<TSchema, TDoc>;
+  protected readonly user: IUserContext | null;
 
   constructor(private model: Model<TSchema>) {
-    this.queries = new BaseQueryService<TSchema, TDoc>(model, this.t);
+    try {
+      this.user = userContext();
+    } catch (error) {
+      this.user = null;
+    }
+
     this.mutations = new BaseMutateService(model, this.t);
+    this.queries = new BaseQueryService<TSchema, TDoc>(model, this.t);
+    this.validations = new BaseValidationService(
+      model,
+      this.user,
+      this.queries,
+      this.t
+    );
   }
 
   /**
@@ -97,7 +125,9 @@ export default abstract class BaseService<
     options?: Partial<TranslationVariables<T>>
   ): string {
     const opts = {
-      model: `models.${this.model.modelName}`,
+      model: translator(
+        `models.${this.model.modelName}.singular` as TranslationKeys
+      ),
       ...options,
     } as unknown as TranslationVariables<T>;
 
@@ -162,6 +192,10 @@ export default abstract class BaseService<
     match: TSchema[K]
   ): Promise<boolean> {
     return this.queries.existsByKey(key, match);
+  }
+
+  async isMadeBySelf(documentId: string, userId: string): Promise<boolean> {
+    return this.isMadeBySelf(documentId, userId);
   }
 
   // =====================
@@ -422,7 +456,7 @@ export default abstract class BaseService<
    */
   async batchDelete(
     ids: string[],
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { additionalFilter?: FilterQuery<TSchema> }
   ): Promise<IApiBatchResponse> {
     return this.mutations.batchDelete(ids, options);
   }
@@ -460,5 +494,12 @@ export default abstract class BaseService<
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     return this.mutations.removeIdsFromArrayField(keyName, ids, options);
+  }
+
+  // =====================
+  // VALIDATIONS
+  // =====================
+  async assertOwnership(document: string | Types.ObjectId) {
+    return this.validations.assertOwnership(document);
   }
 }
