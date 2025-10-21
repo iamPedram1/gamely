@@ -1,5 +1,8 @@
 const commonTranslations = {
   document: 'Document',
+  token: 'Token',
+  refreshToken: 'Refresh token',
+  recoveryKey: 'Recovery key',
   request_failed: 'Request failed due to an error',
   operation_completed_successfully: 'Operation completed successfully',
   deleted_successfully: 'Deleted successfully',

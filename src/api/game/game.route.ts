@@ -30,7 +30,7 @@ gameRouter.get('/summaries', [
 gameRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
 
 // Protected Routes
-gameRouter.use(auth);
+gameRouter.use(auth(['author', 'admin']));
 gameRouter.delete('/batch/delete', gameController.batchDelete);
 gameRouter.delete('/:id', [validateObjectId(Game), gameController.delete]);
 gameRouter.post('/', [

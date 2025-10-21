@@ -34,16 +34,7 @@ export default class UserService extends BaseService<
   }
 
   async update(userId: string, data: UpdateProfileDto): Promise<IUserEntity> {
-    const user = await this.updateOneById(
-      userId,
-      {
-        ...data,
-        ...(data.password && {
-          password: await crypto.hash(data.password),
-        }),
-      },
-      { lean: true }
-    );
+    const user = await this.updateOneById(userId, data, { lean: true });
 
     return user;
   }

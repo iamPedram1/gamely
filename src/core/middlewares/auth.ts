@@ -1,5 +1,3 @@
-import jwt from 'jsonwebtoken';
-
 // Models
 import User from 'api/user/user.model';
 
@@ -7,84 +5,62 @@ import User from 'api/user/user.model';
 import { requestContext, t } from 'core/utilites/request-context';
 
 // Utilities
-import { AnonymousError, UnauthorizedError } from 'core/utilites/errors';
+import tokenUtils from 'core/services/token.service';
 import { jwtAccessTokenKey, jwtTokenName } from 'core/utilites/configs';
+import {
+  AnonymousError,
+  ForbiddenError,
+  UnauthorizedError,
+} from 'core/utilites/errors';
 
 // Types
-import type { Request, Response, NextFunction } from 'express';
 import type { IToken } from 'api/user/user.model';
+import type { UserRole } from 'api/user/user.types';
+import type { Request, Response, NextFunction } from 'express';
 
-export default async function auth(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const mask = req.t('error.token_generic_error');
-
-  try {
+export default function auth(role: UserRole[]) {
+  return async function (req: Request, res: Response, next: NextFunction) {
+    const mask = req.t('error.token_generic_error');
     const token = req.header(jwtTokenName);
+
     if (!token) {
-      return next(new UnauthorizedError(req.t('error.token_missing')));
-    }
-
-    // Step 1: Verify access token
-    const payload = verifyAccessToken(token);
-
-    // Step 2: Fetch user with matching token
-    const user = await findUserByToken(payload.userId, token);
-    if (!user) {
-      return next(
-        new AnonymousError(
-          `User with token (${token}) was not found`,
-          mask,
-          401,
-          {
-            cause: ['User not found or token mismatch'],
-          }
-        )
+      throw new UnauthorizedError(
+        req.t('error.jwt_verify_missing', { name: t('common.token') })
       );
     }
 
-    // Step 3: Ensure refresh token exists
-    if (!user.refreshToken) {
+    // Check JWT
+    const { userId } = tokenUtils.verify<IToken>(
+      token,
+      jwtAccessTokenKey,
+      t('common.token')
+    );
+
+    // Check Role
+    const user = await User.findById(userId).select('role').lean();
+    if (!user)
       return next(
-        new AnonymousError('User refresh token missing', mask, 401, {
-          cause: ['refreshToken not found in user document'],
-        })
+        new AnonymousError('User with given id does not exist', mask, 400)
       );
-    }
 
-    // ✅ Authenticated successfully
-    req.user = { id: payload.userId };
+    if (role.includes('admin') && user.role !== 'admin')
+      throw new AnonymousError(
+        `Expected ${role} role but the role was ${user.role}`,
+        t('error.forbidden_error'),
+        403
+      );
+    if (role.includes('author') && user.role === 'user')
+      throw new AnonymousError(
+        `Expected author or admin role but the role was ${user.role}`,
+        t('error.forbidden_error'),
+        403
+      );
 
-    // Update AsyncLocalStorage context immediately
+    req.user = { id: userId };
+
     const ctx = requestContext.getStore();
     if (ctx) ctx.user = req.user;
 
     return next();
-  } catch (error) {
-    return next(handleJwtError(error, mask));
-  }
-}
-
-function verifyAccessToken(token: string): IToken {
-  try {
-    return jwt.verify(token, jwtAccessTokenKey) as IToken;
-  } catch (err) {
-    throw err; // handled later by handleJwtError()
-  }
-}
-
-async function findUserByToken(userId: string, token: string) {
-  return User.findOne({ _id: userId, token })
-    .select('+token +refreshToken')
-    .lean();
-}
-
-function handleJwtError(error: Error, mask: string): Error {
-  if (error instanceof jwt.TokenExpiredError)
-    return new UnauthorizedError(t('error.token_expired'));
-  if (error instanceof jwt.JsonWebTokenError)
-    return new UnauthorizedError(t('error.token_invalid'));
-  return new AnonymousError(error.message, mask);
+  };
 }

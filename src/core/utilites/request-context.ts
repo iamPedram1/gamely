@@ -73,14 +73,17 @@ export const t = <T extends TranslationKeys>(
   options?: TranslationVariables<T>
 ): string => {
   const ctx = getContext();
+  console.log(1, ctx?.t, key);
 
   if (!ctx?.t) return key;
+  console.log(2, ctx?.t, key);
 
   return ctx.t(key, options);
 };
 
 export const i18nInstance = <T extends TranslationKeys>() => {
   const ctx = getContext();
+  console.log(ctx);
 
   if (!ctx?.i18n) throw new InternalServerError();
 

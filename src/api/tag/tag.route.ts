@@ -22,16 +22,16 @@ const tagRouter = express.Router();
 const tagController = container.resolve(TagController);
 
 // Public Routes
-tagRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
 tagRouter.get(
   '/summaries',
   validateQuery(BaseQueryDto),
   tagController.getAllSummaries
 );
+tagRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
 tagRouter.get('/:id', validateObjectId(Tag), tagController.getOne);
 
 // Protected Routes
-tagRouter.use(auth);
+tagRouter.use(auth(['user', 'admin']));
 tagRouter.delete('/batch/delete', tagController.batchDelete);
 tagRouter.delete('/:id', validateObjectId(Tag), tagController.delete);
 tagRouter.post(

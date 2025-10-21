@@ -6,7 +6,7 @@ const env = process.env;
 // Secrets
 export const fromEmail = env.FROM_Email as string;
 export const emailApiKey = env.EMAIL_Api_Key as string;
-export const jwtAccessTokenKey = env.JWT_AcessToken_Key as string;
+export const jwtAccessTokenKey = env.JWT_AccessToken_Key as string;
 export const jwtRefreshTokenKey = env.JWT_RefreshToken_Key as string;
 export const jwtRecoverPasswordKey = env.JWT_RecoverPassword_Key as string;
 
@@ -16,7 +16,7 @@ export const jwtRecoverPasswordKeyExpiresInMinutes = config.get(
 ) as number;
 export const jwtAccessTokenExpiresInMinutes = config.get(
   'JWT_AccessToken_ExpiresInMinutes'
-) as string;
+) as number;
 export const jwtRefreshTokenExpiresInDays = config.get(
   'JWT_RefreshToken_ExpiresInDays'
 ) as number;

@@ -26,6 +26,7 @@ const messageTranslations = {
     else: 'Request processed successfully',
   },
   auth: {
+    password_recovery_emailSubject: 'Gamely - Password Recovery',
     recover_password: 'A confirmation email will be sent if the account exists',
     password_changed: 'Password changed successfully',
     email_or_recoveryKey_invalid: 'Email or recovery key is invalid',

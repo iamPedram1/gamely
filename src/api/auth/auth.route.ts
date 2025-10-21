@@ -5,17 +5,20 @@ import { container } from 'tsyringe';
 import AuthController from 'api/auth/auth.controller';
 
 // Middlewares
+import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import { limitier } from 'core/middlewares/rateLimitter';
 import blockRequestWithToken from 'api/auth/auth.middleware';
 
 // DTO
+import { RefreshTokenDto } from 'api/user/user.dto';
 import {
   ChangePasswordDto,
   LoginDto,
   RecoverPasswordDto,
   RegisterDto,
 } from 'api/auth/auth.dto';
+
 const authRouter = express.Router();
 const authController = container.resolve(AuthController);
 
@@ -43,5 +46,17 @@ authRouter.post('/change-password', [
   validateBody(ChangePasswordDto),
   authController.changePassword,
 ]);
+authRouter.post(
+  '/token/refresh',
+  limitier,
+  validateBody(RefreshTokenDto),
+  authController.refreshToken
+);
+authRouter.post(
+  '/token/revoke',
+  limitier,
+  auth(['user']),
+  authController.revokeToken
+);
 
 export default authRouter;

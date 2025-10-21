@@ -59,8 +59,8 @@ export class BadRequestError extends Error {
   status = 400;
   cause: string[];
 
-  constructor(message: string, options?: CustomErrorOptions) {
-    super(message);
+  constructor(message?: string, options?: CustomErrorOptions) {
+    super(message || t('error.bad_request'));
 
     this.name = 'BadRequestError';
     this.cause = options?.cause || [];
@@ -86,8 +86,8 @@ export class ForbiddenError extends Error {
   status = 403;
   cause: string[];
 
-  constructor(message: string, options?: CustomErrorOptions) {
-    super(message);
+  constructor(message?: string, options?: CustomErrorOptions) {
+    super(message || t('error.forbidden_error'));
 
     this.name = 'ForbiddenError';
     this.cause = options?.cause || [];
@@ -100,7 +100,7 @@ export class UnauthorizedError extends Error {
   cause: string[];
 
   constructor(message: string, options?: CustomErrorOptions) {
-    super(message);
+    super(message || t('error.unauthorized_error'));
 
     this.name = 'UnauthorizedError';
     this.cause = options?.cause || [];

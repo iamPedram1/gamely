@@ -38,7 +38,7 @@ export class UpdateProfileDto {
 }
 
 export class RefreshTokenDto {
-  constructor(data: Pick<IUserEntity, 'refreshToken' | 'token'>) {
+  constructor(data: Pick<IUserEntity, 'refreshToken'>) {
     Object.assign(this, data);
   }
 

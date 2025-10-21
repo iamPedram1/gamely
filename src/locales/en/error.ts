@@ -1,8 +1,5 @@
 const errosTranslations = {
   bad_request: 'Bad request',
-  token_invalid: 'Token is invalid',
-  token_expired: 'Token is expired',
-  token_missing: 'Token is missing',
   refresh_token_invalid: 'Refresh token is invalid',
   refresh_token_expired: 'Refresh token is expired',
   refresh_token_missing: 'Refresh token is not provided',
@@ -14,6 +11,8 @@ const errosTranslations = {
   token_generic_error: 'Access denied, token is invalid or expired',
   uniqueness_error:
     "{{field}} '${value}' is already taken by another {{name}}`",
+  forbidden_error: 'Access Denied',
+  unauthorized_error: 'Unauthorized',
   too_many_request: 'Too many attempts, Please try again later',
   update_failed: 'An error occured in updating {{name}}',
   create_failed: 'An error occured in creating {{name}}',
@@ -32,6 +31,9 @@ const errosTranslations = {
   batch_delete_failed: 'Batch delete failed for {{model}}',
   category_self_parent: 'parentId: A category cannot be its own parent',
   category_circular_relationship: 'parentId: Circular relationship detected',
+  jwt_verify_expired: '{{name}} is expired',
+  jwt_verify_invalid: '{{name}} is invalid',
+  jwt_verify_missing: '{{name}} is missing',
 } as const;
 
 export default errosTranslations;

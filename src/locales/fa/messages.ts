@@ -1,5 +1,6 @@
 const messageTranslations = {
   auth: {
+    password_recovery_emailSubject: 'گیم‌لی - بازیابی کلمه عبور',
     password_changed: 'کلمه عبور با موفقیت تغییر کرد',
     recover_password:
       'در صورت صحت اطلاعات، ایمیل تأیید به آدرس شما ارسال خواهد شد',

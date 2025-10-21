@@ -30,7 +30,7 @@ postRouter.get('/summaries', [
 postRouter.get('/:id', [validateObjectId(Post), postController.getOne]);
 
 // Protected Routes
-postRouter.use(auth);
+postRouter.use(auth(['author', 'admin']));
 postRouter.delete('/batch/delete', [postController.batchDelete]);
 postRouter.delete('/:id', [validateObjectId(Post), postController.delete]);
 postRouter.post('/', [

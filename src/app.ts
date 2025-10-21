@@ -1,8 +1,6 @@
-// Third-party packages
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import express from 'express';
-
 dotenv.config({ quiet: true });
 
 // Startup
@@ -11,9 +9,9 @@ import routesStartup from 'startup/routes';
 
 // Utilities
 import logger from 'core/utilites/logger';
-import { appPort } from 'core/utilites/configs';
-import baseStartup from 'startup/baseStartup';
 import i18nStartup from 'startup/i18n';
+import baseStartup from 'startup/baseStartup';
+import { appPort } from 'core/utilites/configs';
 
 const app = express();
 

@@ -39,7 +39,7 @@ categoryRouter.get(
 );
 
 // Protected Routes
-categoryRouter.use(auth);
+categoryRouter.use(auth(['author', 'admin']));
 categoryRouter.post(
   '/',
   validateBody(CreateCategoryDto),

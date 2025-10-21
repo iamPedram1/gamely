@@ -1,7 +1,4 @@
 const errosTranslations = {
-  token_expired: 'شناسه کاربر منقضی شده',
-  token_invalid: 'شناسه کاربر نامعتبر است',
-  token_missing: 'شناسه کاربر وجود ندارد، لطفا وارد شوید',
   token_generic_error: 'خطا دسترسی، شناسه منقضی یا نامعتبر است',
   refresh_token_invalid: 'شناسه تازه سازی نامعتبر است',
   refresh_token_expired: 'شناسه تازه سازی منقضی شده است',
@@ -17,6 +14,8 @@ const errosTranslations = {
   update_failed: 'خطایی در بروزرسانی {{name}} رخ داد',
   delete_failed: 'خطایی در حذف {{name}} رخ داد',
   bad_request: 'درخواست نامعتبر است',
+  forbidden_error: 'خطا دسترسی',
+  unauthorized_error: 'خطا احراز هویت',
   too_many_request:
     'تعداد تلاش‌ها بیش از حد مجاز است، لطفاً بعداً دوباره تلاش کنید',
   invalid_route: "مسیر مورد نظر '{{url}}' وجود ندارد.",
@@ -30,6 +29,9 @@ const errosTranslations = {
   batch_delete_failed: 'حذف گروهی برای {{model}} با خطا مواجه شد',
   category_self_parent: 'دسته‌بندی نمیتواند والد خودش باشد',
   category_circular_relationship: 'رابطه چرخشی‌ (دایره‌ای) شناسایی شد',
+  jwt_verify_expired: '{{name}} منقضی شده است',
+  jwt_verify_invalid: '{{name}} نامعتبر است',
+  jwt_verify_missing: '{{name}} وجود ندارد',
 } as const;
 
 export default errosTranslations;

@@ -1,14 +1,25 @@
-import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
-import { Types } from 'mongoose';
+import type { Types } from 'mongoose';
+import type {
+  UserResponseDto,
+  UserSummaryResponseDto,
+} from 'api/user/user.dto';
 
-export interface IUserEntity {
-  _id: Types.ObjectId;
+export type UserRole = 'user' | 'author' | 'admin';
+
+export const UserRoleEnum: UserRole[] = ['user', 'author', 'admin'];
+
+interface PrivateKeys {
   recoveryKey: string | null;
   refreshToken: string | null;
+  password: string;
+}
+
+export interface IUserEntity extends PrivateKeys {
+  _id: Types.ObjectId;
+  role: UserRole;
   name: string;
   bio: string;
   email: string;
-  password: string;
   avatar: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;

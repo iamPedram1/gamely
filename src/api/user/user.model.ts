@@ -6,19 +6,20 @@ import crypto from 'core/utilites/crypto';
 import tokenUtils from 'core/services/token.service';
 
 // Types
-import type { IUserEntity } from 'api/user/user.types';
+import { UserRoleEnum, type IUserEntity } from 'api/user/user.types';
 
 export interface IUserEntityMethods {
   generateToken(): string;
   compareRefreshToken(refreshToken: string): Promise<boolean>;
-  generateRefreshToken(token: string): Promise<string>;
-  generateAuthToken(): Promise<{ token: string; refreshToken: string }>;
+  generateRefreshToken(): string;
+  generateAuthToken(): { token: string; refreshToken: string };
   validateToken(token: string, refreshToken: string): boolean;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 export type IToken = { userId: string };
 export type IRefreshToken = { userId: string };
+export type IRecoveryKey = { userId: string };
 export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
 export type UserLeanDocument = FlattenMaps<IUserEntity>;
 
@@ -40,6 +41,13 @@ const userSchema = new Schema<
       trim: true,
       select: false,
     },
+    role: {
+      type: String,
+      enum: UserRoleEnum,
+      required: true,
+      default: 'user',
+      index: true,
+    },
     name: {
       type: String,
       trim: true,
@@ -54,6 +62,7 @@ const userSchema = new Schema<
       maxlength: 255,
     },
     email: {
+      index: true,
       type: String,
       trim: true,
       unique: true,
@@ -85,15 +94,15 @@ userSchema.methods.generateToken = function () {
   return tokenUtils.generateToken(this._id);
 };
 
-userSchema.methods.generateAuthToken = async function () {
-  const token = tokenUtils.generateToken(this._id);
-  const refreshToken = await tokenUtils.generateRefreshToken(this._id);
+userSchema.methods.generateAuthToken = function () {
+  const token = this.generateToken();
+  const refreshToken = this.generateRefreshToken();
 
   return { token, refreshToken };
 };
 
-userSchema.methods.generateRefreshToken = async function () {
-  return await tokenUtils.generateRefreshToken(this._id);
+userSchema.methods.generateRefreshToken = function () {
+  return tokenUtils.generateRefreshToken(this._id);
 };
 
 userSchema.methods.comparePassword = async function (password) {
@@ -105,6 +114,47 @@ userSchema.methods.compareRefreshToken = async function (refreshToken: string) {
   if (!refreshToken || !this.refreshToken) return false;
   return await crypto.compare(refreshToken, this.refreshToken);
 };
+
+const hashableFields = ['password', 'refreshToken', 'recoveryKey'] as const;
+const methods = ['findOneAndUpdate', 'updateOne'] as const;
+
+userSchema.pre('save', async function (next) {
+  try {
+    for (const field of hashableFields) {
+      if (this.isModified(field) && this[field]) {
+        this[field] = await crypto.hash(this[field]);
+      }
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+methods.forEach((method) => {
+  userSchema.pre(method, async function (next) {
+    try {
+      const update = this.getUpdate();
+
+      if (!update) return next();
+
+      if (!Array.isArray(update) && typeof update === 'object') {
+        const $set = update.$set || {};
+
+        for (const field of hashableFields) {
+          if (update[field]) update[field] = await crypto.hash(update[field]);
+          if ($set[field]) $set[field] = await crypto.hash($set[field]);
+        }
+
+        if (Object.keys($set).length) update.$set = $set;
+      }
+
+      next();
+    } catch (err) {
+      next(err);
+    }
+  });
+});
 
 const User = model('User', userSchema);
 

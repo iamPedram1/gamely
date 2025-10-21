@@ -13,7 +13,7 @@ const fileRouter = express.Router();
 const fileController = container.resolve(FileController);
 
 // Public Routes
-fileRouter.use(auth);
+fileRouter.use(auth(['user']));
 fileRouter.post(
   '/:location/batch',
   uploadManyFiles({ fieldName: 'image', maxFiles: 4 }),

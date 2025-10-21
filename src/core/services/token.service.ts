@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken';
 import type { Types } from 'mongoose';
 
 // Utilites
-import crypto from 'core/utilites/crypto';
+import { t } from 'core/utilites/request-context';
+import { InternalServerError, ValidationError } from 'core/utilites/errors';
 import {
   jwtRefreshTokenExpiresInDays,
   jwtRefreshTokenKey,
@@ -11,19 +12,30 @@ import {
 } from 'core/utilites/configs';
 
 const tokenUtils = {
+  verify<T>(token: string, secret: string, name: string) {
+    try {
+      return jwt.verify(token, secret) as T;
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError)
+        throw new ValidationError(t('error.jwt_verify_expired', { name }));
+      if (error instanceof jwt.JsonWebTokenError)
+        throw new ValidationError(t('error.jwt_verify_invalid', { name }));
+
+      throw new InternalServerError();
+    }
+  },
   generateToken(userId: Types.ObjectId) {
     const obj = { userId: userId.toHexString() };
+
     return jwt.sign(obj, jwtAccessTokenKey, {
-      expiresIn: jwtAccessTokenExpiresInMinutes as `${number}m`,
+      expiresIn: `${jwtAccessTokenExpiresInMinutes}m`,
     });
   },
-  async generateRefreshToken(id: Types.ObjectId) {
+  generateRefreshToken(id: Types.ObjectId) {
     const obj = { userId: id.toHexString() };
-    return await crypto.hash(
-      jwt.sign(obj, jwtRefreshTokenKey, {
-        expiresIn: `${jwtRefreshTokenExpiresInDays}d`,
-      })
-    );
+    return jwt.sign(obj, jwtRefreshTokenKey, {
+      expiresIn: `${jwtRefreshTokenExpiresInDays}d`,
+    });
   },
 };
 

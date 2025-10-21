@@ -9,19 +9,13 @@ import validateBody from 'core/middlewares/validateBody';
 import UserController from 'api/user/user.controller';
 
 // Dto
-import { RefreshTokenDto, UpdateProfileDto } from 'api/user/user.dto';
+import { UpdateProfileDto } from 'api/user/user.dto';
 
 const userRouter = express.Router();
 const userController = container.resolve(UserController);
 
 // Protected Routes
-userRouter.post(
-  '/token/refresh',
-  validateBody(RefreshTokenDto),
-  userController.refreshToken
-);
-userRouter.use(auth);
-userRouter.post('/token/revoke', userController.revokeToken);
+userRouter.use(auth(['user']));
 userRouter.get('/profile', userController.getProfile);
 userRouter.patch(
   '/profile',
