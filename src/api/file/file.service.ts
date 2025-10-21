@@ -7,14 +7,14 @@ import { singleton } from 'tsyringe';
 import File, { FileDocument } from 'api/file/file.model';
 
 // Services
-import BaseService from 'services/base.service.module';
+import BaseService from 'core/services/base/base.service';
 
 // Utilities
-import { t } from 'utilites/request-context';
-import { AnonymousError, BadRequestError } from 'utilites/errors';
+import { t } from 'core/utilites/request-context';
+import { AnonymousError, BadRequestError } from 'core/utilites/errors';
 
 // Types
-import type { BaseMutateOptions } from 'services/base.service.type';
+import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { IFileEntity, IFileLocation } from 'api/file/file.type';
 
 export type IFileService = InstanceType<typeof FileService>;

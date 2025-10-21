@@ -11,11 +11,11 @@ import commentRouter from 'api/comment/comment.route';
 import categoryRouter from 'api/category/category.route';
 
 // Middlewares
-import error from 'middleware/error';
-import notFound from 'middleware/notFound';
+import error from 'core/middlewares/error';
+import notFound from 'core/middlewares/notFound';
 
 // Utilities
-import { prefixBaseUrl } from 'utilites/configs';
+import { prefixBaseUrl } from 'core/utilites/configs';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/user'), userRouter);

@@ -2,9 +2,9 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import auth from 'middleware/auth';
-import validateBody from 'middleware/validateBody';
-import validateObjectId from 'middleware/validateObjectId';
+import auth from 'core/middlewares/auth';
+import validateBody from 'core/middlewares/validateBody';
+import validateObjectId from 'core/middlewares/validateObjectId';
 
 // Model
 import Post from 'api/post/post.model';

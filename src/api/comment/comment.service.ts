@@ -7,17 +7,17 @@ import Comment from 'api/comment/comment.model';
 import { CreateCommentDto, UpdateCommentDto } from 'api/comment/comment.dto';
 
 // Services
-import BaseService from 'services/base.service.module';
+import BaseService from 'core/services/base/base.service';
 
 // Types
 import type { Document, Types } from 'mongoose';
-import type { WithPagination } from 'types/paginate';
-import type { IRequestQueryBase } from 'types/query';
+import type { WithPagination } from 'core/types/paginate';
+import type { IRequestQueryBase } from 'core/types/query';
 import type { CommentType, ICommentEntity } from 'api/comment/comment.type';
 import type {
   BaseMutateOptions,
   IBaseService,
-} from 'services/base.service.type';
+} from 'core/types/base.service.type';
 import type {
   CommentDocument,
   CommentLeanDocument,

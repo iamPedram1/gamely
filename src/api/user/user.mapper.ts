@@ -4,7 +4,7 @@ import { singleton } from 'tsyringe';
 import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
 
 // Mapper
-import { BaseMapper } from 'mapper/base';
+import { BaseMapper } from 'core/mappers/base';
 
 // Types
 import type { UserDocument, UserLeanDocument } from 'api/user/user.model';

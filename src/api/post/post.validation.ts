@@ -1,7 +1,7 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Utilities
-import { NotFoundError } from 'utilites/errors';
+import { NotFoundError } from 'core/utilites/errors';
 
 // Services
 import TagService from 'api/tag/tag.service';

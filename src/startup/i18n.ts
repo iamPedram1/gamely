@@ -3,7 +3,7 @@ import middleware from 'i18next-http-middleware';
 import type { Express } from 'express';
 
 // Middlewares
-import { context } from 'middleware/context';
+import { context } from 'core/middlewares/context';
 
 // Dictionaries
 import commonEN from '../locales/en/common';
@@ -37,7 +37,6 @@ export default async function i18nStartup(app: Express) {
     ns: ['error', 'models', 'common', 'messages'],
     defaultNS: 'error',
     resources,
-    returnObjects: false, // Disable to ensure strings are returned
     keySeparator: '.',
     nsSeparator: '.',
   });

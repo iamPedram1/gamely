@@ -2,11 +2,11 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import auth from 'middleware/auth';
-import validateBody from 'middleware/validateBody';
-import validateObjectId from 'middleware/validateObjectId';
-import validateQuery from 'middleware/validateQuery';
-import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
+import auth from 'core/middlewares/auth';
+import validateBody from 'core/middlewares/validateBody';
+import validateObjectId from 'core/middlewares/validateObjectId';
+import validateQuery from 'core/middlewares/validateQuery';
+import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
 import Game from 'api/game/game.model';
@@ -15,7 +15,7 @@ import Game from 'api/game/game.model';
 import GameController from 'api/game/game.controller';
 
 // Dto
-import { BaseQueryDto } from 'dto/query';
+import { BaseQueryDto } from 'core/dto/query';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 const gameRouter = express.Router();

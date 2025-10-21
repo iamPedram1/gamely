@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import TagService from 'api/tag/tag.service';
 
 // Utilities
-import sendResponse, { sendBatchResponse } from 'utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // DTO
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
@@ -14,7 +14,7 @@ import { TagMapper } from 'api/tag/tag.mapper';
 
 // Types
 import type { RequestHandler } from 'express';
-import type { IRequestQueryBase } from 'types/query';
+import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
 export default class TagController {

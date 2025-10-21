@@ -8,13 +8,16 @@ import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 
 // Services
 import PostService from 'api/post/post.service';
-import BaseService from 'services/base.service.module';
+import BaseService from 'core/services/base/base.service';
 
 // Types
 import type { ITagEntity } from 'api/tag/tag.type';
-import type { IApiBatchResponse } from 'utilites/response';
+import type { IApiBatchResponse } from 'core/utilites/response';
 import { PipelineStage } from 'mongoose';
-import { BaseQueryOptions, AggregateReturn } from 'services/base.service.type';
+import {
+  BaseQueryOptions,
+  AggregateReturn,
+} from 'core/types/base.service.type';
 
 export type ITagService = InstanceType<typeof TagService>;
 

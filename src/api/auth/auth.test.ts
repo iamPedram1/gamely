@@ -6,7 +6,7 @@ import request from 'supertest';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtTokenName } from 'utilites/configs';
+import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';
 
 // Types
 import { IUserEntity } from 'api/user/user.types';

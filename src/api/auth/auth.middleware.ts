@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 
 // Utilites
-import { jwtTokenName } from 'utilites/configs';
-import { AnonymousError } from 'utilites/errors';
+import { jwtTokenName } from 'core/utilites/configs';
+import { AnonymousError } from 'core/utilites/errors';
 
 export default function blockRequestWithToken(
   req: Request,

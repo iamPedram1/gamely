@@ -4,7 +4,7 @@ import { singleton } from 'tsyringe';
 import { PostResponseDto, PostSummaryResponseDto } from 'api/post/post.dto';
 
 // Mapper
-import { BaseMapper } from 'mapper/base';
+import { BaseMapper } from 'core/mappers/base';
 
 // Types
 import { PostDocument, PostLeanDocument } from 'api/post/post.model';

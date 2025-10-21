@@ -12,7 +12,7 @@ import {
 // Dto
 import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type { IFileSummary } from 'api/file/file.type';

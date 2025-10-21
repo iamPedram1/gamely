@@ -2,8 +2,8 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import auth from 'middleware/auth';
-import { uploadManyFiles, uploadOneFile } from 'middleware/upload';
+import auth from 'core/middlewares/auth';
+import { uploadManyFiles, uploadOneFile } from 'core/middlewares/upload';
 
 // Module
 import FileController from 'api/file/file.controller';

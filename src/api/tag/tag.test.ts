@@ -7,7 +7,7 @@ import Tag from 'api/tag/tag.model';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtTokenName } from 'utilites/configs';
+import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';
 
 // Types
 import { ITagEntity } from 'api/tag/tag.type';

@@ -8,11 +8,11 @@ import PostService from 'api/post/post.service';
 import { PostMapper } from 'api/post/post.mapper';
 
 // Utilities
-import sendResponse, { sendBatchResponse } from 'utilites/response';
-import { ValidationError } from 'utilites/errors';
+import sendResponse, { sendBatchResponse } from 'core/utilites/response';
+import { ValidationError } from 'core/utilites/errors';
 
 // Types
-import type { IRequestQueryBase } from 'types/query';
+import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
 export default class PostController {

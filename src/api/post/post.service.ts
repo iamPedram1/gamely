@@ -8,20 +8,20 @@ import { CreatePostDto, UpdatePostDto } from 'api/post/post.dto';
 
 // Services
 import FileService from 'api/file/file.service';
-import BaseService from 'services/base.service.module';
+import BaseService from 'core/services/base/base.service';
 import CommentService from 'api/comment/comment.service';
 
 // Validations
 import { PostValidation } from 'api/post/post.validation';
 
 // Utilities
-import logger from 'utilites/logger';
+import logger from 'core/utilites/logger';
 
 // Types
 import type { Document, Types } from 'mongoose';
 import type { IPostEntity } from 'api/post/post.type';
 import type { PostDocument } from 'api/post/post.model';
-import type { BaseMutateOptions } from 'services/base.service.type';
+import type { BaseMutateOptions } from 'core/types/base.service.type';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()

@@ -1,7 +1,7 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Utilities
-import sendResponse from 'utilites/response';
+import sendResponse from 'core/utilites/response';
 
 // DTO
 import UserService from 'api/user/user.service';
@@ -27,30 +27,6 @@ export default class UserController {
       customName: 'Profile',
       body: {
         data: this.userMapper.toDto(user),
-      },
-    });
-  };
-
-  refreshToken: RequestHandler = async (req, res) => {
-    const newAuth = await this.userService.refreshToken(req.body.refreshToken);
-
-    sendResponse(res, 200, {
-      httpMethod: 'POST',
-      body: {
-        message: req.t('messages.auth.token_refresh_success'),
-        data: newAuth,
-      },
-    });
-  };
-
-  revokeToken: RequestHandler = async (req, res) => {
-    await this.userService.clearToken(req.user.id);
-
-    sendResponse(res, 200, {
-      httpMethod: 'POST',
-      body: {
-        data: null,
-        message: req.t('common.operation_completed_successfully'),
       },
     });
   };

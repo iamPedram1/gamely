@@ -7,7 +7,7 @@ import Game from 'api/game/game.model';
 import User from 'api/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtTokenName } from 'utilites/configs';
+import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';
 
 // Types
 import { IGameEntity } from 'api/game/game.type';

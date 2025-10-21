@@ -1,33 +1,24 @@
-import jwt from 'jsonwebtoken';
-import bcryptjs from 'bcryptjs';
 import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 import { isEmail } from 'class-validator';
 
 // Utils
-import {
-  jwtTokenKey,
-  jwtTokenExpiresInMinutes,
-  jwtRefreshTokenKey,
-  jwtRefreshTokenExpiresInDays,
-} from 'utilites/configs';
+import crypto from 'core/utilites/crypto';
+import tokenUtils from 'core/services/token.service';
 
 // Types
 import type { IUserEntity } from 'api/user/user.types';
 
 export interface IUserEntityMethods {
   generateToken(): string;
-  generateRefreshToken(token: string): string;
-  generateAuthToken(): { token: string; refreshToken: string };
+  compareRefreshToken(refreshToken: string): Promise<boolean>;
+  generateRefreshToken(token: string): Promise<string>;
+  generateAuthToken(): Promise<{ token: string; refreshToken: string }>;
   validateToken(token: string, refreshToken: string): boolean;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-export type IToken = { userId: string; userEmail: string };
-export type IRefreshToken = {
-  userId: string;
-  userEmail: string;
-  token: string;
-};
+export type IToken = { userId: string };
+export type IRefreshToken = { userId: string };
 export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
 export type UserLeanDocument = FlattenMaps<IUserEntity>;
 
@@ -37,12 +28,6 @@ const userSchema = new Schema<
   IUserEntityMethods
 >(
   {
-    token: {
-      type: String,
-      default: null,
-      trim: true,
-      select: false,
-    },
     refreshToken: {
       type: String,
       default: null,
@@ -97,50 +82,28 @@ const userSchema = new Schema<
 );
 
 userSchema.methods.generateToken = function () {
-  const obj: IToken = {
-    userId: this._id.toHexString(),
-    userEmail: this.email,
-  };
-  return jwt.sign(obj, jwtTokenKey, {
-    expiresIn: jwtTokenExpiresInMinutes as `${number}m`,
-  });
+  return tokenUtils.generateToken(this._id);
 };
 
-userSchema.methods.generateAuthToken = function () {
-  const token = this.generateToken();
-  const refreshToken = this.generateRefreshToken(token);
+userSchema.methods.generateAuthToken = async function () {
+  const token = tokenUtils.generateToken(this._id);
+  const refreshToken = await tokenUtils.generateRefreshToken(this._id);
 
   return { token, refreshToken };
 };
 
-userSchema.methods.validateToken = function (token, refreshToken) {
-  const tokenMatch = this.token === token;
-  const refreshTokenMatch = this.refreshToken === refreshToken;
-  if (!tokenMatch || !refreshTokenMatch) return false;
-
-  const refreshTokenVerify = jwt.verify(
-    refreshToken,
-    jwtRefreshTokenKey
-  ) as IRefreshToken;
-
-  if (refreshTokenVerify.token === token) return true;
-  return false;
-};
-
-userSchema.methods.generateRefreshToken = function (token: string) {
-  const obj: IRefreshToken = {
-    userId: this._id.toHexString(),
-    userEmail: this.email,
-    token,
-  };
-  return jwt.sign(obj, jwtRefreshTokenKey, {
-    expiresIn: `${jwtRefreshTokenExpiresInDays}d`,
-  });
+userSchema.methods.generateRefreshToken = async function () {
+  return await tokenUtils.generateRefreshToken(this._id);
 };
 
 userSchema.methods.comparePassword = async function (password) {
   if (!this.password) return false;
-  return await bcryptjs.compare(password, this.password);
+  return await crypto.compare(password, this.password);
+};
+
+userSchema.methods.compareRefreshToken = async function (refreshToken: string) {
+  if (!refreshToken || !this.refreshToken) return false;
+  return await crypto.compare(refreshToken, this.refreshToken);
 };
 
 const User = model('User', userSchema);

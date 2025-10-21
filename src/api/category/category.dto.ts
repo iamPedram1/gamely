@@ -10,7 +10,7 @@ import {
 
 // DTO
 import { UserSummaryResponseDto } from 'api/user/user.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type {

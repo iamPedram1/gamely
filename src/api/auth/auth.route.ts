@@ -5,8 +5,8 @@ import { container } from 'tsyringe';
 import AuthController from 'api/auth/auth.controller';
 
 // Middlewares
-import validateBody from 'middleware/validateBody';
-import { limitier } from 'middleware/rateLimitter';
+import validateBody from 'core/middlewares/validateBody';
+import { limitier } from 'core/middlewares/rateLimitter';
 import blockRequestWithToken from 'api/auth/auth.middleware';
 
 // DTO

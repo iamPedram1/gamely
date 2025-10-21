@@ -16,7 +16,7 @@ import { GameResponseDto } from 'api/game/game.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { CategorySummaryResponseDto } from 'api/category/category.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type { IPostEntity } from 'api/post/post.type';

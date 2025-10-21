@@ -9,7 +9,7 @@ import {
 
 // Dto
 import { UserSummaryResponseDto } from 'api/user/user.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import { ITagEntity } from 'api/tag/tag.type';

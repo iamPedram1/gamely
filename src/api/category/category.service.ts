@@ -12,13 +12,13 @@ import {
 
 // Services
 import PostService from 'api/post/post.service';
-import BaseService from 'services/base.service.module';
+import BaseService from 'core/services/base/base.service';
 
 // Utilities
-import { BadRequestError, NotFoundError } from 'utilites/errors';
+import { BadRequestError, NotFoundError } from 'core/utilites/errors';
 
 // Types
-import type { BaseMutateOptions } from 'services/base.service.type';
+import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { CategoryDocument } from 'api/category/category.model';
 import type {
   ICategoryEntity,

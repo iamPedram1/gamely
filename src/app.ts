@@ -10,8 +10,8 @@ import dbStartup from 'startup/db';
 import routesStartup from 'startup/routes';
 
 // Utilities
-import logger from 'utilites/logger';
-import { appPort } from 'utilites/configs';
+import logger from 'core/utilites/logger';
+import { appPort } from 'core/utilites/configs';
 import baseStartup from 'startup/baseStartup';
 import i18nStartup from 'startup/i18n';
 

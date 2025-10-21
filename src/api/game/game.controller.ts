@@ -7,11 +7,11 @@ import GameService from 'api/game/game.service';
 import { GameMapper } from 'api/game/game.mapper';
 
 // Utilities
-import sendResponse, { sendBatchResponse } from 'utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // Types
 import type { RequestHandler } from 'express';
-import type { IRequestQueryBase } from 'types/query';
+import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
 export default class GameController {

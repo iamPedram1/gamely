@@ -2,8 +2,8 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import auth from 'middleware/auth';
-import validateBody from 'middleware/validateBody';
+import auth from 'core/middlewares/auth';
+import validateBody from 'core/middlewares/validateBody';
 
 // Controller
 import UserController from 'api/user/user.controller';

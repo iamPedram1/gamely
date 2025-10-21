@@ -9,7 +9,7 @@ import {
 
 // Dto
 import { FileResponseDto } from 'api/file/file.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'dto/response';
+import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type { Types } from 'mongoose';

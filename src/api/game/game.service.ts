@@ -8,11 +8,11 @@ import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 // Services
 import PostService from 'api/post/post.service';
-import BaseService from 'services/base.service.module';
+import BaseService from 'core/services/base/base.service';
 
 // Types
 import type { IGameEntity } from 'api/game/game.type';
-import type { IApiBatchResponse } from 'utilites/response';
+import type { IApiBatchResponse } from 'core/utilites/response';
 
 export type IGameService = InstanceType<typeof GameService>;
 

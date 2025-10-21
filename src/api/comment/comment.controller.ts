@@ -5,7 +5,7 @@ import type { RequestHandler } from 'express';
 import CommentService from 'api/comment/comment.service';
 
 // Utilities
-import sendResponse, { sendBatchResponse } from 'utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // Mapper
 import { CommentMapper } from 'api/comment/comment.mapper';
@@ -14,7 +14,7 @@ import { CommentMapper } from 'api/comment/comment.mapper';
 import { CreateCommentDto, UpdateCommentDto } from 'api/comment/comment.dto';
 
 // Types
-import type { IRequestQueryBase } from 'types/query';
+import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
 export default class CommentController {

@@ -7,7 +7,7 @@ import {
 } from 'api/comment/comment.dto';
 
 // Mapper
-import { BaseMapper } from 'mapper/base';
+import { BaseMapper } from 'core/mappers/base';
 
 // Types
 import type {

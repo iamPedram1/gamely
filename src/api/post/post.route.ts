@@ -1,11 +1,11 @@
 import express from 'express';
 
 // Middlewares
-import auth from 'middleware/auth';
-import validateBody from 'middleware/validateBody';
-import validateObjectId from 'middleware/validateObjectId';
-import validateQuery from 'middleware/validateQuery';
-import validateUniqueConflict from 'middleware/uniqueCheckerConflict';
+import auth from 'core/middlewares/auth';
+import validateBody from 'core/middlewares/validateBody';
+import validateObjectId from 'core/middlewares/validateObjectId';
+import validateQuery from 'core/middlewares/validateQuery';
+import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
 import Post from 'api/post/post.model';
@@ -14,7 +14,7 @@ import Post from 'api/post/post.model';
 import PostController from 'api/post/post.controller';
 
 // Dto
-import { BaseQueryDto } from 'dto/query';
+import { BaseQueryDto } from 'core/dto/query';
 import { CreatePostDto, UpdatePostDto } from 'api/post/post.dto';
 import { container } from 'tsyringe';
 

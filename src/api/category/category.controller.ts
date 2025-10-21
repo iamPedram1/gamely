@@ -7,12 +7,12 @@ import CategoryService from 'api/category/category.service';
 import { CategoryMapper } from 'api/category/category.mapper';
 
 // Utilities
-import sendResponse from 'utilites/response';
-import { AnonymousError } from 'utilites/errors';
+import sendResponse from 'core/utilites/response';
+import { AnonymousError } from 'core/utilites/errors';
 
 // Types
 import type { RequestHandler } from 'express';
-import type { IRequestQueryBase } from 'types/query';
+import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
 export default class CategoryController {
