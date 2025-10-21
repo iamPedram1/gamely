@@ -35,6 +35,8 @@ const errosTranslations = {
   jwt_verify_invalid: '{{name}} is invalid',
   jwt_verify_missing: '{{name}} is missing',
   made_byself_error: "You didn't create this {{model}}",
+  own_every_children_error:
+    "This {{model}} has children, you didn't create every children in this {{model}}",
 } as const;
 
 export default errosTranslations;

@@ -34,6 +34,8 @@ const errosTranslations = {
   jwt_verify_missing: '{{name}} وجود ندارد',
   made_byself_error:
     'شما سازنده این {{model}} نیستید و دسترسی به عملیات مربوطه را ندارید',
+  own_every_children_error:
+    '{{model}} دارای {{model}} فرزند است و شما سازنده تمامی آنها نیستید',
 } as const;
 
 export default errosTranslations;

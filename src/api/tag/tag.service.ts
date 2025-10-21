@@ -89,14 +89,14 @@ class TagService extends BaseService<
 
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
     return this.withTransaction(async (session) => {
-      if (!this.user)
+      if (!this.currentUser)
         throw new AnonymousError('Something wrong with user context');
 
       await this.postService.removeIdsFromArrayField('tags', ids, { session });
       return await super.batchDelete(ids, {
         session,
-        ...(this.user.role !== 'admin' && {
-          additionalFilter: { creator: this.user.id },
+        ...(this.currentUser.isNot('admin') && {
+          additionalFilter: { creator: this.currentUser.id },
         }),
       });
     });

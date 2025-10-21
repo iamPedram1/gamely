@@ -16,7 +16,6 @@ import { PostValidation } from 'api/post/post.validation';
 
 // Utilities
 import logger from 'core/utilites/logger';
-import { AnonymousError } from 'core/utilites/errors';
 
 // Types
 import type { IPostEntity } from 'api/post/post.type';
@@ -66,12 +65,9 @@ class PostService extends BaseService<
   }
 
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
-    if (!this.user)
-      throw new AnonymousError('Something wrong with the user context');
-
     return await super.batchDelete(ids, {
-      ...(this.user.role !== 'admin' && {
-        additionalFilter: { creator: this.user.id },
+      ...(this.currentUser.isNot('admin') && {
+        additionalFilter: { creator: this.currentUser.id },
       }),
     });
   }
@@ -84,7 +80,7 @@ class PostService extends BaseService<
       | undefined
   ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
     const validations = [
-      this.user?.role === 'author' && (await this.assertOwnership(id)),
+      this.currentUser.is('author') && (await this.assertOwnership(id)),
       payload.game && this.postValidation.validateGame(payload.game),
       payload.tags && this.postValidation.validateTags(payload.tags),
       payload.category &&

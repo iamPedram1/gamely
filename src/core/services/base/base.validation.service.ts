@@ -7,6 +7,7 @@ import { AnonymousError, ValidationError } from 'core/utilites/errors';
 import BaseQueryService from 'core/services/base/base.query.service';
 import { BaseTFunction } from 'core/services/base/base.service';
 import { userContext } from 'core/utilites/request-context';
+import { UserRole } from 'api/user/user.types';
 
 /**
  * Base service for CRUD and mutation operations on Mongoose models.
@@ -21,27 +22,22 @@ class BaseValidationService<
     protected readonly t: BaseTFunction
   ) {}
 
-  protected get user() {
-    try {
-      return userContext();
-    } catch (error) {
-      return null;
-    }
+  protected get currentUser() {
+    return userContext();
   }
 
   async assertOwnership(document: string | Record<'creator', Types.ObjectId>) {
-    if (!this.user || !this.user.id)
-      throw new AnonymousError('Something wrong in user context');
-
     let isMadeBySelf = false;
+    if (this.currentUser.is('admin')) return true;
 
     if (typeof document === 'string') {
       isMadeBySelf = await this.queryService.isMadeBySelf(
         document,
-        this.user.id
+        this.currentUser.id
       );
     } else {
-      if (this.user.id === document.creator.toHexString()) isMadeBySelf = true;
+      if (this.currentUser.id === document.creator.toHexString())
+        isMadeBySelf = true;
     }
 
     if (!isMadeBySelf)

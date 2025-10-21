@@ -1,4 +1,4 @@
-import type { ClientSession, DeleteResult, Document, Types } from 'mongoose';
+import type { ClientSession } from 'mongoose';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
@@ -15,7 +15,11 @@ import PostService from 'api/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Utilities
-import { BadRequestError, NotFoundError } from 'core/utilites/errors';
+import {
+  BadRequestError,
+  NotFoundError,
+  ValidationError,
+} from 'core/utilites/errors';
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';
@@ -60,6 +64,8 @@ class CategoryService extends BaseService<
     payload: Partial<UpdateCategoryDto>,
     options?: BaseMutateOptions
   ): Promise<CategoryDocument> {
+    await this.assertOwnership(id);
+
     const [category, descendants] = await Promise.all([
       this.getOneById(id),
       this.getAllDescendantIds(id),
@@ -88,9 +94,25 @@ class CategoryService extends BaseService<
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
     return this.withTransaction(async (session) => {
-      const deleted = await super.deleteOneById(id);
-      await this.removeChildrens(id, session);
-      await this.postService.deleteManyByKey('category', id, { session });
+      await this.assertOwnership(id);
+
+      if (this.currentUser.isNot('admin')) {
+        const childrenIds = await this.getAllDescendantIds(id);
+        const ownsAllChildren =
+          (await Category.countDocuments({
+            _id: { $in: childrenIds },
+            creator: this.currentUser.id,
+          })) === childrenIds.length;
+
+        if (!ownsAllChildren)
+          throw new ValidationError(this.t('error.own_every_children_error'));
+      }
+
+      const [deleted] = await Promise.all([
+        super.deleteOneById(id, { ...options, session }),
+        this.removeChildrens(id, session),
+        this.postService.deleteManyByKey('category', id, { session }),
+      ]);
 
       return deleted;
     });
@@ -173,7 +195,7 @@ class CategoryService extends BaseService<
   }
 
   private async removeChildrens(id: string, session: ClientSession) {
-    const children = await Category.find({ parentId: id }).session(session);
+    const children = await Category.find({ parentId: id });
 
     for (const child of children) {
       await this.removeChildrens(String(child._id), session);

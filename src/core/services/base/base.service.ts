@@ -41,6 +41,7 @@ import type {
   IBaseValidationService,
   NullableQueryResult,
 } from 'core/types/base.service.type';
+import { UserRole } from 'api/user/user.types';
 
 type Q<
   TSchema,
@@ -93,11 +94,16 @@ export default abstract class BaseService<
     this.validations = new BaseValidationService(model, this.queries, this.t);
   }
 
-  protected get user() {
+  protected get currentUser() {
     try {
-      return userContext();
+      const user = userContext();
+      return {
+        ...user,
+        is: (role: UserRole) => user.role === role,
+        isNot: (role: UserRole) => user.role !== role,
+      };
     } catch (error) {
-      return null;
+      throw new AnonymousError('Something wrong with user context');
     }
   }
 

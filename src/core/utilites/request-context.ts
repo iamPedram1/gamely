@@ -3,7 +3,7 @@ import { AnonymousError, InternalServerError } from 'core/utilites/errors';
 
 // Types
 import type { i18n as I18nType } from 'i18next';
-import type { IUser, IUserContext } from 'api/user/user.types';
+import type { IUser, IUserContext, UserRole } from 'api/user/user.types';
 import type {
   TranslationKeys,
   TranslationVariables,
@@ -90,7 +90,14 @@ export const i18nInstance = <T extends TranslationKeys>() => {
 export const userContext = () => {
   const ctx = getContext();
 
-  if (!ctx?.user) throw new InternalServerError();
+  if (!ctx || !ctx.user)
+    throw new AnonymousError('Something went wrong with user context');
 
-  return ctx.user;
+  const user = ctx.user as IUserContext;
+
+  return {
+    ...user,
+    is: (role: UserRole) => user.role === role,
+    isNot: (role: UserRole) => user.role !== role,
+  };
 };
