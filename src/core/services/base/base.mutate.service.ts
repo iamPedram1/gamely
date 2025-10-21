@@ -257,12 +257,6 @@ class BaseMutateService<
       throw new ValidationError(this.t('error.ids_array_empty'));
     }
 
-    console.log('Batch Delete', {
-      _id: { $in: ids },
-      ...options?.additionalFilter,
-      options,
-    });
-
     const query = this.model.deleteMany({
       _id: { $in: ids },
       ...options?.additionalFilter,

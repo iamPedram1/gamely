@@ -17,8 +17,8 @@ const app = express();
 
 (async () => {
   dbStartup();
-  baseStartup(app);
   await i18nStartup(app);
+  baseStartup(app);
   routesStartup(app);
 })();
 

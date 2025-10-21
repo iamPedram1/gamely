@@ -15,7 +15,6 @@ import {
 } from 'core/utilites/request-context';
 
 // Types
-import type { IUserContext } from 'api/user/user.types';
 import type { i18n } from 'i18next';
 import type { TranslationKeys, TranslationVariables } from 'core/types/i18n';
 import type {
@@ -87,23 +86,19 @@ export default abstract class BaseService<
   protected readonly queries: Q<TSchema, TDoc>;
   protected readonly mutations: M<TSchema, TCreateDto, TUpdateDto, TDoc>;
   protected readonly validations: V<TSchema, TDoc>;
-  protected readonly user: IUserContext | null;
 
   constructor(private model: Model<TSchema>) {
-    try {
-      this.user = userContext();
-    } catch (error) {
-      this.user = null;
-    }
-
     this.mutations = new BaseMutateService(model, this.t);
     this.queries = new BaseQueryService<TSchema, TDoc>(model, this.t);
-    this.validations = new BaseValidationService(
-      model,
-      this.user,
-      this.queries,
-      this.t
-    );
+    this.validations = new BaseValidationService(model, this.queries, this.t);
+  }
+
+  protected get user() {
+    try {
+      return userContext();
+    } catch (error) {
+      return null;
+    }
   }
 
   /**
@@ -499,7 +494,7 @@ export default abstract class BaseService<
   // =====================
   // VALIDATIONS
   // =====================
-  async assertOwnership(document: string | Types.ObjectId) {
+  async assertOwnership(document: string | Record<'creator', Types.ObjectId>) {
     return this.validations.assertOwnership(document);
   }
 }

@@ -38,7 +38,7 @@ export default function auth(roles: UserRole[]) {
       return next(
         new AnonymousError('User with given id does not exist', mask, 400)
       );
-    console.log(roles, user.role);
+
     if (!roles.includes(user.role))
       throw new AnonymousError(
         `Expected (${roles}) role but the role was (${user.role})`,
@@ -55,6 +55,7 @@ export default function auth(roles: UserRole[]) {
 
     const ctx = requestContext.getStore();
     if (ctx) ctx.user = req.user;
+    console.log('2 AUth =>', { reqUesr: req.user, ctxUser: ctx?.user });
 
     return next();
   };

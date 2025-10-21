@@ -16,12 +16,13 @@ import { PostValidation } from 'api/post/post.validation';
 
 // Utilities
 import logger from 'core/utilites/logger';
+import { AnonymousError } from 'core/utilites/errors';
 
 // Types
-import type { Document, Types } from 'mongoose';
 import type { IPostEntity } from 'api/post/post.type';
 import type { PostDocument } from 'api/post/post.model';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
+import type { IApiBatchResponse } from 'core/utilites/response';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()
@@ -54,11 +55,7 @@ class PostService extends BaseService<
     data: CreatePostDto,
     userId?: string,
     options?: BaseMutateOptions
-  ): Promise<
-    Document<unknown, {}, IPostEntity, {}, {}> &
-      IPostEntity &
-      Required<{ _id: Types.ObjectId }> & { __v: number }
-  > {
+  ): Promise<PostDocument> {
     await Promise.all([
       this.postValidation.validateGame(data.game),
       this.postValidation.validateTags(data.tags),
@@ -68,30 +65,33 @@ class PostService extends BaseService<
     return await super.create(data, userId, options);
   }
 
+  async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
+    if (!this.user)
+      throw new AnonymousError('Something wrong with the user context');
+
+    return await super.batchDelete(ids, {
+      ...(this.user.role !== 'admin' && {
+        additionalFilter: { creator: this.user.id },
+      }),
+    });
+  }
+
   async updateOneById<TThrowError extends boolean = true>(
     id: string,
     payload: Partial<UpdatePostDto>,
     options?:
       | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
       | undefined
-  ): Promise<
-    TThrowError extends true
-      ? Document<unknown, {}, IPostEntity, {}, {}> &
-          IPostEntity &
-          Required<{ _id: Types.ObjectId }> & { __v: number }
-      :
-          | (Document<unknown, {}, IPostEntity, {}, {}> &
-              IPostEntity &
-              Required<{ _id: Types.ObjectId }> & { __v: number })
-          | null
-  > {
-    await Promise.all([
-      ...(payload.game ? [this.postValidation.validateGame(payload.game)] : []),
-      ...(payload.tags ? [this.postValidation.validateTags(payload.tags)] : []),
-      ...(payload.category
-        ? [this.postValidation.validateCategory(payload.category)]
-        : []),
-    ]);
+  ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
+    const validations = [
+      this.user?.role === 'author' && (await this.assertOwnership(id)),
+      payload.game && this.postValidation.validateGame(payload.game),
+      payload.tags && this.postValidation.validateTags(payload.tags),
+      payload.category &&
+        this.postValidation.validateCategory(payload.category),
+    ].filter(Boolean) as Promise<void>[];
+
+    await Promise.all(validations);
 
     return await super.updateOneById(id, payload, options);
   }
@@ -99,6 +99,7 @@ class PostService extends BaseService<
   async deleteOneById(id: string): Promise<true> {
     return this.withTransaction(async (session) => {
       const post = await super.getOneById(id, { lean: true });
+      await this.assertOwnership(post);
 
       // Delete the post itself first
       const result = await super.deleteOneById(id, { session });

@@ -10,6 +10,9 @@ import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 import PostService from 'api/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
+// Custom Utilties
+import { AnonymousError } from 'core/utilites/errors';
+
 // Types
 import type { ITagEntity } from 'api/tag/tag.type';
 import type { IApiBatchResponse } from 'core/utilites/response';
@@ -86,13 +89,15 @@ class TagService extends BaseService<
 
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
     return this.withTransaction(async (session) => {
+      if (!this.user)
+        throw new AnonymousError('Something wrong with user context');
+
       await this.postService.removeIdsFromArrayField('tags', ids, { session });
       return await super.batchDelete(ids, {
         session,
-        ...(this.user &&
-          this.user.role === 'author' && {
-            additionalFilter: { creator: this.user.id },
-          }),
+        ...(this.user.role !== 'admin' && {
+          additionalFilter: { creator: this.user.id },
+        }),
       });
     });
   }
