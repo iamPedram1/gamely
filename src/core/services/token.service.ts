@@ -16,10 +16,11 @@ const tokenUtils = {
     try {
       return jwt.verify(token, secret) as T;
     } catch (error) {
+      console.log({ error, token, secret, name });
       if (error instanceof jwt.TokenExpiredError)
-        throw new ValidationError(t('error.jwt_verify_expired', { name }));
+        throw new ValidationError(t('error.jwt.verify_expired', { name }));
       if (error instanceof jwt.JsonWebTokenError)
-        throw new ValidationError(t('error.jwt_verify_invalid', { name }));
+        throw new ValidationError(t('error.jwt.verify_invalid', { name }));
 
       throw new InternalServerError();
     }

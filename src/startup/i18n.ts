@@ -39,6 +39,9 @@ export default async function i18nStartup(app: Express) {
     resources,
     keySeparator: '.',
     nsSeparator: '.',
+    interpolation: {
+      escapeValue: false,
+    },
   });
 
   app.use(middleware.handle(i18next));

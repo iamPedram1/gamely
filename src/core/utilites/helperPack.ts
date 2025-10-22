@@ -12,3 +12,7 @@ export const setTokenCookie = (res: Response, token: string) => {
     sameSite: 'none',
   });
 };
+
+export const decodeHtmlEntities = (str: string) => {
+  return str.replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(dec));
+};

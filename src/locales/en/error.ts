@@ -1,8 +1,10 @@
 const errosTranslations = {
   bad_request: 'Bad request',
-  refresh_token_invalid: 'Refresh token is invalid',
-  refresh_token_expired: 'Refresh token is expired',
-  refresh_token_missing: 'Refresh token is not provided',
+  refresh_token: {
+    invalid: 'Refresh token is invalid',
+    expired: 'Refresh token is expired',
+    missing: 'Refresh token is not provided',
+  },
   recovery_token_invalid: 'Recovery key is invalid',
   recovery_token_expired: 'Recovery key is expired',
   validation_failed: 'Validation failed',
@@ -29,14 +31,23 @@ const errosTranslations = {
   not_found_by_key_value: 'No {{model}} with {{key}}={{value}} was found',
   ids_array_empty: 'Ids array cannot be empty',
   batch_delete_failed: 'Batch delete failed for {{model}}',
-  category_self_parent: 'parentId: A category cannot be its own parent',
-  category_circular_relationship: 'parentId: Circular relationship detected',
-  jwt_verify_expired: '{{name}} is expired',
-  jwt_verify_invalid: '{{name}} is invalid',
-  jwt_verify_missing: '{{name}} is missing',
+  category: {
+    self_parent: 'parentId: A category cannot be its own parent',
+    circular_relationship: 'parentId: Circular relationship detected',
+  },
+  jwt: {
+    verify_expired: '{{name}} is expired',
+    verify_invalid: '{{name}} is invalid',
+    verify_missing: '{{name}} is missing',
+  },
   made_byself_error: "You didn't create this {{model}}",
   own_every_children_error:
     "This {{model}} has children, you didn't create every children in this {{model}}",
+  param: {
+    required: '{{param}} is required',
+    invalid: '{{param}} is invalid',
+    not_found_by_param: 'No {{model}} found with {{param}} = {{id}}',
+  },
 } as const;
 
 export default errosTranslations;

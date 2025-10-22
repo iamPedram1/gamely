@@ -1,7 +1,7 @@
 import { userAppUrl } from 'core/utilites/configs';
 
 export const recoveryEnglishHtml = (name: string, key: string) => {
-  const recoveryUrl = `${userAppUrl}/recovery/${key}`;
+  const recoveryUrl = `${userAppUrl}/password-recovery/${key}`;
   return `
         <html>
         <body style="font-family: Arial, sans-serif; background-color:#f5f5f5; padding: 20px;">
@@ -21,7 +21,7 @@ export const recoveryEnglishHtml = (name: string, key: string) => {
 };
 
 export const recoveryPersianHtml = (name: string, key: string) => {
-  const recoveryUrl = `${userAppUrl}/recovery/${key}`;
+  const recoveryUrl = `${userAppUrl}/password-recovery/${key}`;
   return `
   <html dir="rtl">
     <body style="font-family: Tahoma, sans-serif; background-color:#f5f5f5; padding: 20px;">

@@ -1,5 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
-import { IsISO8601, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsMongoId } from 'class-validator';
 
 export class BaseResponseDto {
   @Expose({ name: '_id' })

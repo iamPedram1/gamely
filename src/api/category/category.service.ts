@@ -77,10 +77,10 @@ class CategoryService extends BaseService<
         : false;
 
     if (isIdChanged && descendants.includes(payload.parentId as string))
-      throw new BadRequestError(this.t('error.category_circular_relationship'));
+      throw new BadRequestError(this.t('error.category.circular_relationship'));
 
     if (payload.parentId === id)
-      throw new BadRequestError(this.t('error.category_self_parent'));
+      throw new BadRequestError(this.t('error.category.self_parent'));
 
     if (payload.title) category.set('title', payload.title);
     if (payload.slug) category.set('slug', payload.slug);

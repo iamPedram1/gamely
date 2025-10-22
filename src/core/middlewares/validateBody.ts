@@ -1,8 +1,7 @@
 import { validate } from 'class-validator';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
-import type { Request, Response, NextFunction } from 'express';
-
 import { ValidationError } from 'core/utilites/errors';
+import type { Request, Response, NextFunction } from 'express';
 
 /**
  * Middleware factory to validate the request body against a DTO class using class-validator.

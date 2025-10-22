@@ -21,10 +21,6 @@ export class ChangePasswordDto {
   recoveryKey: string;
 
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
   @IsString()
   @Length(8, 255)
   password: string;

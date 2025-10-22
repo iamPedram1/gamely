@@ -18,6 +18,7 @@ import {
 
 // Utilities
 import logger from 'core/utilites/logger';
+import crypto from 'core/utilites/crypto';
 import { sendEmail } from 'core/utilites/mail';
 import { i18nInstance, t } from 'core/utilites/request-context';
 import { recoveryEnglishHtml, recoveryPersianHtml } from 'api/auth/auth.html';
@@ -78,27 +79,24 @@ export default class AuthService {
   }
 
   async changePassword(data: ChangePasswordDto): Promise<void> {
-    try {
-      const key = this.verifyRecoveryJwt(data.recoveryKey);
-      const user = await this.userService.getOneById(key.userId, {
-        select: '+recoveryKey',
-      });
+    const key = this.verifyRecoveryJwt(data.recoveryKey);
+    const user = await this.userService.getOneById(key.userId, {
+      select: '+recoveryKey',
+    });
 
-      const email = data.email.trim().toLowerCase();
-      if (user.recoveryKey !== data.recoveryKey || user.email !== email)
-        throw new Error();
+    const isRecoveryKeyCorrect = user.recoveryKey
+      ? await crypto.compare(data.recoveryKey, user.recoveryKey)
+      : false;
 
-      return await this.userService.mutateWithTransaction(async (session) => {
-        user.password = data.password;
-        user.recoveryKey = null;
-        if (user.refreshToken) user.refreshToken = null;
-        await user.save({ session });
-      });
-    } catch (error) {
-      throw new ValidationError(
-        t('messages.auth.email_or_recoveryKey_invalid')
-      );
-    }
+    if (!isRecoveryKeyCorrect)
+      throw new ValidationError(t('error.recovery_token_invalid'));
+
+    return await this.userService.mutateWithTransaction(async (session) => {
+      user.password = data.password;
+      user.recoveryKey = null;
+      if (user.refreshToken) user.refreshToken = null;
+      await user.save({ session });
+    });
   }
 
   async login(data: LoginDto) {
@@ -136,7 +134,7 @@ export default class AuthService {
     });
 
     if (!(await user.compareRefreshToken(refreshToken)))
-      throw new ValidationError(t('error.refresh_token_invalid'));
+      throw new ValidationError(t('error.refresh_token.invalid'));
 
     const newAuth = user.generateAuthToken();
 

@@ -21,7 +21,7 @@ export default function auth(roles: UserRole[]) {
 
     if (!token) {
       throw new UnauthorizedError(
-        req.t('error.jwt_verify_missing', { name: t('common.token') })
+        req.t('error.jwt.verify_missing', { name: t('common.token') })
       );
     }
 

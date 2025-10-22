@@ -1,6 +1,6 @@
 {
   "PORT": 3000,
-  "User_App_URL": "https://www.gamely.com",
+  "User_App_URL": "http://localhost:5173",
   "VERSION": 1,
   "JWT_AccessToken_ExpiresInMinutes": 60,
   "JWT_RecoverPasswordKey_ExpiresInMinutes": 10,
