@@ -1,7 +1,11 @@
 import { validate } from 'class-validator';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
-import { ValidationError } from 'core/utilites/errors';
 import type { Request, Response, NextFunction } from 'express';
+import { ValidationError } from 'core/utilites/errors';
+import {
+  flattenValidationErrors,
+  formatValidationErrors,
+} from 'core/utilites/helperPack';
 
 /**
  * Middleware factory to validate the request body against a DTO class using class-validator.
@@ -20,16 +24,20 @@ export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
   return async function (req: Request, res: Response, next: NextFunction) {
     const dto = plainToInstance(DtoClass, req.body, {
       enableImplicitConversion: true,
+      exposeDefaultValues: true,
+      enableCircularCheck: true,
     });
 
-    const errors = await validate(dto as object, { whitelist: true });
+    const errors = await validate(dto as object, {
+      whitelist: true,
+      skipMissingProperties: false,
+      validationError: { target: false },
+    });
 
     if (errors.length > 0) {
-      const messages = errors.flatMap((err) =>
-        Object.values(err.constraints || {})
-      );
       throw new ValidationError(req.t('error.validation_failed'), {
-        cause: messages,
+        cause: flattenValidationErrors(errors),
+        errorDetails: formatValidationErrors(errors),
       });
     }
 

@@ -5,10 +5,7 @@ import type {
 } from 'api/post/post.dto';
 
 export interface IPostEntity {
-  title: string;
   slug: string;
-  content: string;
-  abstract: string;
   readingTime: number;
   _id: Types.ObjectId;
   tags: Types.ObjectId[];
@@ -18,6 +15,18 @@ export interface IPostEntity {
   game: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+  translations: {
+    en: {
+      title: string;
+      content: string;
+      abstract: string;
+    };
+    fa: {
+      title: string;
+      content: string;
+      abstract: string;
+    };
+  };
 }
 
 export type IPost = InstanceType<typeof PostResponseDto>;

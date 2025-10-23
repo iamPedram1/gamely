@@ -1,8 +1,10 @@
 const errosTranslations = {
   token_generic_error: 'خطا دسترسی، شناسه منقضی یا نامعتبر است',
-  refresh_token_invalid: 'شناسه تازه سازی نامعتبر است',
-  refresh_token_expired: 'شناسه تازه سازی منقضی شده است',
-  refresh_token_missing: 'شناسه تازه سازی ارسال نشده است',
+  refresh_token: {
+    invalid: 'شناسه تازه سازی نامعتبر است',
+    expired: 'شناسه تازه سازی منقضی شده است',
+    missing: 'شناسه تازه سازی ارسال نشده است',
+  },
   recovery_token_invalid: 'شناسه بازیابی نامعتبر است',
   recovery_token_expired: 'شناسه بازیابی منقضی شده',
   validation_failed: 'اعتبار سنجی با خطا مواجه شد',
@@ -29,9 +31,11 @@ const errosTranslations = {
   batch_delete_failed: 'حذف گروهی برای {{model}} با خطا مواجه شد',
   category_self_parent: 'دسته‌بندی نمیتواند والد خودش باشد',
   category_circular_relationship: 'رابطه چرخشی‌ (دایره‌ای) شناسایی شد',
-  jwt_verify_expired: '{{name}} منقضی شده است',
-  jwt_verify_invalid: '{{name}} نامعتبر است',
-  jwt_verify_missing: '{{name}} وجود ندارد',
+  jwt: {
+    verify_expired: '{{name}} منقضی شده است',
+    verify_invalid: '{{name}} نامعتبر است',
+    verify_missing: '{{name}} وجود ندارد',
+  },
   made_byself_error:
     'شما سازنده این {{model}} نیستید و دسترسی به عملیات مربوطه را ندارید',
   own_every_children_error:

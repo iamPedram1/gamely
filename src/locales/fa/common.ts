@@ -2,6 +2,7 @@ const commonTranslations = {
   document: 'داکیومنت',
   recoveryKey: 'شناسه بازیابی',
   refreshToken: 'شناسه تازه‌سازی',
+  profile: 'پروفایل',
   token: 'شناسه کاربر',
   request_failed: 'بدلیل رخ دادن خطا درخواست با شکست مواجه شد',
   operation_completed_successfully: 'عملیات با موفقیت انجام شد',

@@ -24,7 +24,7 @@ export default class UserController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      customName: 'Profile',
+      customName: req.t('common.profile'),
       body: {
         data: this.userMapper.toDto(user),
       },

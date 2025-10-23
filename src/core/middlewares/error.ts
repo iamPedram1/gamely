@@ -81,6 +81,7 @@ export default function errorMiddleware(
     body: {
       message,
       errors,
+      errorDetails: (error as any)?.errorDetails || {},
     },
   });
 }

@@ -14,35 +14,26 @@ import Post from 'api/post/post.model';
 import PostController from 'api/post/post.controller';
 
 // Dto
-import { BaseQueryDto } from 'core/dto/query';
 import { CreatePostDto, UpdatePostDto } from 'api/post/post.dto';
 import { container } from 'tsyringe';
 
-const postRouter = express.Router();
+const postAdminRouter = express.Router();
 const postController = container.resolve(PostController);
 
-// Public Routes
-postRouter.get('/', [validateQuery(BaseQueryDto), postController.getAll]);
-postRouter.get('/summaries', [
-  validateQuery(BaseQueryDto),
-  postController.getAllSummaries,
-]);
-postRouter.get('/:id', [validateObjectId(Post), postController.getOne]);
-
 // Protected Routes
-postRouter.use(auth(['author', 'admin']));
-postRouter.delete('/batch/delete', [postController.batchDelete]);
-postRouter.delete('/:id', [validateObjectId(Post), postController.delete]);
-postRouter.post('/', [
+postAdminRouter.use(auth(['author', 'admin']));
+postAdminRouter.delete('/batch/delete', [postController.batchDelete]);
+postAdminRouter.delete('/:id', [validateObjectId(Post), postController.delete]);
+postAdminRouter.post('/', [
   validateUniqueConflict(Post, 'slug'),
   validateBody(CreatePostDto),
   postController.create,
 ]);
-postRouter.patch('/:id', [
+postAdminRouter.patch('/:id', [
   validateObjectId(Post),
   validateBody(UpdatePostDto),
   validateUniqueConflict(Post, 'slug'),
   postController.update,
 ]);
 
-export default postRouter;
+export default postAdminRouter;

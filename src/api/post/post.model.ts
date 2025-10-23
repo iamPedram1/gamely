@@ -13,7 +13,7 @@ import type { IPostEntity } from 'api/post/post.type';
 export type PostDocument = HydratedDocument<IPostEntity>;
 export type PostLeanDocument = FlattenMaps<PostDocument>;
 
-const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
+const translationSchema = new Schema(
   {
     title: {
       type: String,
@@ -22,17 +22,11 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       maxlength: 255,
       required: true,
     },
-    readingTime: {
-      type: Number,
-      min: 1,
-      default: 1,
-      required: true,
-    },
     abstract: {
       type: String,
       trim: true,
       minlength: 1,
-      maxLength: 150,
+      maxlength: 150,
       required: true,
     },
     content: {
@@ -41,6 +35,12 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       minlength: 1,
       required: true,
     },
+  },
+  { _id: false }
+);
+
+const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
+  {
     slug: {
       type: String,
       trim: true,
@@ -56,6 +56,7 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       index: true,
       type: Schema.Types.ObjectId,
       ref: 'User',
+      immutable: true,
     },
     game: {
       type: Schema.Types.ObjectId,
@@ -81,6 +82,16 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
         ref: 'Tag',
       },
     ],
+    readingTime: {
+      type: Number,
+      min: 1,
+      default: 1,
+      required: true,
+    },
+    translations: {
+      en: { type: translationSchema, required: true },
+      fa: { type: translationSchema, required: true },
+    },
   },
   { timestamps: true }
 );

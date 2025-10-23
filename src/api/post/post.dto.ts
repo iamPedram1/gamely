@@ -8,9 +8,13 @@ import {
   IsMongoId,
   IsNumber,
   Min,
+  ValidateNested,
+  IsNotEmptyObject,
+  IsDefined,
+  IsObject,
 } from 'class-validator';
 
-// Dto
+// Dtos
 import { TagSummaryResponseDto } from 'api/tag/tag.dto';
 import { GameResponseDto } from 'api/game/game.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
@@ -19,14 +23,10 @@ import { CategorySummaryResponseDto } from 'api/category/category.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
-import type { IPostEntity } from 'api/post/post.type';
 import type { IFileSummary } from 'api/file/file.type';
+import { i18nInstance } from 'core/utilites/request-context';
 
-export class CreatePostDto {
-  constructor(post?: Pick<IPostEntity, 'title' | 'slug'>) {
-    Object.assign(this, post);
-  }
-
+export class TranslationDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 255)
@@ -37,6 +37,28 @@ export class CreatePostDto {
   @Length(1, 150)
   abstract: string;
 
+  @IsNotEmpty()
+  @IsString()
+  @Length(1)
+  content: string;
+}
+
+export class TranslationsDto {
+  @IsNotEmptyObject()
+  @ValidateNested()
+  @Type(() => TranslationDto)
+  @Transform(({ value }) => value || {})
+  en: TranslationDto;
+
+  @IsNotEmptyObject()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => TranslationDto)
+  @Transform(({ value }) => value || {})
+  fa: TranslationDto;
+}
+
+export class CreatePostDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 255)
@@ -52,11 +74,6 @@ export class CreatePostDto {
   @Min(1)
   readingTime: number;
 
-  @IsNotEmpty()
-  @IsString()
-  @Length(1)
-  content: string;
-
   @IsOptional()
   @IsMongoId()
   game: string;
@@ -68,38 +85,26 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsMongoId()
   category: string;
+
+  @IsNotEmptyObject()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => TranslationsDto)
+  @Transform(({ value }) => value || {})
+  translations: TranslationsDto;
 }
 
 export class UpdatePostDto {
-  constructor(post?: Pick<IPostEntity, 'title' | 'slug'>) {
-    Object.assign(this, post);
-  }
-
   @IsOptional()
   @IsString()
   @Length(3, 255)
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  @Length(1, 150)
-  abstract: string;
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  slug: string;
 
   @IsOptional()
   @IsNumber()
   @Min(1)
   readingTime: number;
-
-  @IsOptional()
-  @IsString()
-  @Length(3)
-  content: string;
-
-  @IsOptional()
-  @IsString()
-  @Length(1)
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-  slug: string;
 
   @IsOptional()
   @IsMongoId()
@@ -116,23 +121,41 @@ export class UpdatePostDto {
   @IsOptional()
   @IsMongoId()
   category: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TranslationDto)
+  en: TranslationDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TranslationDto)
+  fa: TranslationDto;
 }
 
 export class PostResponseDto extends BaseResponseDto {
   @Expose()
-  title: string;
-
-  @Expose()
-  abstract: string;
-
-  @Expose()
   slug: string;
 
   @Expose()
-  content: string;
+  readingTime: number;
 
   @Expose()
-  readingTime: number;
+  @Transform(
+    ({ obj }) => obj?.translations[i18nInstance().language].title || ''
+  )
+  title: string;
+
+  @Expose()
+  @Transform(
+    ({ obj }) => obj?.translations[i18nInstance().language].abstract || ''
+  )
+  abstract: string;
+
+  @Transform(
+    ({ obj }) => obj?.translations[i18nInstance().language].content || ''
+  )
+  content: string;
 
   @Expose()
   @Transform(({ obj }) =>
@@ -161,8 +184,11 @@ export class PostResponseDto extends BaseResponseDto {
 
 export class PostSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  title: string;
+  slug: string;
 
   @Expose()
-  slug: string;
+  @Transform(
+    ({ obj }) => obj?.translations[i18nInstance().language]?.title || ''
+  )
+  title: string;
 }

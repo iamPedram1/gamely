@@ -17,6 +17,7 @@ interface IApiResponse<T = null> {
   errors?: string[];
   data: T | null;
   statusCode: number;
+  errorDetails: Record<string, any>;
 }
 export type IApiBatchResult = {
   id: string;
@@ -80,6 +81,7 @@ const sendResponse = <T>(
   const statusCode = status || 500;
   const data = config?.body?.data ?? null;
   const errors = config?.body?.errors ?? [];
+  const errorDetails = config?.body?.errorDetails || {};
   const message = config?.body?.message
     ? config?.body?.message
     : generateDefaultMessage(
@@ -90,11 +92,12 @@ const sendResponse = <T>(
       );
 
   const response: IApiResponse<T> = {
-    isSuccess,
-    message,
-    data,
     statusCode,
+    isSuccess,
+    data,
+    message,
     errors,
+    errorDetails,
   };
 
   res.status(status).json(response);

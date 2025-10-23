@@ -1,5 +1,6 @@
 const commonTranslations = {
   document: 'Document',
+  profile: 'Profile',
   token: 'Token',
   refreshToken: 'Refresh token',
   recoveryKey: 'Recovery key',

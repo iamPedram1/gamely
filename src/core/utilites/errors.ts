@@ -2,16 +2,19 @@ import { t } from 'core/utilites/request-context';
 
 interface CustomErrorOptions {
   cause: string[];
+  errorDetails?: Record<string, any>;
 }
 
 export class ValidationError extends Error {
   cause: string[];
   status = 400;
+  errorDetails = {};
 
   constructor(message: string, options?: CustomErrorOptions) {
     super(message);
     this.name = 'ValidationError';
     this.cause = options?.cause || [];
+    this.errorDetails = options?.errorDetails || {};
 
     if (options?.cause && options.cause.length > 0) {
       this.message = options.cause[0];
