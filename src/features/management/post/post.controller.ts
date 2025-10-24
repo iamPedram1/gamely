@@ -2,20 +2,19 @@ import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import PostService from 'api/post/post.service';
+import PostService from 'features/shared/post/post.service';
 
 // Dto
-import { PostMapper } from 'api/post/post.mapper';
+import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
-import { ValidationError } from 'core/utilites/errors';
 
 // Types
 import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
-export default class PostController {
+export default class PostMangementController {
   constructor(
     @inject(delay(() => PostMapper)) private postMapper: PostMapper,
     @inject(delay(() => PostService)) private postService: PostService
@@ -41,7 +40,7 @@ export default class PostController {
       body: {
         data: {
           pagination,
-          docs: docs.map((doc) => this.postMapper.toDto(doc)),
+          docs: docs.map((doc) => this.postMapper.toPublicDto(doc)),
         },
       },
     });
@@ -59,7 +58,7 @@ export default class PostController {
       httpMethod: 'GET',
       featureName: 'models.Post.plural',
       body: {
-        data: docs.map((doc) => this.postMapper.toDto(doc)),
+        data: docs.map((doc) => this.postMapper.toPublicDto(doc)),
       },
     });
   };
@@ -80,7 +79,7 @@ export default class PostController {
       httpMethod: 'GET',
       featureName: 'models.Post.singular',
       body: {
-        data: post ? this.postMapper.toDto(post) : null,
+        data: post ? this.postMapper.toPublicDto(post) : null,
       },
     });
   };
@@ -100,7 +99,7 @@ export default class PostController {
     sendResponse(res, post ? 201 : 400, {
       httpMethod: 'POST',
       featureName: 'models.Post.singular',
-      body: { data: post ? this.postMapper.toDto(post) : null },
+      body: { data: post ? this.postMapper.toManagementDto(post) : null },
     });
   };
 
@@ -145,7 +144,7 @@ export default class PostController {
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
       featureName: 'models.Post.singular',
-      body: { data: this.postMapper.toDto(body) },
+      body: { data: this.postMapper.toManagementDto(body) },
     });
   };
 }

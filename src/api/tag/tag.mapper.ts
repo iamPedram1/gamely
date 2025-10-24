@@ -6,7 +6,7 @@ import { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
 import { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
 
 // Mapper
-import { BaseMapper } from 'core/mappers/base';
+import { BaseMapper } from 'core/mappers/deprecated.base';
 import { ITagEntity } from 'api/tag/tag.type';
 
 export type ITagMapper = InstanceType<typeof TagMapper>;

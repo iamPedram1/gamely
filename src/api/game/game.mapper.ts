@@ -7,7 +7,7 @@ import { GameDocument, GameLeanDocument } from 'api/game/game.model';
 import { GameResponseDto, GameSummaryResponseDto } from 'api/game/game.dto';
 
 // Mapper
-import { BaseMapper } from 'core/mappers/base';
+import { BaseMapper } from 'core/mappers/deprecated.base';
 
 export type IGameMapper = InstanceType<typeof GameMapper>;
 

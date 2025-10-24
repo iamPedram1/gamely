@@ -10,7 +10,7 @@ import routesStartup from 'startup/routes';
 // Utilities
 import logger from 'core/utilites/logger';
 import i18nStartup from 'startup/i18n';
-import baseStartup from 'startup/baseStartup';
+import baseStartup from 'startup/base';
 import { appPort } from 'core/utilites/configs';
 
 const app = express();

@@ -15,7 +15,7 @@ import {
 } from 'api/category/category.dto';
 
 // Mapper
-import { BaseMapper } from 'core/mappers/base';
+import { BaseMapper } from 'core/mappers/deprecated.base';
 import {
   INestedCategory,
   INestedCategoryEntity,

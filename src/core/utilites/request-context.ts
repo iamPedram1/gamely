@@ -9,6 +9,7 @@ import type {
   TranslationVariables,
   TypedTFunction,
 } from 'core/types/i18n';
+import { TransformFnParams } from 'class-transformer';
 
 /**
  * Represents the contextual data stored per request.
@@ -101,3 +102,10 @@ export const userContext = () => {
     isNot: (role: UserRole) => user.role !== role,
   };
 };
+
+export const pickLocaleField =
+  (field: string) =>
+  ({ obj }: TransformFnParams) =>
+    obj?.translations?.[i18nInstance().language]?.[field] ||
+    obj?.translations?.['en']?.[field] ||
+    '';

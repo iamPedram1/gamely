@@ -16,13 +16,8 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type { IFileSummary } from 'api/file/file.type';
-import type { IGameEntity } from 'api/game/game.type';
 
 export class CreateGameDto {
-  constructor(game?: Pick<IGameEntity, 'title' | 'slug'>) {
-    Object.assign(this, game);
-  }
-
   @IsNotEmpty()
   @IsString()
   @Length(3, 255)
@@ -49,10 +44,6 @@ export class CreateGameDto {
 }
 
 export class UpdateGameDto {
-  constructor(game?: Pick<IGameEntity, 'title' | 'slug'>) {
-    Object.assign(this, game);
-  }
-
   @IsOptional()
   @IsString()
   @Length(3, 255)

@@ -11,7 +11,7 @@ import {
 } from 'api/category/category.dto';
 
 // Services
-import PostService from 'api/post/post.service';
+import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Utilities

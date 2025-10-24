@@ -12,16 +12,12 @@ import type { Document } from 'mongoose';
 export class BaseMapper<
   TDoc extends Document | Record<string, any>,
   TLean extends Record<string, any>,
-  TPublicDto,
-  TManagementDto,
-  TPublicSummaryDto,
-  TManagementSummaryDto,
+  TDto,
+  TSummaryDto,
 > {
   constructor(
-    private PublicDtoClass: ClassConstructor<TPublicDto>,
-    private ManagementDtoClass: ClassConstructor<TManagementDto>,
-    private PublicSummaryDtoClass: ClassConstructor<TPublicSummaryDto>,
-    private AdminSummaryDtoClass: ClassConstructor<TManagementSummaryDto>
+    private dtoClass: ClassConstructor<TDto>,
+    private summaryDtoClass: ClassConstructor<TSummaryDto>
   ) {}
 
   protected isDocument(v: TDoc | TLean): v is TDoc {
@@ -39,25 +35,14 @@ export class BaseMapper<
       : (entity as any);
   }
 
-  public toPublicDto(entity: TDoc | TLean): TPublicDto {
-    return plainToInstance(this.PublicDtoClass, this.toPlain(entity), {
+  public toDto(entity: TDoc | TLean): TDto {
+    return plainToInstance(this.dtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,
     });
   }
 
-  public toManagementDto(entity: TDoc | TLean): TManagementDto {
-    return plainToInstance(this.ManagementDtoClass, this.toPlain(entity), {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  public toPublicSummaryDto(entity: TDoc | TLean): TPublicSummaryDto {
-    return plainToInstance(this.PublicSummaryDtoClass, this.toPlain(entity), {
-      excludeExtraneousValues: true,
-    });
-  }
-  public toManagementSummaryDto(entity: TDoc | TLean): TManagementSummaryDto {
-    return plainToInstance(this.AdminSummaryDtoClass, this.toPlain(entity), {
+  public toSummaryDto(entity: TDoc | TLean): TSummaryDto {
+    return plainToInstance(this.summaryDtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,
     });
   }

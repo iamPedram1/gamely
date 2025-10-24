@@ -1,10 +1,10 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import Post from 'api/post/post.model';
+import Post from 'features/shared/post/post.model';
 
 // Dto
-import { CreatePostDto, UpdatePostDto } from 'api/post/post.dto';
+import { CreatePostDto, UpdatePostDto } from 'api/post/dtos';
 
 // Services
 import FileService from 'api/file/file.service';
@@ -12,14 +12,14 @@ import BaseService from 'core/services/base/base.service';
 import CommentService from 'api/comment/comment.service';
 
 // Validations
-import { PostValidation } from 'api/post/post.validation';
+import { PostValidation } from 'features/shared/post/post.validation';
 
 // Utilities
 import logger from 'core/utilites/logger';
 
 // Types
-import type { IPostEntity } from 'api/post/post.type';
-import type { PostDocument } from 'api/post/post.model';
+import type { IPostEntity } from 'features/shared/post/post.type';
+import type { PostDocument } from 'features/shared/post/post.model';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { IApiBatchResponse } from 'core/utilites/response';
 

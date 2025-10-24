@@ -13,17 +13,9 @@ import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
-import type {
-  ICategory,
-  ICategoryEntity,
-  INestedCategory,
-} from 'api/category/category.type';
+import type { ICategory, INestedCategory } from 'api/category/category.type';
 
 export class CreateCategoryDto {
-  constructor(category?: Pick<ICategoryEntity, 'title' | 'slug'>) {
-    Object.assign(this, category);
-  }
-
   @IsNotEmpty()
   @IsString()
   @Length(3, 255)
@@ -41,10 +33,6 @@ export class CreateCategoryDto {
 }
 
 export class UpdateCategoryDto {
-  constructor(game?: Pick<ICategoryEntity, 'title' | 'slug'>) {
-    Object.assign(this, game);
-  }
-
   @IsOptional()
   @IsString()
   @Length(3, 255)

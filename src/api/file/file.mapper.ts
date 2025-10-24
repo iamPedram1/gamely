@@ -7,7 +7,7 @@ import { FileDocument, FileLeanDocument } from 'api/file/file.model';
 import { FileResponseDto, FileSummaryResponseDto } from 'api/file/file.dto';
 
 // Mapper
-import { BaseMapper } from 'core/mappers/base';
+import { BaseMapper } from 'core/mappers/deprecated.base';
 
 export type IFileMapper = InstanceType<typeof FileMapper>;
 

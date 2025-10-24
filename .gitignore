@@ -24,4 +24,4 @@ build/
 .vscode/
 
 # Files
-public/
+/public/

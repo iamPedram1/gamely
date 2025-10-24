@@ -7,7 +7,7 @@ import Tag, { TagDocument } from 'api/tag/tag.model';
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 
 // Services
-import PostService from 'api/post/post.service';
+import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Custom Utilties

@@ -6,7 +6,7 @@ import type { ITagEntity } from 'api/tag/tag.type';
 export type TagDocument = HydratedDocument<ITagEntity>;
 export type TagLeanDocument = FlattenMaps<TagDocument>;
 
-const tagSchema = new Schema<ITagEntity, Model<ITagEntity>>(
+const translationSchema = new Schema(
   {
     title: {
       type: String,
@@ -15,6 +15,12 @@ const tagSchema = new Schema<ITagEntity, Model<ITagEntity>>(
       maxlength: 255,
       required: true,
     },
+  },
+  { _id: false }
+);
+
+const tagSchema = new Schema<ITagEntity, Model<ITagEntity>>(
+  {
     slug: {
       type: String,
       trim: true,
@@ -24,6 +30,16 @@ const tagSchema = new Schema<ITagEntity, Model<ITagEntity>>(
       required: true,
       lowercase: true,
       match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug is not valid'],
+    },
+    translations: {
+      en: {
+        type: translationSchema,
+        required: true,
+      },
+      fa: {
+        type: translationSchema,
+        required: true,
+      },
     },
     creator: {
       type: Schema.Types.ObjectId,

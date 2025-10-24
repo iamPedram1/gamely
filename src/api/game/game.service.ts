@@ -7,7 +7,7 @@ import Game, { GameDocument } from 'api/game/game.model';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 // Services
-import PostService from 'api/post/post.service';
+import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Types

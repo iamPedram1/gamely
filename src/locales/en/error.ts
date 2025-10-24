@@ -12,7 +12,7 @@ const errosTranslations = {
   id_invalid: 'The id paramater is required',
   token_generic_error: 'Access denied, token is invalid or expired',
   uniqueness_error:
-    "{{field}} '${value}' is already taken by another {{name}}`",
+    "{{field}} '{{value}}' is already taken by another {{name}}`",
   forbidden_error: 'Access Denied',
   unauthorized_error: 'Unauthorized',
   too_many_request: 'Too many attempts, Please try again later',

@@ -8,7 +8,7 @@ import {
 } from 'mongoose';
 
 // Types
-import type { IPostEntity } from 'api/post/post.type';
+import type { IPostEntity } from 'features/shared/post/post.type';
 
 export type PostDocument = HydratedDocument<IPostEntity>;
 export type PostLeanDocument = FlattenMaps<PostDocument>;

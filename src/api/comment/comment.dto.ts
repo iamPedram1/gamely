@@ -11,14 +11,7 @@ import {
 import { FileResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
-// Types
-import type { ICommentEntity } from 'api/comment/comment.type';
-
 export class CreateCommentDto {
-  constructor(comment?: ICommentEntity) {
-    Object.assign(this, comment);
-  }
-
   @IsNotEmpty()
   @IsString()
   @Length(10, 500)
@@ -30,15 +23,6 @@ export class CreateCommentDto {
 }
 
 export class UpdateCommentDto {
-  constructor(
-    comment?: Pick<
-      ICommentEntity,
-      'comment' | 'type' | 'postId' | 'replyToCommentId'
-    >
-  ) {
-    Object.assign(this, comment);
-  }
-
   @IsNotEmpty()
   @IsString()
   @Length(10, 500)

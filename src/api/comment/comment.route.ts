@@ -7,7 +7,7 @@ import validateBody from 'core/middlewares/validateBody';
 import validateObjectId from 'core/middlewares/validateObjectId';
 
 // Model
-import Post from 'api/post/post.model';
+import Post from 'features/shared/post/post.model';
 
 // Controller
 import CommentController from 'api/comment/comment.controller';

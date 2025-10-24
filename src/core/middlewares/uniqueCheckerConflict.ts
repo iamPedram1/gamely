@@ -36,6 +36,7 @@ export default function validateUniqueConflict<T>(
           new ValidationError(
             t('error.uniqueness_error', {
               field: fieldName,
+              value,
               name: t(`models.${model.modelName}.singular` as TranslationKeys),
             })
           )

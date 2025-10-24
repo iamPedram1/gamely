@@ -30,6 +30,8 @@ export const appDbUrl = config.get('DB') as string;
 export const apiVersion = config.get('VERSION') as number;
 export const appUrl = `http://localhost:${appPort}`;
 export const prefixBaseUrl = (url: string) => `/api/v${apiVersion}${url}`;
+export const prefixManagementBaseUrl = (url: string) =>
+  `/api/v${apiVersion}/management${url}`;
 export const userAppUrl = config.get('User_App_URL') as string;
 export const jwtTokenName = config.get('JWT_Token_Name') as string;
 export const jwtRefreshTokenName = config.get(
