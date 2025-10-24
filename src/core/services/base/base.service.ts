@@ -41,7 +41,7 @@ import type {
   IBaseValidationService,
   NullableQueryResult,
 } from 'core/types/base.service.type';
-import { UserRole } from 'api/user/user.types';
+import { UserRole } from 'features/shared/user/user.types';
 
 type Q<
   TSchema,

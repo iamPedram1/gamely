@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 // Models
 import Tag from 'api/tag/tag.model';
-import User from 'api/user/user.model';
+import User from 'features/shared/user/user.model';
 
 // Utils
 import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';

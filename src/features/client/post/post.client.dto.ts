@@ -12,7 +12,7 @@ import { pickLocaleField } from 'core/utilites/request-context';
 // Types
 import type { IFileSummary } from 'api/file/file.type';
 
-export class UserPostResponseDto extends BaseResponseDto {
+export class ClientPostResponseDto extends BaseResponseDto {
   @Expose()
   slug: string;
 
@@ -56,7 +56,7 @@ export class UserPostResponseDto extends BaseResponseDto {
   tags: TagSummaryResponseDto[];
 }
 
-export class UserPostSummaryResponseDto extends BaseSummaryResponseDto {
+export class ClientPostSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   slug: string;
 

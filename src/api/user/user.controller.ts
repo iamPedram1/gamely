@@ -4,10 +4,10 @@ import { delay, inject, injectable } from 'tsyringe';
 import sendResponse from 'core/utilites/response';
 
 // DTO
-import UserService from 'api/user/user.service';
+import UserService from 'features/shared/user/user.service';
 
 // Mapper
-import { UserMapper } from 'api/user/user.mapper';
+import { UserMapper } from 'features/shared/user/user.mapper';
 import { RequestHandler } from 'express';
 import { UpdateProfileDto } from 'api/user/user.dto';
 

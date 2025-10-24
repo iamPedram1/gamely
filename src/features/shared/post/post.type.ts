@@ -2,9 +2,9 @@ import type { Types } from 'mongoose';
 import type { WithTranslations } from 'core/types/translations';
 import type { AdminPostResponseDto } from 'features/management/post/post.management.dto';
 import type {
-  UserPostSummaryResponseDto,
-  UserPostResponseDto,
-} from 'features/public/post/post.public.dto';
+  ClientPostSummaryResponseDto,
+  ClientPostResponseDto,
+} from 'features/client/post/post.client.dto';
 
 export interface PostTranslation {
   title: string;
@@ -25,6 +25,6 @@ export interface IPostEntity extends WithTranslations<PostTranslation> {
   updatedAt: Date;
 }
 
-export type IUserPost = InstanceType<typeof UserPostResponseDto>;
+export type IUserPost = InstanceType<typeof ClientPostResponseDto>;
 export type IAdminPost = InstanceType<typeof AdminPostResponseDto>;
-export type IPostSummary = InstanceType<typeof UserPostSummaryResponseDto>;
+export type IPostSummary = InstanceType<typeof ClientPostSummaryResponseDto>;

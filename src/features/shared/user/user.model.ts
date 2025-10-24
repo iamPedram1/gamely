@@ -6,7 +6,10 @@ import crypto from 'core/utilites/crypto';
 import tokenUtils from 'core/services/token.service';
 
 // Types
-import { UserRoleEnum, type IUserEntity } from 'api/user/user.types';
+import {
+  UserRoleEnum,
+  type IUserEntity,
+} from 'features/shared/user/user.types';
 
 export interface IUserEntityMethods {
   generateToken(): string;

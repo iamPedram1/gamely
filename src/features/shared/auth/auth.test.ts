@@ -3,13 +3,13 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 
 // Models
-import User from 'api/user/user.model';
+import User from 'features/shared/user/user.model';
 
 // Utils
 import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';
 
 // Types
-import { IUserEntity } from 'api/user/user.types';
+import { IUserEntity } from 'features/shared/user/user.types';
 import { RegisterDto } from 'features/shared/auth/auth.dto';
 
 describe('auth routes', () => {

@@ -7,7 +7,10 @@ import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
 import { BaseMapper } from 'core/mappers/deprecated.base';
 
 // Types
-import type { UserDocument, UserLeanDocument } from 'api/user/user.model';
+import type {
+  UserDocument,
+  UserLeanDocument,
+} from 'features/shared/user/user.model';
 
 export type IUserMapper = InstanceType<typeof UserMapper>;
 

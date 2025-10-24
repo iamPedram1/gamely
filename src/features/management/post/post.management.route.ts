@@ -12,7 +12,7 @@ import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 import Post from 'features/shared/post/post.model';
 
 // Controller
-import PostMangementController from 'features/management/post/post.controller';
+import PostMangementController from 'features/management/post/post.management.controller';
 
 // Dto
 import { BaseQueryDto } from 'core/dto/query';

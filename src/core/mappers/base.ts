@@ -12,15 +12,15 @@ import type { Document } from 'mongoose';
 export class BaseMapper<
   TDoc extends Document | Record<string, any>,
   TLean extends Record<string, any>,
-  TPublicDto,
+  TClientDto,
   TManagementDto,
-  TPublicSummaryDto,
+  TClientSummaryDto,
   TManagementSummaryDto,
 > {
   constructor(
-    private PublicDtoClass: ClassConstructor<TPublicDto>,
+    private ClientDtoClass: ClassConstructor<TClientDto>,
     private ManagementDtoClass: ClassConstructor<TManagementDto>,
-    private PublicSummaryDtoClass: ClassConstructor<TPublicSummaryDto>,
+    private ClientSummaryDtoClass: ClassConstructor<TClientSummaryDto>,
     private AdminSummaryDtoClass: ClassConstructor<TManagementSummaryDto>
   ) {}
 
@@ -39,8 +39,8 @@ export class BaseMapper<
       : (entity as any);
   }
 
-  public toPublicDto(entity: TDoc | TLean): TPublicDto {
-    return plainToInstance(this.PublicDtoClass, this.toPlain(entity), {
+  public toPublicDto(entity: TDoc | TLean): TClientDto {
+    return plainToInstance(this.ClientDtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,
     });
   }
@@ -51,8 +51,8 @@ export class BaseMapper<
     });
   }
 
-  public toPublicSummaryDto(entity: TDoc | TLean): TPublicSummaryDto {
-    return plainToInstance(this.PublicSummaryDtoClass, this.toPlain(entity), {
+  public toPublicSummaryDto(entity: TDoc | TLean): TClientSummaryDto {
+    return plainToInstance(this.ClientSummaryDtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,
     });
   }

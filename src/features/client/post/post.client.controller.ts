@@ -14,7 +14,7 @@ import sendResponse from 'core/utilites/response';
 import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
-export default class PostPublicController {
+export default class PostClientController {
   constructor(
     @inject(delay(() => PostMapper)) private postMapper: PostMapper,
     @inject(delay(() => PostService)) private postService: PostService

@@ -13,7 +13,7 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
 import type { Types } from 'mongoose';
-import type { UserRole } from 'api/user/user.types';
+import type { UserRole } from 'features/shared/user/user.types';
 
 export class UpdateProfileDto {
   @IsOptional()

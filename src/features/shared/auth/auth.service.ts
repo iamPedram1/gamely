@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Model
-import { IRecoveryKey, IRefreshToken } from 'api/user/user.model';
+import { IRecoveryKey, IRefreshToken } from 'features/shared/user/user.model';
 
 // Service
-import UserService from 'api/user/user.service';
+import UserService from 'features/shared/user/user.service';
 import tokenUtils from 'core/services/token.service';
 
 // Dto
@@ -37,7 +37,7 @@ import {
 } from 'core/utilites/configs';
 
 // Types
-import { IUserEntity } from 'api/user/user.types';
+import { IUserEntity } from 'features/shared/user/user.types';
 
 @injectable()
 export default class AuthService {

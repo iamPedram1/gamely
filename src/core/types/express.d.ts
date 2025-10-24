@@ -1,4 +1,4 @@
-import type { IUser, IUserContext } from 'api/user/user.types';
+import type { IUser, IUserContext } from 'features/shared/user/user.types';
 import type { JwtPayload } from 'jsonwebtoken';
 import type { TranslationKeys, TranslationVariables } from 'startup/i18n';
 import type { TFunction, i18n } from 'i18next';

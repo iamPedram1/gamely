@@ -1,5 +1,5 @@
 // Models
-import User from 'api/user/user.model';
+import User from 'features/shared/user/user.model';
 
 // Middlewares
 import { requestContext, t } from 'core/utilites/request-context';
@@ -10,8 +10,8 @@ import { jwtAccessTokenKey, jwtTokenName } from 'core/utilites/configs';
 import { AnonymousError, UnauthorizedError } from 'core/utilites/errors';
 
 // Types
-import type { IToken } from 'api/user/user.model';
-import type { UserRole } from 'api/user/user.types';
+import type { IToken } from 'features/shared/user/user.model';
+import type { UserRole } from 'features/shared/user/user.types';
 import type { Request, Response, NextFunction } from 'express';
 
 export default function auth(roles: UserRole[]) {

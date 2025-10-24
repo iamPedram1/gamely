@@ -3,14 +3,14 @@ import { Express } from 'express';
 // Routers
 
 import tagRouter from 'api/tag/tag.route';
-import authPublicRouter from 'features/public/auth/auth.public.route';
+import authPublicRouter from 'features/client/auth/auth.client.route';
 import fileRouter from 'api/file/file.route';
 import gameRouter from 'api/game/game.route';
 import userRouter from 'api/user/user.route';
 
 import commentRouter from 'api/comment/comment.route';
 import categoryRouter from 'api/category/category.route';
-import postPublicRouter from 'features/public/post/post.public.route';
+import postPublicRouter from 'features/client/post/post.client.route';
 import postManagementRouter from 'features/management/post/post.management.route';
 
 // Middlewares

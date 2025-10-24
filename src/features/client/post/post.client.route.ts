@@ -9,13 +9,13 @@ import validateObjectId from 'core/middlewares/validateObjectId';
 import Post from 'features/shared/post/post.model';
 
 // Controller
-import PostPublicController from 'features/public/post/post.controller';
+import PostClientController from 'features/client/post/post.client.controller';
 
 // Dto
 import { BaseQueryDto } from 'core/dto/query';
 
 export const postPublicRouter = express.Router();
-const postController = container.resolve(PostPublicController);
+const postController = container.resolve(PostClientController);
 
 postPublicRouter.get('/', [validateQuery(BaseQueryDto), postController.getAll]);
 postPublicRouter.get('/summaries', [

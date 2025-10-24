@@ -1,4 +1,4 @@
-import User from 'api/user/user.model';
+import User from 'features/shared/user/user.model';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { jwtAccessTokenKey } from 'core/utilites/configs';

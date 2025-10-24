@@ -2,9 +2,9 @@ import { singleton } from 'tsyringe';
 
 // Dto
 import {
-  UserPostResponseDto,
-  UserPostSummaryResponseDto,
-} from 'features/public/post/post.public.dto';
+  ClientPostResponseDto,
+  ClientPostSummaryResponseDto,
+} from 'features/client/post/post.client.dto';
 import {
   AdminPostResponseDto,
   AdminPostSummaryResponseDto,
@@ -25,16 +25,16 @@ export type IPostMapper = InstanceType<typeof PostMapper>;
 export class PostMapper extends BaseMapper<
   PostDocument,
   PostLeanDocument,
-  UserPostResponseDto,
+  ClientPostResponseDto,
   AdminPostResponseDto,
-  UserPostSummaryResponseDto,
+  ClientPostSummaryResponseDto,
   AdminPostSummaryResponseDto
 > {
   constructor() {
     super(
-      UserPostResponseDto,
+      ClientPostResponseDto,
       AdminPostResponseDto,
-      UserPostSummaryResponseDto,
+      ClientPostSummaryResponseDto,
       AdminPostSummaryResponseDto
     );
   }

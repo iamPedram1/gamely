@@ -7,7 +7,7 @@ import { AnonymousError, ValidationError } from 'core/utilites/errors';
 import BaseQueryService from 'core/services/base/base.query.service';
 import { BaseTFunction } from 'core/services/base/base.service';
 import { userContext } from 'core/utilites/request-context';
-import { UserRole } from 'api/user/user.types';
+import { UserRole } from 'features/shared/user/user.types';
 
 /**
  * Base service for CRUD and mutation operations on Mongoose models.
