@@ -26,7 +26,7 @@ const tagController = container.resolve(TagManagementController);
 
 tagManagementRouter.use(auth(['author', 'admin']));
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 tagManagementRouter.get(
   '/summaries',
   validateQuery(BaseQueryDto),
@@ -35,11 +35,11 @@ tagManagementRouter.get(
 tagManagementRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
 tagManagementRouter.get('/:id', validateObjectId(Tag), tagController.getOne);
 
-// ----------------   DELETE   ----------------
+// <----------------   DELETE   ---------------->
 tagManagementRouter.delete('/batch/delete', tagController.batchDelete);
 tagManagementRouter.delete('/:id', validateObjectId(Tag), tagController.delete);
 
-// ----------------   POST   ----------------
+// <----------------   POST   ---------------->
 tagManagementRouter.post(
   '/',
   validateBody(CreateTagDto),
@@ -47,7 +47,7 @@ tagManagementRouter.post(
   tagController.create
 );
 
-// ----------------   PATCH  ----------------
+// <----------------   PATCH  ---------------->
 tagManagementRouter.patch(
   '/:id',
   validateObjectId(Tag),

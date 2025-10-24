@@ -6,7 +6,7 @@ import type { IGameEntity } from 'features/shared/game/game.type';
 export type GameDocument = HydratedDocument<IGameEntity>;
 export type GameLeanDocument = FlattenMaps<GameDocument>;
 
-const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
+const translationSchema = new Schema(
   {
     title: {
       type: String,
@@ -21,6 +21,16 @@ const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
       minlength: 10,
       maxlength: 500,
       required: true,
+    },
+  },
+  { _id: false }
+);
+
+const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
+  {
+    translations: {
+      en: { type: translationSchema, required: true },
+      fa: { type: translationSchema, required: true },
     },
     slug: {
       type: String,
@@ -45,6 +55,8 @@ const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
+      immutable: true,
     },
   },
   { timestamps: true }

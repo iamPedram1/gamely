@@ -4,13 +4,15 @@ import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { pickLocaleField } from 'core/utilites/request-context';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
-import { CategorySummaryResponseDto } from 'api/category/category.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { TagClientSummaryResponseDto } from 'features/shared/tag/tag.dto';
 import { GameClientResponseDto } from 'features/client/game/game.client.dto';
+import { CategoryClientResponseDto } from 'features/client/category/category.client.dto';
 
 // Types
 import type { IFileSummary } from 'api/file/file.type';
+
+// <----------------   RESPONSE   ---------------->
 
 export class ClientPostResponseDto extends BaseResponseDto {
   @Expose()
@@ -44,8 +46,8 @@ export class ClientPostResponseDto extends BaseResponseDto {
   game: GameClientResponseDto;
 
   @Expose()
-  @Type(() => CategorySummaryResponseDto)
-  category: CategorySummaryResponseDto;
+  @Type(() => CategoryClientResponseDto)
+  category: CategoryClientResponseDto;
 
   @Expose()
   @Type(() => FileSummaryResponseDto)

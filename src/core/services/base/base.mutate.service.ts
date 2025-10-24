@@ -39,9 +39,7 @@ class BaseMutateService<
     protected readonly t: BaseTFunction
   ) {}
 
-  // --------------------------------------------------------------------------
-  // Create
-  // --------------------------------------------------------------------------
+  // <----------------   CREATE   ---------------->
 
   async create<TThrowError extends boolean = true>(
     data: TCreateDto,
@@ -64,9 +62,7 @@ class BaseMutateService<
     return doc as TDoc;
   }
 
-  // --------------------------------------------------------------------------
-  // Update Operations
-  // --------------------------------------------------------------------------
+  // <----------------   UPDATE   ---------------->
 
   async updateOneById<TThrowError extends boolean = true>(
     id: string,
@@ -161,9 +157,7 @@ class BaseMutateService<
     return result;
   }
 
-  // --------------------------------------------------------------------------
-  // Delete Operations
-  // --------------------------------------------------------------------------
+  // <----------------   DELETE   ---------------->
 
   async deleteOneById<TThrowError extends boolean = true>(
     id: string,
@@ -260,9 +254,7 @@ class BaseMutateService<
     };
   }
 
-  // --------------------------------------------------------------------------
-  // Array Field Operations
-  // --------------------------------------------------------------------------
+  // <----------------   ARRAY FIELD   ---------------->
   async removeIdFromArrayField(
     keyName: keyof AnyKeys<TSchema>,
     id: string,
@@ -284,9 +276,7 @@ class BaseMutateService<
     return await this.applyMutateOptions(query, options).exec();
   }
 
-  // --------------------------------------------------------------------------
-  // Options Application
-  // --------------------------------------------------------------------------
+  // <----------------   PRIVATE METHODS   ---------------->
 
   /**
    * Applies common mutate options such as session or lean.

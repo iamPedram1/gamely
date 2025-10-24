@@ -1,5 +1,4 @@
 import { Expose, Transform, Type } from 'class-transformer';
-import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 // DTO
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';

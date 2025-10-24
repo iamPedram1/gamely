@@ -17,7 +17,7 @@ import { BaseQueryDto } from 'core/dto/query';
 const tagClientRouter = express.Router();
 const tagController = container.resolve(TagClientController);
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 tagClientRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
 tagClientRouter.get('/:id', validateObjectId(Tag), tagController.getOne);
 

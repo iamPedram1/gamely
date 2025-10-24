@@ -9,54 +9,62 @@ import validateQuery from 'core/middlewares/validateQuery';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
-import Category from 'api/category/category.model';
+import Category from 'features/shared/category/category.model';
 
 // Controller
-import CategoryController from 'api/category/category.controller';
+import CategoryManagementController from 'features/management/category/category.management.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
 import {
   CreateCategoryDto,
   UpdateCategoryDto,
-} from 'api/category/category.dto';
+} from 'features/management/category/category.management.dto';
 
-const categoryRouter = express.Router();
-const categoryController = container.resolve(CategoryController);
+const categoryManagementnRouter = express.Router();
+const categoryController = container.resolve(CategoryManagementController);
 
-// Public Routes
-categoryRouter.get('/', validateQuery(BaseQueryDto), categoryController.getAll);
-categoryRouter.get(
+categoryManagementnRouter.use(auth(['author', 'admin']));
+
+// <----------------   GET   ---------------->
+categoryManagementnRouter.get(
+  '/',
+  validateQuery(BaseQueryDto),
+  categoryController.getAll
+);
+categoryManagementnRouter.get(
   '/summaries',
   validateQuery(BaseQueryDto),
   categoryController.getAllSummaries
 );
-categoryRouter.get('/nested', categoryController.getAllNested);
-categoryRouter.get(
+categoryManagementnRouter.get(
   '/:id',
   validateObjectId(Category),
   categoryController.getOne
 );
 
-// Protected Routes
-categoryRouter.use(auth(['author', 'admin']));
-categoryRouter.post(
+// <----------------   POST   ---------------->
+categoryManagementnRouter.post(
   '/',
   validateBody(CreateCategoryDto),
   validateUniqueConflict(Category, 'slug'),
   categoryController.create
 );
-categoryRouter.patch(
+
+// <----------------   PATCH   ---------------->
+categoryManagementnRouter.patch(
   '/:id',
   validateObjectId(Category),
   validateBody(UpdateCategoryDto),
   validateUniqueConflict(Category, 'slug'),
   categoryController.update
 );
-categoryRouter.delete(
+
+// <----------------   DELETE   ---------------->
+categoryManagementnRouter.delete(
   '/:id',
   validateObjectId(Category),
   categoryController.delete
 );
 
-export default categoryRouter;
+export default categoryManagementnRouter;

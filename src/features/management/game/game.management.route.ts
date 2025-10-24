@@ -26,7 +26,7 @@ const gameController = container.resolve(GameManagementController);
 
 gameManagementRouter.use(auth(['author', 'admin']));
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 gameManagementRouter.get('/', [
   validateQuery(BaseQueryDto),
   gameController.getAll,
@@ -40,21 +40,21 @@ gameManagementRouter.get('/:id', [
   gameController.getOne,
 ]);
 
-// ----------------   DELETE   ----------------
+// <----------------   DELETE   ---------------->
 gameManagementRouter.delete('/batch/delete', gameController.batchDelete);
 gameManagementRouter.delete('/:id', [
   validateObjectId(Game),
   gameController.delete,
 ]);
 
-// ----------------   POST   ----------------
+// <----------------   POST   ---------------->
 gameManagementRouter.post('/', [
   validateBody(CreateGameDto),
   validateUniqueConflict(Game, 'slug'),
   gameController.create,
 ]);
 
-// ----------------   PATCH   ----------------
+// <----------------   PATCH   ---------------->
 gameManagementRouter.patch('/:id', [
   validateObjectId(Game),
   validateBody(UpdateGameDto),

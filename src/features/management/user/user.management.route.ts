@@ -16,12 +16,12 @@ const userController = container.resolve(UserManagementController);
 
 userManagementRouter.use(auth(['admin']));
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 userManagementRouter.get('/', userController.getAll);
 userManagementRouter.get('/summaries', userController.getSummaries);
 userManagementRouter.get('/:id', userController.getOne);
 
-// ----------------   PATCH  ----------------
+// <----------------   PATCH  ---------------->
 userManagementRouter.patch(
   '/:id',
   validateBody(UpdateUserDto),

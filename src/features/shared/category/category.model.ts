@@ -8,12 +8,12 @@ import {
 } from 'mongoose';
 
 // Types
-import type { ICategoryEntity } from 'api/category/category.type';
+import type { ICategoryEntity } from 'features/shared/category/category.type';
 
 export type CategoryDocument = HydratedDocument<ICategoryEntity>;
 export type CategoryLeanDocument = FlattenMaps<CategoryDocument>;
 
-const gameSchema = new Schema<ICategoryEntity, Model<ICategoryEntity>>(
+const translationSchema = new Schema(
   {
     title: {
       type: String,
@@ -21,6 +21,23 @@ const gameSchema = new Schema<ICategoryEntity, Model<ICategoryEntity>>(
       minlength: 3,
       maxlength: 255,
       required: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+      minlength: 10,
+      maxlength: 500,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
+const gameSchema = new Schema<ICategoryEntity, Model<ICategoryEntity>>(
+  {
+    translations: {
+      en: { type: translationSchema, required: true },
+      fa: { type: translationSchema, required: true },
     },
     slug: {
       type: String,
@@ -46,6 +63,8 @@ const gameSchema = new Schema<ICategoryEntity, Model<ICategoryEntity>>(
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
+      immutable: true,
     },
   },
   { timestamps: true }

@@ -15,12 +15,14 @@ import {
   IsTranslationsField,
 } from 'core/dto/translation';
 
+// Utilities
+import { IsSlug } from 'core/utilites/validation';
+
 // Types
 import type { WithDictionaries } from 'core/types/translations';
 import type { TagTranslation } from 'features/shared/tag/tag.type';
-import { IsSlug } from 'core/utilites/validation';
 
-// ----------------   CREATE   ----------------
+// <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
   @IsNotEmpty()
   @IsString()
@@ -42,7 +44,7 @@ export class CreateTagDto {
   slug: string;
 }
 
-// ----------------   UPDATE   ----------------
+// <----------------   UPDATE   ---------------->
 
 export class UpdateTranslationDto {
   @IsOptional()
@@ -65,7 +67,7 @@ export class UpdateTagDto {
   translations: UpdateTranslationsDto;
 }
 
-// ----------------   RESPONSE   ----------------
+// <----------------   RESPONSE   ---------------->
 
 export class TagManagementResponseDto extends BaseResponseDto {
   @Expose()

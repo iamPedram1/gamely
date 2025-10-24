@@ -18,14 +18,14 @@ import { CreateCommentDto } from 'features/client/comment/comment.client.dto';
 const commentClientRouter = express.Router();
 const commentController = container.resolve(CommentClientController);
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 commentClientRouter.get(
   '/:id/comments',
   validateObjectId(Post),
   commentController.getApprovedPostComments
 );
 
-// ----------------   POST   ----------------
+// <----------------   POST   ---------------->
 commentClientRouter.use(auth(['user', 'author', 'admin']));
 commentClientRouter.post(
   '/:id/comments',

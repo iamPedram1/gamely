@@ -56,6 +56,7 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       index: true,
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
       immutable: true,
     },
     game: {

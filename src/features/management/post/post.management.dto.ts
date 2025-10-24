@@ -14,7 +14,6 @@ import {
 import { BaseResponseDto } from 'core/dto/response';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
-import { CategorySummaryResponseDto } from 'api/category/category.dto';
 import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.management.dto';
 import {
   createTranslationsWrapper,
@@ -29,8 +28,9 @@ import type { IFileSummary } from 'api/file/file.type';
 import type { PostTranslation } from 'features/shared/post/post.type';
 import type { WithDictionaries } from 'core/types/translations';
 import { GameManagementResponseDto } from 'features/management/game/game.management.dto';
+import { CategoryManagementResponseDto } from 'features/management/category/category.management.dto';
 
-// ----------------   CREATE   ----------------
+// <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
   @IsNotEmpty()
   @IsString()
@@ -83,7 +83,7 @@ export class CreatePostDto {
   translations: CreateTranslationsDto;
 }
 
-// ----------------   UPDATE   ----------------
+// <----------------   UPDATE   ---------------->
 export class UpdateTranslationDto {
   title: string;
   abstract: string;
@@ -123,7 +123,7 @@ export class UpdatePostDto {
   translations: UpdateTranslationsDto;
 }
 
-// ----------------   RESPONSE   ----------------
+// <----------------   RESPONSE   ---------------->
 
 export class BasePostResponseDto extends BaseResponseDto {
   @Expose()
@@ -147,8 +147,8 @@ export class PostManagementResponseDto extends BasePostResponseDto {
   game: GameManagementResponseDto;
 
   @Expose()
-  @Type(() => CategorySummaryResponseDto)
-  category: CategorySummaryResponseDto;
+  @Type(() => CategoryManagementResponseDto)
+  category: CategoryManagementResponseDto;
 
   @Expose()
   @Type(() => FileSummaryResponseDto)

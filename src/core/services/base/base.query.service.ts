@@ -33,9 +33,7 @@ class BaseQueryService<
     protected readonly t: BaseTFunction
   ) {}
 
-  // --------------------------------------------------------------------------
-  // Existence Checks
-  // --------------------------------------------------------------------------
+  // <----------------   EXISTANCE   ---------------->
 
   /**
    * Checks if a document exists matching a filter.
@@ -66,9 +64,8 @@ class BaseQueryService<
     return this.exists({ [key]: match } as FilterQuery<TSchema>);
   }
 
-  // --------------------------------------------------------------------------
-  // Single Document Queries
-  // --------------------------------------------------------------------------
+  // <----------------   SINGLE DOCUMENT   ---------------->
+
   async getOneById<
     TLean extends boolean = false,
     TThrowError extends boolean = true,
@@ -138,9 +135,8 @@ class BaseQueryService<
     return result as NullableQueryResult<TDoc, TLean, TThrowError>;
   }
 
-  // --------------------------------------------------------------------------
-  // Multiple Documents Query
-  // --------------------------------------------------------------------------
+  // <----------------   MULTIPLE DOCUMENTS   ---------------->
+
   async find<TLean extends boolean = false, TPaginate extends boolean = true>(
     options?: BaseQueryOptions<TSchema> & {
       lean?: TLean;
@@ -186,9 +182,8 @@ class BaseQueryService<
     const docs = await this.model.aggregate<TResult>(aggPipeline).exec();
     return docs as AggregateReturn<TResult, TPaginate>;
   }
-  // --------------------------------------------------------------------------
-  // Query Options Application
-  // --------------------------------------------------------------------------
+
+  // <----------------   PRIVATE METHODS   ---------------->
 
   /**
    * Applies common query modifiers (select, populate, sort, limit, skip, lean).

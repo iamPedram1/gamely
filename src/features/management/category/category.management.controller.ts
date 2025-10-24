@@ -1,10 +1,10 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Service
-import CategoryService from 'api/category/category.service';
+import CategoryService from 'features/shared/category/category.service';
 
 // DTO
-import { CategoryMapper } from 'api/category/category.mapper';
+import { CategoryMapper } from 'features/shared/category/category.mapper';
 
 // Utilities
 import sendResponse from 'core/utilites/response';
@@ -15,7 +15,7 @@ import type { RequestHandler } from 'express';
 import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
-export default class CategoryController {
+export default class CategoryManagementController {
   constructor(
     @inject(delay(() => CategoryMapper)) private categoryMapper: CategoryMapper,
     @inject(delay(() => CategoryService))
@@ -36,19 +36,9 @@ export default class CategoryController {
       body: {
         data: {
           pagination,
-          docs: docs.map((doc) => this.categoryMapper.toDto(doc)),
+          docs: docs.map((doc) => this.categoryMapper.toManagementDto(doc)),
         },
       },
-    });
-  };
-
-  getAllNested: RequestHandler = async (req, res) => {
-    const docs = await this.categoryService.getAllNested();
-
-    sendResponse(res, 200, {
-      httpMethod: 'GET',
-      featureName: 'models.Category.plural',
-      body: { data: docs.map((doc) => this.categoryMapper.toNestedDto(doc)) },
     });
   };
 
@@ -65,7 +55,9 @@ export default class CategoryController {
       httpMethod: 'GET',
       featureName: 'models.Category.plural',
       body: {
-        data: docs.map((doc) => this.categoryMapper.toSummaryDto(doc)),
+        data: docs.map((doc) =>
+          this.categoryMapper.toManagementSummaryDto(doc)
+        ),
       },
     });
   };
@@ -80,7 +72,7 @@ export default class CategoryController {
       httpMethod: 'GET',
       featureName: 'models.Category.singular',
       body: {
-        data: this.categoryMapper.toDto(category),
+        data: this.categoryMapper.toManagementDto(category),
       },
     });
   };
@@ -93,7 +85,7 @@ export default class CategoryController {
     sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'models.Category.singular',
-      body: { data: this.categoryMapper.toDto(category) },
+      body: { data: this.categoryMapper.toManagementDto(category) },
     });
   };
 
@@ -122,7 +114,7 @@ export default class CategoryController {
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
       featureName: 'models.Category.singular',
-      body: { data: this.categoryMapper.toDto(body) },
+      body: { data: this.categoryMapper.toManagementDto(body) },
     });
   };
 }

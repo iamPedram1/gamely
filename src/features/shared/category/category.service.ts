@@ -2,13 +2,13 @@ import type { ClientSession } from 'mongoose';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import Category from 'api/category/category.model';
+import Category from 'features/shared/category/category.model';
 
 // DTO
 import {
   CreateCategoryDto,
   UpdateCategoryDto,
-} from 'api/category/category.dto';
+} from 'features/management/category/category.management.dto';
 
 // Services
 import PostService from 'features/shared/post/post.service';
@@ -23,11 +23,11 @@ import {
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';
-import type { CategoryDocument } from 'api/category/category.model';
+import type { CategoryDocument } from 'features/shared/category/category.model';
 import type {
   ICategoryEntity,
   INestedCategoryEntity,
-} from 'api/category/category.type';
+} from 'features/shared/category/category.type';
 
 type ParentMap = Record<string, number[]>;
 
@@ -82,9 +82,10 @@ class CategoryService extends BaseService<
     if (payload.parentId === id)
       throw new BadRequestError(this.t('error.category.self_parent'));
 
-    if (payload.title) category.set('title', payload.title);
     if (payload.slug) category.set('slug', payload.slug);
     if (payload.parentId) category.set('parentId', payload.parentId);
+    if (payload.translations)
+      category.set('translations', payload.translations);
 
     return await category.save({ session: options?.session });
   }

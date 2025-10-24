@@ -10,7 +10,7 @@ import { UserRoles } from 'features/shared/user/user.constants';
 import type { Types } from 'mongoose';
 import type { UserRole } from 'features/shared/user/user.types';
 
-// ----------------   UPDATE   ----------------
+// <----------------   UPDATE   ---------------->
 export class UpdateUserDto extends BaseUserUpdate {
   avatar: Types.ObjectId;
   bio: string;

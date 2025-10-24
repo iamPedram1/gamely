@@ -16,10 +16,10 @@ const userClientController = container.resolve(UserClientController);
 
 userClientRouter.use(auth(['user', 'admin', 'author']));
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 userClientRouter.get('/profile', userClientController.getProfile);
 
-// ----------------   PATCH  ----------------
+// <----------------   PATCH  ---------------->
 userClientRouter.patch(
   '/profile',
   validateBody(UpdateProfileDto),

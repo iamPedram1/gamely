@@ -4,23 +4,21 @@ import {
   IsString,
   Length,
   IsOptional,
+  Matches,
   IsMongoId,
-  IsISO8601,
   IsNotEmptyObject,
 } from 'class-validator';
 
 // DTO
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
-import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
-
-// Types
-import type { IFileSummary } from 'api/file/file.type';
-import { IsSlug } from 'core/utilites/validation';
 import {
   createTranslationsWrapper,
   IsTranslationsField,
 } from 'core/dto/translation';
+import { IsSlug } from 'core/utilites/validation';
+
+// Types
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
@@ -28,18 +26,13 @@ export class CreateTranslationDto {
   @IsString()
   @Length(3, 255)
   title: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Length(10, 500)
-  description: string;
 }
 
 export class CreateTranslationsDto extends createTranslationsWrapper(
   CreateTranslationDto
 ) {}
 
-export class CreateGameDto {
+export class CreateCategoryDto {
   @IsNotEmptyObject()
   @IsTranslationsField(CreateTranslationsDto)
   translations: CreateTranslationsDto;
@@ -48,76 +41,62 @@ export class CreateGameDto {
   @IsSlug()
   slug: string;
 
-  @IsNotEmpty()
-  @IsISO8601()
-  releaseDate: string;
-
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
-  coverImage: string | null;
+  parentId: string | null;
 }
 
 // <----------------   UPDATE   ---------------->
+
 export class UpdateTranslationDto {
   @IsOptional()
   @IsString()
   @Length(3, 255)
   title: string;
-
-  @IsOptional()
-  @IsString()
-  @Length(10, 500)
-  description: string;
 }
 
 export class UpdateTranslationsDto extends createTranslationsWrapper(
   UpdateTranslationDto
 ) {}
 
-export class UpdateGameDto {
+export class UpdateCategoryDto {
   @IsOptional()
   @IsSlug()
   slug: string;
 
   @IsOptional()
-  @IsMongoId()
-  coverImage: string | null;
-
-  @IsOptional()
-  @IsISO8601()
-  releaseDate: string;
-
-  @IsOptional()
   @IsTranslationsField(UpdateTranslationsDto)
   translations: UpdateTranslationsDto;
+
+  @IsOptional()
+  @IsMongoId()
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  parentId: string;
 }
 
 // <----------------   RESPONSE   ---------------->
-export class GameManagementResponseDto extends BaseResponseDto {
+
+export class CategoryManagementResponseDto extends BaseResponseDto {
   @Expose()
-  title: string;
+  title!: string;
 
   @Expose()
-  slug: string;
+  slug!: string;
 
   @Expose()
-  description: string;
-
-  @Expose()
-  releaseDate: string;
-
-  @Expose()
-  @Type(() => FileSummaryResponseDto)
-  coverImage: IFileSummary;
+  parentId!: string | null;
 
   @Expose()
   @Type(() => UserSummaryResponseDto)
   creator: UserSummaryResponseDto;
 }
 
-export class GameManagementSummaryResponseDto extends BaseSummaryResponseDto {
+export class CategoryManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   title!: string;
+
+  @Expose()
+  parentId!: string | null;
 
   @Expose()
   slug!: string;

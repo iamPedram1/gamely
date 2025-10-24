@@ -17,7 +17,7 @@ import { BaseQueryDto } from 'core/dto/query';
 const gameClientRouter = express.Router();
 const gameController = container.resolve(GameClientController);
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 gameClientRouter.get('/', [validateQuery(BaseQueryDto), gameController.getAll]);
 gameClientRouter.get('/:id', [validateObjectId(Game), gameController.getOne]);
 

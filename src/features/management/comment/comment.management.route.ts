@@ -21,14 +21,14 @@ const commentController = container.resolve(CommentManagementController);
 
 commentManagementRouter.use(auth(['author', 'admin']));
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 commentManagementRouter.get(
   '/:id/comments',
   validateParam(Post, 'id', '_id', { isId: true }),
   commentController.getPostComments
 );
 
-// ----------------   PATCH   ----------------
+// <----------------   PATCH   ---------------->
 commentManagementRouter.patch(
   '/:postId/comments/:commentId',
   validateParam(Post, 'postId', '_id', { isId: true }),
@@ -36,7 +36,7 @@ commentManagementRouter.patch(
   validateBody(UpdateCommentDto),
   commentController.update
 );
-// ----------------   DELETE   ----------------
+// <----------------   DELETE   ---------------->
 commentManagementRouter.delete(
   '/:postId/comments/:commentId',
   validateParam(Post, 'postId', '_id', { isId: true }),

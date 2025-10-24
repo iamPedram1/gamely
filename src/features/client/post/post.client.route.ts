@@ -17,7 +17,7 @@ import { BaseQueryDto } from 'core/dto/query';
 export const postClientRouter = express.Router();
 const postController = container.resolve(PostClientController);
 
-// ----------------   GET   ----------------
+// <----------------   GET   ---------------->
 postClientRouter.get('/', [validateQuery(BaseQueryDto), postController.getAll]);
 postClientRouter.get('/:id', [validateObjectId(Post), postController.getOne]);
 

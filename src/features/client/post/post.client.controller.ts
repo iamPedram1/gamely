@@ -58,11 +58,11 @@ export default class PostClientController {
       ],
     });
 
-    sendResponse(res, post ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.Post.singular',
       body: {
-        data: post ? this.postMapper.toClientDto(post) : null,
+        data: this.postMapper.toClientDto(post),
       },
     });
   };
