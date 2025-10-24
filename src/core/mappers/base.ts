@@ -39,7 +39,7 @@ export class BaseMapper<
       : (entity as any);
   }
 
-  public toPublicDto(entity: TDoc | TLean): TClientDto {
+  public toClientDto(entity: TDoc | TLean): TClientDto {
     return plainToInstance(this.ClientDtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,
     });
@@ -51,7 +51,7 @@ export class BaseMapper<
     });
   }
 
-  public toPublicSummaryDto(entity: TDoc | TLean): TClientSummaryDto {
+  public toClientSummaryDto(entity: TDoc | TLean): TClientSummaryDto {
     return plainToInstance(this.ClientSummaryDtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,
     });

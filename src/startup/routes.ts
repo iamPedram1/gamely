@@ -1,7 +1,6 @@
 import { Express } from 'express';
 
 // Routers
-import tagRouter from 'api/tag/tag.route';
 import fileRouter from 'api/file/file.route';
 import gameRouter from 'api/game/game.route';
 
@@ -22,11 +21,13 @@ import notFound from 'core/middlewares/notFound';
 
 // Utilities
 import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilites/configs';
+import tagClientRouter from 'features/client/tag/tag.route';
+import tagManagementRouter from 'features/management/tag/tag.route';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/user'), userClientRouter);
   app.use(prefixBaseUrl('/auth'), authClientRouter);
-  app.use(prefixBaseUrl('/tags'), tagRouter);
+  app.use(prefixBaseUrl('/tags'), tagClientRouter);
   app.use(prefixBaseUrl('/games'), gameRouter);
   app.use(prefixBaseUrl('/categories'), categoryRouter);
   app.use(prefixBaseUrl('/posts'), postClientRouter);
@@ -34,6 +35,7 @@ export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);
 
   // Management
+  app.use(prefixManagementBaseUrl('/tags'), tagManagementRouter);
   app.use(prefixManagementBaseUrl('/posts'), postManagementRouter);
   app.use(prefixManagementBaseUrl('/users'), userManagementRouter);
 

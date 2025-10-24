@@ -4,7 +4,10 @@ import { delay, inject, injectable } from 'tsyringe';
 import Post from 'features/shared/post/post.model';
 
 // DTO
-import { CreatePostDto, UpdatePostDto } from 'api/post/dtos';
+import {
+  CreatePostDto,
+  UpdatePostDto,
+} from 'features/management/post/post.management.dto';
 
 // Services
 import FileService from 'api/file/file.service';

@@ -40,7 +40,7 @@ export default class PostClientController {
       body: {
         data: {
           pagination,
-          docs: docs.map((doc) => this.postMapper.toPublicDto(doc)),
+          docs: docs.map((doc) => this.postMapper.toClientDto(doc)),
         },
       },
     });
@@ -62,7 +62,7 @@ export default class PostClientController {
       httpMethod: 'GET',
       featureName: 'models.Post.singular',
       body: {
-        data: post ? this.postMapper.toPublicDto(post) : null,
+        data: post ? this.postMapper.toClientDto(post) : null,
       },
     });
   };

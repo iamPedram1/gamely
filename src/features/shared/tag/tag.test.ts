@@ -3,14 +3,14 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 
 // Models
-import Tag from 'api/tag/tag.model';
+import Tag from 'features/shared/tag/tag.model';
 import User from 'features/shared/user/user.model';
 
 // Utils
 import { prefixBaseUrl } from 'core/utilites/configs';
 
 // Types
-import { ITagEntity } from 'api/tag/tag.type';
+import { ITagEntity } from 'features/shared/tag/tag.type';
 import { jwtTokenName } from 'features/shared/auth/auth.constants';
 
 describe('tag routes', () => {

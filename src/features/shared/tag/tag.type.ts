@@ -1,6 +1,5 @@
 // Types
 import type { Types } from 'mongoose';
-import type { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
 import type { WithTranslations } from 'core/types/translations';
 
 export interface TagTranslation {
@@ -14,6 +13,3 @@ export interface ITagEntity extends WithTranslations<TagTranslation> {
   createdAt: Date;
   updatedAt: Date;
 }
-
-export type ITag = InstanceType<typeof TagResponseDto>;
-export type ITagSummary = InstanceType<typeof TagSummaryResponseDto>;

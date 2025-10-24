@@ -1,23 +1,23 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Services
-import TagService from 'api/tag/tag.service';
+import TagService from 'features/shared/tag/tag.service';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // DTO
-import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
+import { CreateTagDto, UpdateTagDto } from 'features/management/tag/tag.dto';
 
 // Mapper
-import { TagMapper } from 'api/tag/tag.mapper';
+import { TagMapper } from 'features/shared/tag/tag.mapper';
 
 // Types
 import type { RequestHandler } from 'express';
 import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
-export default class TagController {
+export default class TagManagementController {
   constructor(
     @inject(delay(() => TagService)) private tagService: TagService,
     @inject(delay(() => TagMapper)) private tagMapper: TagMapper
@@ -36,20 +36,20 @@ export default class TagController {
       body: {
         data: {
           pagination,
-          docs: docs.map((doc) => this.tagMapper.toDto(doc)),
+          docs: docs.map((doc) => this.tagMapper.toManagementDto(doc)),
         },
       },
     });
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const docs = await this.tagService.getWithPostsCount();
+    const docs = await this.tagService.find({ lean: true, paginate: false });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.Tag.plural',
       body: {
-        data: docs.map((doc) => this.tagMapper.toSummaryDto(doc)),
+        data: docs.map((doc) => this.tagMapper.toManagementSummaryDto(doc)),
       },
     });
   };
@@ -61,7 +61,7 @@ export default class TagController {
       httpMethod: 'GET',
       featureName: 'models.Tag.singular',
       body: {
-        data: this.tagMapper.toDto(tag),
+        data: this.tagMapper.toManagementDto(tag),
       },
     });
   };
@@ -73,7 +73,7 @@ export default class TagController {
     sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'models.Tag.singular',
-      body: { data: this.tagMapper.toDto(tag) },
+      body: { data: this.tagMapper.toManagementDto(tag) },
     });
   };
 

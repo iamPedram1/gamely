@@ -14,12 +14,14 @@ import { UpdateUserDto } from 'features/management/user/user.management.dto';
 const userManagementRouter = express.Router();
 const userController = container.resolve(UserManagementController);
 
-// Protected Routes
 userManagementRouter.use(auth(['admin']));
+
+// ----------------   GET   ----------------
 userManagementRouter.get('/', userController.getAll);
 userManagementRouter.get('/summaries', userController.getSummaries);
-
 userManagementRouter.get('/:id', userController.getOne);
+
+// ----------------   PATCH  ----------------
 userManagementRouter.patch(
   '/:id',
   validateBody(UpdateUserDto),

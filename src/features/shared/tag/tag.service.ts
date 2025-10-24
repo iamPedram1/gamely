@@ -1,21 +1,19 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import Tag, { TagDocument } from 'api/tag/tag.model';
+import Tag from 'features/shared/tag/tag.model';
 
 // DTO
-import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
+import { CreateTagDto, UpdateTagDto } from 'features/management/tag/tag.dto';
 
 // Services
 import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
-// Custom Utilties
-import { AnonymousError } from 'core/utilites/errors';
-
 // Types
-import type { ITagEntity } from 'api/tag/tag.type';
+import type { ITagEntity } from 'features/shared/tag/tag.type';
 import type { IApiBatchResponse } from 'core/utilites/response';
+import type { TagDocument } from 'features/shared/tag/tag.model';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 
 export type ITagService = InstanceType<typeof TagService>;
@@ -89,9 +87,6 @@ class TagService extends BaseService<
 
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
     return this.withTransaction(async (session) => {
-      if (!this.currentUser)
-        throw new AnonymousError('Something wrong with user context');
-
       await this.postService.removeIdsFromArrayField('tags', ids, { session });
       return await super.batchDelete(ids, {
         session,

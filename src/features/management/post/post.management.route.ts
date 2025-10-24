@@ -25,6 +25,8 @@ export const postManagementRouter = express.Router();
 const postController = container.resolve(PostMangementController);
 
 postManagementRouter.use(auth(['author', 'admin']));
+
+// ----------------   GET   ----------------
 postManagementRouter.get('/', [
   validateQuery(BaseQueryDto),
   postController.getAll,
@@ -38,16 +40,21 @@ postManagementRouter.get('/:id', [
   postController.getOne,
 ]);
 
+// ----------------   DELETE   ----------------
 postManagementRouter.delete('/batch/delete', [postController.batchDelete]);
 postManagementRouter.delete('/:id', [
   validateObjectId(Post),
   postController.delete,
 ]);
+
+// ----------------   POST   ----------------
 postManagementRouter.post('/', [
   validateUniqueConflict(Post, 'slug'),
   validateBody(CreatePostDto),
   postController.create,
 ]);
+
+// ----------------   PATCH  ----------------
 postManagementRouter.patch('/:id', [
   validateObjectId(Post),
   validateBody(UpdatePostDto),

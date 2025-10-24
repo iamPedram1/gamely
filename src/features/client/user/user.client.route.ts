@@ -4,19 +4,22 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import UserClientController from 'features/client/user/user.client.controller';
-import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 
 // Controller
+import UserClientController from 'features/client/user/user.client.controller';
 
 // DTO
+import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 
 const userClientRouter = express.Router();
 const userClientController = container.resolve(UserClientController);
 
-// Protected Routes
 userClientRouter.use(auth(['user', 'admin', 'author']));
+
+// ----------------   GET   ----------------
 userClientRouter.get('/profile', userClientController.getProfile);
+
+// ----------------   PATCH  ----------------
 userClientRouter.patch(
   '/profile',
   validateBody(UpdateProfileDto),

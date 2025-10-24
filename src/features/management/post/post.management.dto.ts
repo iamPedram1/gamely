@@ -8,19 +8,20 @@ import {
   IsMongoId,
   IsNumber,
   Min,
-  ValidateNested,
   IsNotEmptyObject,
-  IsObject,
 } from 'class-validator';
 
 // DTOs
 import { BaseResponseDto } from 'core/dto/response';
 import { GameResponseDto } from 'api/game/game.dto';
-import { TagSummaryResponseDto } from 'api/tag/tag.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
-import { createTranslationsWrapper } from 'core/dto/translation';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { CategorySummaryResponseDto } from 'api/category/category.dto';
+import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.dto';
+import {
+  createTranslationsWrapper,
+  IsTranslationsField,
+} from 'core/dto/translation';
 
 // Types
 import type { IFileSummary } from 'api/file/file.type';
@@ -100,10 +101,7 @@ export class CreatePostDto extends BasePostMutateDto {
   tags: string[];
 
   @IsNotEmptyObject()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => CreateTranslationsDto)
-  @Transform(({ value }) => value || {})
+  @IsTranslationsField(CreateTranslationsDto)
   translations: CreateTranslationsDto;
 }
 
@@ -125,11 +123,7 @@ export class UpdatePostDto extends BasePostMutateDto {
   slug: string;
   tags: string[];
 
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => UpdateTranslationsDto)
-  @Transform(({ value }) => value || {})
+  @IsTranslationsField(UpdateTranslationsDto)
   translations: UpdateTranslationsDto;
 }
 
@@ -165,8 +159,8 @@ export class AdminPostResponseDto extends BasePostResponseDto {
   coverImage: IFileSummary;
 
   @Expose()
-  @Type(() => TagSummaryResponseDto)
-  tags: TagSummaryResponseDto[];
+  @Type(() => TagManagementSummaryResponseDto)
+  tags: TagManagementSummaryResponseDto[];
 
   @Expose()
   translations: WithDictionaries<PostTranslation>;
