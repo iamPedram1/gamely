@@ -3,14 +3,14 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 
 // Models
-import Game from 'api/game/game.model';
+import Game from 'features/shared/game/game.model';
 import User from 'features/shared/user/user.model';
 
 // Utils
 import { prefixBaseUrl } from 'core/utilites/configs';
 
 // Types
-import { IGameEntity } from 'api/game/game.type';
+import { IGameEntity } from 'features/shared/game/game.type';
 import { jwtTokenName } from 'features/shared/auth/auth.constants';
 
 describe('game routes', () => {

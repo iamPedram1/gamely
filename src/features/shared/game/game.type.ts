@@ -1,7 +1,12 @@
 import { Types } from 'mongoose';
-import { GameResponseDto, GameSummaryResponseDto } from 'api/game/game.dto';
+import { WithTranslations } from 'core/types/translations';
 
-export interface IGameEntity {
+export interface GameTranslation {
+  title: string;
+  description: string;
+}
+
+export interface IGameEntity extends WithTranslations<GameTranslation> {
   _id: Types.ObjectId;
   title: string;
   slug: string;

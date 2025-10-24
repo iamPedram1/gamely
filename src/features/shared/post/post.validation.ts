@@ -5,7 +5,7 @@ import { NotFoundError } from 'core/utilites/errors';
 
 // Services
 import TagService from 'features/shared/tag/tag.service';
-import GameService from 'api/game/game.service';
+import GameService from 'features/shared/game/game.service';
 import CategoryService from 'api/category/category.service';
 
 @injectable()

@@ -1,10 +1,10 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Service
-import GameService from 'api/game/game.service';
+import GameService from 'features/shared/game/game.service';
 
 // DTO
-import { GameMapper } from 'api/game/game.mapper';
+import { GameMapper } from 'features/shared/game/game.mapper';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
@@ -14,7 +14,7 @@ import type { RequestHandler } from 'express';
 import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
-export default class GameController {
+export default class GameManagementController {
   constructor(
     @inject(delay(() => GameMapper)) private gameMapper: GameMapper,
     @inject(delay(() => GameService)) private gameService: GameService
@@ -37,7 +37,7 @@ export default class GameController {
       body: {
         data: {
           pagination,
-          docs: docs.map((doc) => this.gameMapper.toDto(doc)),
+          docs: docs.map((doc) => this.gameMapper.toManagementDto(doc)),
         },
       },
     });
@@ -55,7 +55,7 @@ export default class GameController {
       httpMethod: 'GET',
       featureName: 'models.Game.plural',
       body: {
-        data: docs.map((doc) => this.gameMapper.toDto(doc)),
+        data: docs.map((doc) => this.gameMapper.toManagementSummaryDto(doc)),
       },
     });
   };
@@ -66,11 +66,11 @@ export default class GameController {
       populate: 'coverImage',
     });
 
-    sendResponse(res, game ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.Game.singular',
       body: {
-        data: game ? this.gameMapper.toDto(game) : null,
+        data: this.gameMapper.toManagementDto(game),
       },
     });
   };
@@ -83,10 +83,10 @@ export default class GameController {
       ],
     });
 
-    sendResponse(res, game ? 201 : 400, {
+    sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'models.Game.singular',
-      body: { data: game ? this.gameMapper.toDto(game) : null },
+      body: { data: this.gameMapper.toManagementDto(game) },
     });
   };
 
@@ -128,7 +128,7 @@ export default class GameController {
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
       featureName: 'models.Game.singular',
-      body: { data: this.gameMapper.toDto(body) },
+      body: { data: this.gameMapper.toManagementDto(body) },
     });
   };
 }

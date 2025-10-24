@@ -4,17 +4,14 @@ import {
   IsString,
   Length,
   IsOptional,
-  Matches,
   IsMongoId,
   IsNumber,
   Min,
   IsNotEmptyObject,
-  IsArray,
 } from 'class-validator';
 
 // DTOs
 import { BaseResponseDto } from 'core/dto/response';
-import { GameResponseDto } from 'api/game/game.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { CategorySummaryResponseDto } from 'api/category/category.dto';
@@ -24,11 +21,14 @@ import {
   IsTranslationsField,
 } from 'core/dto/translation';
 
+// Utilities
+import { IsSlug } from 'core/utilites/validation';
+
 // Types
 import type { IFileSummary } from 'api/file/file.type';
 import type { PostTranslation } from 'features/shared/post/post.type';
 import type { WithDictionaries } from 'core/types/translations';
-import { IsSlug } from 'core/utilites/validation';
+import { GameManagementResponseDto } from 'features/management/game/game.management.dto';
 
 // ----------------   CREATE   ----------------
 export class CreateTranslationDto {
@@ -143,8 +143,8 @@ export class PostManagementResponseDto extends BasePostResponseDto {
   author: UserSummaryResponseDto;
 
   @Expose()
-  @Type(() => GameResponseDto)
-  game: GameResponseDto;
+  @Type(() => GameManagementResponseDto)
+  game: GameManagementResponseDto;
 
   @Expose()
   @Type(() => CategorySummaryResponseDto)

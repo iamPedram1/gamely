@@ -1,13 +1,13 @@
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 
 // DTOs
-import { GameResponseDto } from 'api/game/game.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { pickLocaleField } from 'core/utilites/request-context';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { CategorySummaryResponseDto } from 'api/category/category.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { TagClientSummaryResponseDto } from 'features/shared/tag/tag.dto';
+import { GameClientResponseDto } from 'features/client/game/game.client.dto';
 
 // Types
 import type { IFileSummary } from 'api/file/file.type';
@@ -40,8 +40,8 @@ export class ClientPostResponseDto extends BaseResponseDto {
   author: UserSummaryResponseDto;
 
   @Expose()
-  @Type(() => GameResponseDto)
-  game: GameResponseDto;
+  @Type(() => GameClientResponseDto)
+  game: GameClientResponseDto;
 
   @Expose()
   @Type(() => CategorySummaryResponseDto)

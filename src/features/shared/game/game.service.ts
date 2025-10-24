@@ -1,17 +1,20 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import Game, { GameDocument } from 'api/game/game.model';
+import Game, { GameDocument } from 'features/shared/game/game.model';
 
 // DTO
-import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
+import {
+  CreateGameDto,
+  UpdateGameDto,
+} from 'features/management/game/game.management.dto';
 
 // Services
 import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Types
-import type { IGameEntity } from 'api/game/game.type';
+import type { IGameEntity } from 'features/shared/game/game.type';
 import type { IApiBatchResponse } from 'core/utilites/response';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 

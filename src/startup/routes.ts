@@ -2,17 +2,18 @@ import { Express } from 'express';
 
 // Routers
 import fileRouter from 'api/file/file.route';
-import gameRouter from 'api/game/game.route';
 
 // Client Routes
 import categoryRouter from 'api/category/category.route';
 import tagClientRouter from 'features/client/tag/tag.client.route';
+import gameClientRouter from 'features/client/game/game.client.route';
 import authClientRouter from 'features/client/auth/auth.client.route';
 import postClientRouter from 'features/client/post/post.client.route';
 import userClientRouter from 'features/client/user/user.client.route';
 import commentClientRouter from 'features/client/comment/comment.client.route';
 
 // Management Routes
+import gameManagementRouter from 'features/management/game/game.management.route';
 import tagManagementRouter from 'features/management/tag/tag.management.route';
 import postManagementRouter from 'features/management/post/post.management.route';
 import userManagementRouter from 'features/management/user/user.management.route';
@@ -29,7 +30,7 @@ export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/user'), userClientRouter);
   app.use(prefixBaseUrl('/auth'), authClientRouter);
   app.use(prefixBaseUrl('/tags'), tagClientRouter);
-  app.use(prefixBaseUrl('/games'), gameRouter);
+  app.use(prefixBaseUrl('/games'), gameClientRouter);
   app.use(prefixBaseUrl('/categories'), categoryRouter);
   app.use(prefixBaseUrl('/posts'), postClientRouter);
   app.use(prefixBaseUrl('/posts'), commentClientRouter);
@@ -40,6 +41,7 @@ export default function routesStartup(app: Express) {
   app.use(prefixManagementBaseUrl('/posts'), postManagementRouter);
   app.use(prefixManagementBaseUrl('/posts'), commentManagementRouter);
   app.use(prefixManagementBaseUrl('/users'), userManagementRouter);
+  app.use(prefixManagementBaseUrl('/games'), gameManagementRouter);
 
   app.use(notFound);
   app.use(error);
