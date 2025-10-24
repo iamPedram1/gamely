@@ -40,6 +40,7 @@ import type {
   IBaseService,
   IBaseValidationService,
   NullableQueryResult,
+  OrAndFilter,
 } from 'core/types/base.service.type';
 import { UserRole } from 'features/shared/user/user.types';
 
@@ -386,6 +387,25 @@ export default abstract class BaseService<
   }
 
   /**
+   * Updates multiple documents based on complex filter conditions.
+   *
+   * @template TSchema - The Mongoose schema type.
+   * @param {OrAndFilter<TSchema> | FilterQuery<TSchema>} conditions - Filter object or combination of $or/$and queries.
+   * @param {UpdateWithAggregationPipeline | UpdateQuery<TSchema>} data - Data or aggregation pipeline to update the matched documents.
+   * @param {Object} [options] - Optional settings (e.g., session, throwError).
+   * @param {boolean} [options.throwError=true] - Whether to throw an error if no documents match.
+   * @returns {Promise<UpdateResult>} - The result of the update operation.
+   * @throws {Error} - If no documents match the conditions.
+   */
+  async updateManyWithConditions<TThrowError extends boolean = true>(
+    conditions: OrAndFilter<TSchema> | FilterQuery<TSchema>,
+    data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ) {
+    return this.mutations.updateManyWithConditions(conditions, data, options);
+  }
+
+  /**
    * Updates many documents with multiple reference IDs.
    * @param ids - List of reference IDs.
    * @param referenceKey - Key that holds the reference.
@@ -455,6 +475,24 @@ export default abstract class BaseService<
     options?: BaseMutateOptions & { additionalFilter?: FilterQuery<TSchema> }
   ): Promise<IApiBatchResponse> {
     return this.mutations.batchDelete(ids, options);
+  }
+
+  /**
+   * Deletes multiple documents based on complex filter conditions.
+   *
+   * @template TSchema - The Mongoose schema type.
+   * @param {OrAndFilter<TSchema> | FilterQuery<TSchema>} conditions - Filter object or combination of $or/$and queries.
+   * @param {BaseMutateOptions} [options] - Optional settings (e.g., session, throwError).
+   * @param {boolean} [options.throwError=true] - Whether to throw an error if no documents match.
+   * @returns {Promise<import('mongoose').DeleteResult>} - The result of the delete operation.
+   * @throws {Error} - If throwError is true and no documents match the conditions.
+   */
+
+  async deleteManyWithConditions<TThrowError extends boolean = false>(
+    conditions: OrAndFilter<TSchema> | FilterQuery<TSchema>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<DeleteResult> {
+    return this.mutations.deleteManyWithConditions(conditions, options);
   }
 
   // =====================

@@ -1,6 +1,6 @@
 import type { Types } from 'mongoose';
 import type { WithTranslations } from 'core/types/translations';
-import type { AdminPostResponseDto } from 'features/management/post/post.management.dto';
+import type { PostManagementResponseDto } from 'features/management/post/post.management.dto';
 import type {
   ClientPostSummaryResponseDto,
   ClientPostResponseDto,
@@ -26,5 +26,5 @@ export interface IPostEntity extends WithTranslations<PostTranslation> {
 }
 
 export type IUserPost = InstanceType<typeof ClientPostResponseDto>;
-export type IAdminPost = InstanceType<typeof AdminPostResponseDto>;
+export type IAdminPost = InstanceType<typeof PostManagementResponseDto>;
 export type IPostSummary = InstanceType<typeof ClientPostSummaryResponseDto>;

@@ -116,3 +116,8 @@ export type IBaseService<
   TUpdateDto,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = BaseService<TSchema, TCreateDto, TUpdateDto, TDoc>;
+
+export type OrAndFilter<T> = {
+  $or?: FilterQuery<T>[];
+  $and?: FilterQuery<T>[];
+};

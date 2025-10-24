@@ -9,7 +9,7 @@ import validateObjectId from 'core/middlewares/validateObjectId';
 import Tag from 'features/shared/tag/tag.model';
 
 // Controller
-import TagClientController from 'features/client/tag/tag.controller';
+import TagClientController from 'features/client/tag/tag.client.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';

@@ -12,6 +12,3 @@ export interface IGameEntity {
   createdAt: Date;
   updatedAt: Date;
 }
-
-export type IGame = InstanceType<typeof GameResponseDto>;
-export type IGameSummary = InstanceType<typeof GameSummaryResponseDto>;

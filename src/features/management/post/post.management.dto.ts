@@ -9,6 +9,7 @@ import {
   IsNumber,
   Min,
   IsNotEmptyObject,
+  IsArray,
 } from 'class-validator';
 
 // DTOs
@@ -17,7 +18,7 @@ import { GameResponseDto } from 'api/game/game.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { CategorySummaryResponseDto } from 'api/category/category.dto';
-import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.dto';
+import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.management.dto';
 import {
   createTranslationsWrapper,
   IsTranslationsField,
@@ -27,60 +28,23 @@ import {
 import type { IFileSummary } from 'api/file/file.type';
 import type { PostTranslation } from 'features/shared/post/post.type';
 import type { WithDictionaries } from 'core/types/translations';
-
-// ----------------   BASE   ----------------
-abstract class BasePostMutateDto {
-  @IsOptional()
-  @IsString()
-  @Length(3, 255)
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'slug is not valid' })
-  abstract slug: string;
-
-  @IsOptional()
-  @IsMongoId()
-  abstract coverImage: string;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  abstract readingTime: number;
-
-  @IsOptional()
-  @IsMongoId()
-  abstract game: string;
-
-  @IsOptional()
-  @IsMongoId({ each: true })
-  abstract tags: string[];
-
-  @IsOptional()
-  @IsMongoId()
-  abstract category: string;
-}
-
-abstract class BaseTranslationDto {
-  @IsString()
-  @Length(3, 255)
-  abstract title: string;
-
-  @IsString()
-  @Length(1, 150)
-  abstract abstract: string;
-
-  @IsString()
-  @Length(1)
-  abstract content: string;
-}
+import { IsSlug } from 'core/utilites/validation';
 
 // ----------------   CREATE   ----------------
-export class CreateTranslationDto extends BaseTranslationDto {
+export class CreateTranslationDto {
   @IsNotEmpty()
+  @IsString()
+  @Length(3, 255)
   title: string;
 
   @IsNotEmpty()
+  @IsString()
+  @Length(1, 150)
   abstract: string;
 
   @IsNotEmpty()
+  @IsString()
+  @Length(1)
   content: string;
 }
 
@@ -88,17 +52,31 @@ export class CreateTranslationsDto extends createTranslationsWrapper(
   CreateTranslationDto
 ) {}
 
-export class CreatePostDto extends BasePostMutateDto {
+export class CreatePostDto {
   @IsNotEmpty()
-  category: string;
-  @IsNotEmpty()
-  coverImage: string;
-  @IsNotEmpty()
-  game: string;
-  readingTime: number;
-  @IsNotEmpty()
+  @IsSlug()
   slug: string;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  coverImage: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
+  readingTime: number;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  game: string;
+
+  @IsNotEmpty()
+  @IsMongoId({ each: true })
   tags: string[];
+
+  @IsNotEmpty()
+  @IsMongoId()
+  category: string;
 
   @IsNotEmptyObject()
   @IsTranslationsField(CreateTranslationsDto)
@@ -106,7 +84,7 @@ export class CreatePostDto extends BasePostMutateDto {
 }
 
 // ----------------   UPDATE   ----------------
-export class UpdateTranslationDto extends BaseTranslationDto {
+export class UpdateTranslationDto {
   title: string;
   abstract: string;
   content: string;
@@ -115,13 +93,31 @@ export class UpdateTranslationsDto extends createTranslationsWrapper(
   UpdateTranslationDto
 ) {}
 
-export class UpdatePostDto extends BasePostMutateDto {
-  category: string;
-  coverImage: string;
-  game: string;
-  readingTime: number;
+export class UpdatePostDto {
+  @IsOptional()
+  @IsSlug()
   slug: string;
+
+  @IsOptional()
+  @IsMongoId()
+  coverImage: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  readingTime: number;
+
+  @IsOptional()
+  @IsMongoId()
+  game: string;
+
+  @IsOptional()
+  @IsMongoId({ each: true })
   tags: string[];
+
+  @IsOptional()
+  @IsMongoId()
+  category: string;
 
   @IsTranslationsField(UpdateTranslationsDto)
   translations: UpdateTranslationsDto;
@@ -134,7 +130,7 @@ export class BasePostResponseDto extends BaseResponseDto {
   slug: string;
 }
 
-export class AdminPostResponseDto extends BasePostResponseDto {
+export class PostManagementResponseDto extends BasePostResponseDto {
   @Expose()
   readingTime: number;
 
@@ -166,7 +162,7 @@ export class AdminPostResponseDto extends BasePostResponseDto {
   translations: WithDictionaries<PostTranslation>;
 }
 
-export class AdminPostSummaryResponseDto extends BasePostResponseDto {
+export class PostManagementSummaryResponseDto extends BasePostResponseDto {
   @Expose()
   translations: WithDictionaries<Pick<PostTranslation, 'title'>>;
 }

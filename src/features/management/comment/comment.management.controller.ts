@@ -2,22 +2,22 @@ import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Services
-import CommentService from 'api/comment/comment.service';
+import CommentService from 'features/shared/comment/comment.service';
 
 // Utilities
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // Mapper
-import { CommentMapper } from 'api/comment/comment.mapper';
+import { CommentMapper } from 'features/shared/comment/comment.mapper';
 
 // DTO
-import { CreateCommentDto, UpdateCommentDto } from 'api/comment/comment.dto';
+import { UpdateCommentDto } from 'features/management/comment/comment.management.dto';
 
 // Types
 import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
-export default class CommentController {
+export default class CommentManagementController {
   constructor(
     @inject(delay(() => CommentMapper)) private commentMapper: CommentMapper,
     @inject(delay(() => CommentService)) private commentService: CommentService
@@ -25,6 +25,7 @@ export default class CommentController {
 
   getPostComments: RequestHandler = async (req, res) => {
     const id = req.params.id as string;
+
     const query = req.query as unknown as IRequestQueryBase;
     const { pagination, docs } = await this.commentService.getPostComments(
       id,
@@ -37,44 +38,26 @@ export default class CommentController {
       body: {
         data: {
           pagination,
-          docs: docs.map((item) => this.commentMapper.toDto(item)),
+          docs: docs.map((item) => this.commentMapper.toManagementDto(item)),
         },
       },
     });
   };
 
-  getOne: RequestHandler = async (req, res) => {
-    const comment = await this.commentService.getOneById(req.params.id, {
-      lean: true,
-    });
+  update: RequestHandler = async (req, res) => {
+    const dto = req.body as UpdateCommentDto;
+    const commentId = req.params.commentId;
+    const body = await this.commentService.updateOneById(commentId, dto);
 
-    sendResponse(res, comment ? 200 : 400, {
-      httpMethod: 'GET',
+    sendResponse(res, 200, {
+      httpMethod: 'PATCH',
       featureName: 'models.Comment.singular',
-      body: {
-        data: comment ? this.commentMapper.toDto(comment) : null,
-      },
-    });
-  };
-
-  create: RequestHandler = async (req, res) => {
-    const dto = req.body as CreateCommentDto;
-
-    const comment = await this.commentService.create(
-      { ...dto, postId: req.params.id },
-      req.user.id
-    );
-
-    sendResponse(res, comment ? 201 : 400, {
-      httpMethod: 'POST',
-      featureName: 'models.Comment.singular',
-      body: { data: this.commentMapper.toDto(comment) },
+      body: { data: this.commentMapper.toManagementDto(body) },
     });
   };
 
   delete: RequestHandler = async (req, res) => {
-    await this.commentService.deleteOneById(req.params.id);
-
+    await this.commentService.deleteOneById(req.params.commentId);
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'models.Comment.singular',
@@ -95,17 +78,6 @@ export default class CommentController {
           ? req.t('messages.batch.completed')
           : req.t('messages.batch.completed_with_error'),
       },
-    });
-  };
-
-  update: RequestHandler = async (req, res) => {
-    const dto = req.body as UpdateCommentDto;
-    const body = await this.commentService.updateOneById(req.params.id, dto);
-
-    sendResponse(res, 200, {
-      httpMethod: 'PATCH',
-      featureName: 'models.Comment.singular',
-      body: { data: body },
     });
   };
 }

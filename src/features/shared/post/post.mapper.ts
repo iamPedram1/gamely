@@ -6,8 +6,8 @@ import {
   ClientPostSummaryResponseDto,
 } from 'features/client/post/post.client.dto';
 import {
-  AdminPostResponseDto,
-  AdminPostSummaryResponseDto,
+  PostManagementResponseDto,
+  PostManagementSummaryResponseDto,
 } from 'features/management/post/post.management.dto';
 
 // Mapper
@@ -26,16 +26,16 @@ export class PostMapper extends BaseMapper<
   PostDocument,
   PostLeanDocument,
   ClientPostResponseDto,
-  AdminPostResponseDto,
+  PostManagementResponseDto,
   ClientPostSummaryResponseDto,
-  AdminPostSummaryResponseDto
+  PostManagementSummaryResponseDto
 > {
   constructor() {
     super(
       ClientPostResponseDto,
-      AdminPostResponseDto,
+      PostManagementResponseDto,
       ClientPostSummaryResponseDto,
-      AdminPostSummaryResponseDto
+      PostManagementSummaryResponseDto
     );
   }
 }

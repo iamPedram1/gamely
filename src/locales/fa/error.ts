@@ -24,6 +24,7 @@ const errosTranslations = {
   invalid_credentials: 'ایمیل یا کلمه عبور معتبر نیست',
   not_found_by_id: '{{model}} با شناسه ({{id}}) پیدا نشد',
   not_found_by_key: '{{model}} با {{key}} پیدا نشد',
+  not_found_docs: 'سندی یافت نشد',
   found_but_update_failed: '{{model}} پیدا شد اما بروزرسانی آن انجام نشد',
   no_documents_with_references: 'هیچ سندی از {{model}} با مراجع منطبق پیدا نشد',
   not_found_by_key_value: 'هیچ {{model}} با {{key}}={{value}} پیدا نشد',
@@ -40,6 +41,11 @@ const errosTranslations = {
     'شما سازنده این {{model}} نیستید و دسترسی به عملیات مربوطه را ندارید',
   own_every_children_error:
     '{{model}} دارای {{model}} فرزند است و شما سازنده تمامی آنها نیستید',
+  param: {
+    required: '{{param}} اجباریست',
+    invalid: '{{param}} نامعتبر است',
+    not_found: '{{model}} مورد نظر یافت نشد',
+  },
 } as const;
 
 export default errosTranslations;

@@ -1,19 +1,27 @@
-import { singleton } from 'tsyringe';
+import { delay, inject, singleton } from 'tsyringe';
 
 // Models
-import Comment from 'api/comment/comment.model';
+import Comment from 'features/shared/comment/comment.model';
 
 // DTO
-import { CreateCommentDto, UpdateCommentDto } from 'api/comment/comment.dto';
+import { CreateCommentDto } from 'features/client/comment/comment.client.dto';
+import { UpdateCommentDto } from 'features/management/comment/comment.management.dto';
 
 // Services
 import BaseService from 'core/services/base/base.service';
+import PostService from 'features/shared/post/post.service';
+
+// Utilities
+import { ForbiddenError } from 'core/utilites/errors';
 
 // Types
 import type { Document, Types } from 'mongoose';
 import type { WithPagination } from 'core/types/paginate';
 import type { IRequestQueryBase } from 'core/types/query';
-import type { CommentType, ICommentEntity } from 'api/comment/comment.type';
+import type {
+  CommentType,
+  ICommentEntity,
+} from 'features/shared/comment/comment.type';
 import type {
   BaseMutateOptions,
   IBaseService,
@@ -21,7 +29,7 @@ import type {
 import type {
   CommentDocument,
   CommentLeanDocument,
-} from 'api/comment/comment.model';
+} from 'features/shared/comment/comment.model';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;
@@ -49,8 +57,29 @@ class CommentService extends BaseService<
   UpdateCommentDto,
   CommentDocument
 > {
-  constructor() {
+  constructor(
+    @inject(delay(() => PostService)) private postService: PostService
+  ) {
     super(Comment);
+  }
+
+  async deleteOneById<TThrowError extends boolean = true>(
+    id: string,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? true : boolean> {
+    if (this.currentUser.isNot(['admin', 'author'])) throw new ForbiddenError();
+
+    if (this.currentUser.is('author')) {
+      const post = await this.getCommentPost(id);
+      await this.postService.assertOwnership(post);
+    }
+
+    await this.deleteManyWithConditions(
+      { $or: [{ _id: id }, { threadId: id }] },
+      options
+    );
+
+    return true;
   }
 
   async getPostComments(
@@ -61,13 +90,7 @@ class CommentService extends BaseService<
       reqQuery,
       lean: true,
       filter: { postId, type: 'main' },
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-      ],
+      populate: [{ path: 'creator', populate: 'avatar' }],
     });
 
     const ids = firstLevel.docs.map((doc) => String(doc._id));
@@ -89,6 +112,14 @@ class CommentService extends BaseService<
     };
   }
 
+  async getPostApprovedComments(postId: string) {
+    return await this.find({
+      filter: { postId, status: 'approved' },
+      lean: true,
+      populate: 'creator',
+    });
+  }
+
   async create(
     data: CreateCommentInput,
     userId?: string,
@@ -99,14 +130,28 @@ class CommentService extends BaseService<
       Required<{ _id: Types.ObjectId }> & { __v: number }
   > {
     if (data.replyToCommentId) {
-      const comment = await this.getOneById(data.replyToCommentId, {
-        lean: true,
-      });
+      const cm = await this.getOneById(data.replyToCommentId, { lean: true });
       data.type = 'reply';
-      data.threadId = comment.threadId || comment._id;
+      data.threadId = cm.threadId || cm._id;
     } else data.type = 'main';
 
     return super.create(data, userId, options);
+  }
+
+  async updateOneById(commentId: string, payload: UpdateCommentDto) {
+    if (this.currentUser.isNot(['admin', 'author'])) throw new ForbiddenError();
+
+    if (this.currentUser.is('author')) {
+      const post = await this.getCommentPost(commentId);
+      await this.postService.assertOwnership(post);
+    }
+
+    return await super.updateOneById(commentId, payload);
+  }
+
+  private async getCommentPost(commentId: string) {
+    const cm = await this.getOneById(commentId, { lean: true });
+    return await this.postService.getOneById(cm.postId.toHexString());
   }
 
   private getReplies(

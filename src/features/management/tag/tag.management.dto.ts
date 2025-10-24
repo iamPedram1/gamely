@@ -4,7 +4,6 @@ import {
   IsString,
   Length,
   IsOptional,
-  Matches,
   IsNotEmptyObject,
 } from 'class-validator';
 
@@ -16,52 +15,51 @@ import {
   IsTranslationsField,
 } from 'core/dto/translation';
 
+// Types
 import type { WithDictionaries } from 'core/types/translations';
 import type { TagTranslation } from 'features/shared/tag/tag.type';
+import { IsSlug } from 'core/utilites/validation';
 
-// ----------------   BASE   ----------------
-class BaseTranslationDto {
-  @IsOptional()
+// ----------------   CREATE   ----------------
+export class CreateTranslationDto {
+  @IsNotEmpty()
   @IsString()
   @Length(3, 255)
   title: string;
-}
-
-class BaseTagDto {
-  @IsNotEmpty()
-  @IsString()
-  @Length(3, 255)
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'slug is not valid' })
-  slug: string;
-}
-
-// ----------------   CREATE   ----------------
-export class CreateTranslationDto extends BaseTranslationDto {
-  @IsNotEmpty()
-  declare title: string;
 }
 
 export class CreateTranslationsDto extends createTranslationsWrapper(
   CreateTranslationDto
 ) {}
 
-export class CreateTagDto extends BaseTagDto {
+export class CreateTagDto {
   @IsNotEmptyObject()
   @IsTranslationsField(CreateTranslationsDto)
   translations: CreateTranslationsDto;
+
+  @IsNotEmpty()
+  @IsSlug()
+  slug: string;
 }
 
 // ----------------   UPDATE   ----------------
 
-export class UpdateTranslationDto extends BaseTranslationDto {
-  declare title: string;
+export class UpdateTranslationDto {
+  @IsOptional()
+  @IsString()
+  @Length(3, 255)
+  title: string;
 }
 
 export class UpdateTranslationsDto extends createTranslationsWrapper(
   UpdateTranslationDto
 ) {}
 
-export class UpdateTagDto extends BaseTagDto {
+export class UpdateTagDto {
+  @IsOptional()
+  @IsSlug()
+  slug: string;
+
   @IsOptional()
   @IsTranslationsField(UpdateTranslationsDto)
   translations: UpdateTranslationsDto;

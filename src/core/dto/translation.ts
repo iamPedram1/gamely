@@ -4,23 +4,19 @@ import { IsObject, ValidateNested } from 'class-validator';
 export function createTranslationsWrapper<
   T extends new (...args: any[]) => any,
 >(Cls: T) {
-  const decorators = [
-    IsObject(),
-    ValidateNested(),
-    Type(() => Cls),
-    Transform(({ value }) => value || {}),
-  ];
-
   class TranslationsWrapper {
+    @IsObject()
+    @ValidateNested()
+    @Type(() => Cls)
+    @Transform(({ value }) => value || {})
     en: InstanceType<T>;
+
+    @IsObject()
+    @ValidateNested()
+    @Type(() => Cls)
+    @Transform(({ value }) => value || {})
     fa: InstanceType<T>;
   }
-
-  ['en', 'fa'].forEach((lang) => {
-    decorators.forEach((decorator) => {
-      decorator(TranslationsWrapper.prototype, lang);
-    });
-  });
 
   return TranslationsWrapper;
 }

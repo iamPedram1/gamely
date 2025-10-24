@@ -7,11 +7,11 @@ import { TagDocument, TagLeanDocument } from 'features/shared/tag/tag.model';
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
 import { ITagEntity } from 'features/shared/tag/tag.type';
-import { TagClientResponseDto } from 'features/client/tag/tag.dto';
+import { TagClientResponseDto } from 'features/client/tag/tag.client.dto';
 import {
   TagManagementResponseDto,
   TagManagementSummaryResponseDto,
-} from 'features/management/tag/tag.dto';
+} from 'features/management/tag/tag.management.dto';
 import { TagClientSummaryResponseDto } from 'features/shared/tag/tag.dto';
 
 export type ITagMapper = InstanceType<typeof TagMapper>;

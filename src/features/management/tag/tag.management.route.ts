@@ -12,11 +12,14 @@ import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 import Tag from 'features/shared/tag/tag.model';
 
 // Controller
-import TagManagementController from 'features/management/tag/tag.controller';
+import TagManagementController from 'features/management/tag/tag.management.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
-import { CreateTagDto, UpdateTagDto } from 'features/management/tag/tag.dto';
+import {
+  CreateTagDto,
+  UpdateTagDto,
+} from 'features/management/tag/tag.management.dto';
 
 const tagManagementRouter = express.Router();
 const tagController = container.resolve(TagManagementController);

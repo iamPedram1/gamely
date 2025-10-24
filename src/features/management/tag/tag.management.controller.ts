@@ -7,7 +7,10 @@ import TagService from 'features/shared/tag/tag.service';
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // DTO
-import { CreateTagDto, UpdateTagDto } from 'features/management/tag/tag.dto';
+import {
+  CreateTagDto,
+  UpdateTagDto,
+} from 'features/management/tag/tag.management.dto';
 
 // Mapper
 import { TagMapper } from 'features/shared/tag/tag.mapper';

@@ -25,6 +25,7 @@ const errosTranslations = {
   not_found_by_key: '{{model}} with {{key}} was not found',
   not_exists_by_key: '{{model}} with {{key}} does not exist',
   not_exists_by_id: '{{model}} with id {{id}} does not exist',
+  not_found_docs: 'No {{model}} found',
   found_but_update_failed: '{{model}} was matched but could not be updated',
   no_documents_with_references:
     'No {{model}} documents found with matching references',
@@ -46,7 +47,7 @@ const errosTranslations = {
   param: {
     required: '{{param}} is required',
     invalid: '{{param}} is invalid',
-    not_found_by_param: 'No {{model}} found with {{param}} = {{id}}',
+    not_found: 'No {{model}} found with {{param}} = {{value}}',
   },
 } as const;
 

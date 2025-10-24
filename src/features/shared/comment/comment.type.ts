@@ -1,15 +1,13 @@
 // Types
 import type { Types } from 'mongoose';
-import type {
-  CommentResponseDto,
-  CommentSummaryResponseDto,
-} from 'api/comment/comment.dto';
 
 export type CommentType = 'main' | 'reply';
+export type CommentStatusType = 'approved' | 'rejected' | 'pending';
 
 export interface ICommentEntity {
   _id: Types.ObjectId;
   type: CommentType;
+  status: CommentStatusType;
   comment: string;
   postId: Types.ObjectId;
   creator: Types.ObjectId;
@@ -18,6 +16,3 @@ export interface ICommentEntity {
   updatedAt: Date;
   createdAt: Date;
 }
-
-export type IComment = InstanceType<typeof CommentResponseDto>;
-export type ICommentSummary = InstanceType<typeof CommentSummaryResponseDto>;

@@ -26,7 +26,10 @@ class BaseValidationService<
     return userContext();
   }
 
-  async assertOwnership(document: string | Record<'creator', Types.ObjectId>) {
+  async assertOwnership(
+    document: string | Record<'creator', Types.ObjectId>,
+    throwError: boolean = true
+  ) {
     let isMadeBySelf = false;
     if (this.currentUser.is('admin')) return true;
 
@@ -40,8 +43,9 @@ class BaseValidationService<
         isMadeBySelf = true;
     }
 
-    if (!isMadeBySelf)
+    if (!isMadeBySelf && throwError)
       throw new ValidationError(this.t('error.made_byself_error'));
+    return isMadeBySelf;
   }
 }
 

@@ -4,7 +4,10 @@ import { delay, inject, injectable } from 'tsyringe';
 import Tag from 'features/shared/tag/tag.model';
 
 // DTO
-import { CreateTagDto, UpdateTagDto } from 'features/management/tag/tag.dto';
+import {
+  CreateTagDto,
+  UpdateTagDto,
+} from 'features/management/tag/tag.management.dto';
 
 // Services
 import PostService from 'features/shared/post/post.service';

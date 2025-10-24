@@ -5,11 +5,14 @@ import {
   Length,
   IsOptional,
   IsMongoId,
+  IsIn,
 } from 'class-validator';
 
 // DTO
 import { FileResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+import { commentStatus } from 'features/shared/comment/comment.constants';
+import { CommentStatusType } from 'features/shared/comment/comment.type';
 
 export class CreateCommentDto {
   @IsNotEmpty()
@@ -22,18 +25,7 @@ export class CreateCommentDto {
   replyToCommentId: string;
 }
 
-export class UpdateCommentDto {
-  @IsNotEmpty()
-  @IsString()
-  @Length(10, 500)
-  comment: string;
-
-  @IsOptional()
-  @IsMongoId()
-  replyToCommentId: string;
-}
-
-export class CommentResponseDto extends BaseResponseDto {
+export class CommentClientResponseDto extends BaseResponseDto {
   @Expose()
   @Transform(({ obj }) => obj.comment)
   content: string;
@@ -47,11 +39,11 @@ export class CommentResponseDto extends BaseResponseDto {
   avatar: FileResponseDto;
 
   @Expose()
-  @Type(() => CommentResponseDto)
-  replies!: CommentResponseDto;
+  @Type(() => CommentClientResponseDto)
+  replies: CommentClientResponseDto;
 }
 
-export class CommentSummaryResponseDto extends BaseSummaryResponseDto {
+export class CommentClientSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(({ obj }) => obj.comment)
   content: string;
@@ -65,6 +57,6 @@ export class CommentSummaryResponseDto extends BaseSummaryResponseDto {
   avatar: FileResponseDto;
 
   @Expose()
-  @Type(() => CommentSummaryResponseDto)
-  replies!: CommentSummaryResponseDto;
+  @Type(() => CommentClientSummaryResponseDto)
+  replies: CommentClientSummaryResponseDto;
 }

@@ -1,33 +1,80 @@
 import { TranslationKeys } from 'core/types/i18n';
 import { NotFoundError, ValidationError } from 'core/utilites/errors';
 import { Request, Response, NextFunction } from 'express';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
+
+interface ValidateParamConfigs {
+  isId?: boolean;
+}
+
+export interface ParamValidation<T> {
+  model: Model<T>;
+  paramKey: string; // name in route params
+  modelKey: keyof T; // key in the model to check
+  options?: { isId?: boolean };
+}
 
 /**
- * Extract valid param keys from Express params type
+ * Middleware to validate a single param
  */
-type ParamKeys = keyof Request['params'];
+export function validateParamz<T>(options: ParamValidation<T>) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { model, paramKey, modelKey, options: opts } = options;
+    const value = req.params[paramKey];
+
+    if (!value) {
+      throw new ValidationError(
+        req.t('error.param.required', { param: paramKey })
+      );
+    }
+
+    // Optionally, you could validate ID format here if opts.isId is true
+
+    const exists = await model.exists({ [modelKey]: value } as any);
+
+    if (!exists) {
+      const modelName = req.t(
+        `models.${model.modelName}.singular` as TranslationKeys
+      );
+      throw new NotFoundError(
+        req.t('error.param.not_found', {
+          value,
+          param: paramKey,
+          model: modelName,
+        })
+      );
+    }
+
+    next();
+  };
+}
 
 /**
- * Ensure the param key exists in the model schema
- */
-type ValidParamKey<T> = Extract<keyof T, string>;
-
-/**
- * Type-safe middleware to validate route parameters against a Mongoose model
+ * Middleware to validate a route param against a model field
  *
- * @param Model - Mongoose model to validate against
- * @param paramKey - Parameter key from route params (must exist in both route params and model schema)
+ * @param Model - Mongoose model
+ * @param paramKey - Route param name
+ * @param modelKey - Field in the model to check against
  *
  * @example
- * router.get('/users/:userId', validateParams(User, 'userId'), getUserHandler);
+ * router.get('/posts/:id', validateParam(Post, 'id', '_id'), handler);
+ * router.get('/comments/:postId', validateParam(Comment, 'postId', 'postId'), handler);
  */
-export function validateParams<T>(
+export function validateParam<T>(
   Model: Model<T>,
-  paramKey: ValidParamKey<T> & ParamKeys
+  paramKey: string,
+  modelKey: keyof T,
+  configs?: ValidateParamConfigs
 ) {
-  return async function (req: Request, res: Response, next: NextFunction) {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const value = req.params[paramKey];
+
+    if (configs?.isId) {
+      if (!value) throw new ValidationError(req.t('error.id_required'));
+
+      if (!isValidObjectId(value))
+        throw new ValidationError(req.t('error.id_invalid'));
+    }
 
     if (!value) {
       throw new ValidationError(
@@ -35,18 +82,17 @@ export function validateParams<T>(
       );
     }
 
-    const exists = await Model.exists({ [paramKey]: value } as any);
+    const exists = await Model.exists({ [modelKey]: value } as any);
 
     if (!exists) {
-      const modelKey = `models.${Model.modelName}.singular` as const;
-
-      // Type-safe check to ensure the model translation key exists
-      const modelName = req.t(modelKey as TranslationKeys);
+      const modelName = req.t(
+        `models.${Model.modelName}.singular` as TranslationKeys
+      );
 
       throw new NotFoundError(
-        req.t('error.param.not_found_by_param', {
+        req.t('error.param.not_found', {
           param: paramKey,
-          id: value,
+          value,
           model: modelName,
         })
       );
@@ -56,80 +102,13 @@ export function validateParams<T>(
   };
 }
 
-/**
- * Alternative version with runtime validation of model name in translation keys
- */
-export function validateParamsStrict<T>(
-  Model: Model<T>,
-  paramKey: ValidParamKey<T> & ParamKeys
+export function validateParams<T extends ParamValidation<any>[]>(
+  validations: readonly [...T]
 ) {
-  // Verify at initialization that the model has a translation key
-  const modelKey = `models.${Model.modelName}.singular`;
-
-  return async function (req: Request, res: Response, next: NextFunction) {
-    const value = req.params[paramKey];
-
-    if (!value) {
-      throw new ValidationError(
-        req.t('error.param.required', { param: paramKey })
-      );
+  return async (req: Request, res: Response, next: NextFunction) => {
+    for (const v of validations) {
+      await validateParamz(v)(req, res, () => Promise.resolve());
     }
-
-    const exists = await Model.exists({ [paramKey]: value } as any);
-
-    if (!exists) {
-      throw new NotFoundError(
-        req.t('error.param.not_found_by_param', {
-          param: paramKey,
-          id: value,
-          model: req.t(modelKey as TranslationKeys),
-        })
-      );
-    }
-
-    next();
-  };
-}
-
-/**
- * Enhanced version with multiple param validation
- */
-export function validateMultipleParams<T>(
-  Model: Model<T>,
-  paramKeys: Array<ValidParamKey<T> & ParamKeys>
-) {
-  return async function (req: Request, res: Response, next: NextFunction) {
-    const query: Record<string, any> = {};
-
-    // Validate all params exist
-    for (const paramKey of paramKeys) {
-      const value = req.params[paramKey];
-
-      if (!value) {
-        throw new ValidationError(
-          req.t('error.param.required', { param: paramKey })
-        );
-      }
-
-      query[paramKey] = value;
-    }
-
-    // Check if document exists with all params
-    const exists = await Model.exists(query);
-
-    if (!exists) {
-      const modelKey = `models.${Model.modelName}.singular` as const;
-      const modelName = req.t(modelKey as TranslationKeys);
-
-      throw new NotFoundError(
-        req.t('error.param.not_found_by_param', {
-          param: paramKeys.join(', '),
-          id: Object.values(query).join(', '),
-          model: modelName,
-        })
-      );
-    }
-
     next();
   };
 }

@@ -12,7 +12,7 @@ import {
 // Services
 import FileService from 'api/file/file.service';
 import BaseService from 'core/services/base/base.service';
-import CommentService from 'api/comment/comment.service';
+import CommentService from 'features/shared/comment/comment.service';
 
 // Validations
 import { PostValidation } from 'features/shared/post/post.validation';
