@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { singleton } from 'tsyringe';
 
 // Models
-import File, { FileDocument } from 'api/file/file.model';
+import File, { FileDocument } from 'features/shared/file/file.model';
 
 // Services
 import BaseService from 'core/services/base/base.service';
@@ -15,7 +15,10 @@ import { AnonymousError, BadRequestError } from 'core/utilites/errors';
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';
-import type { IFileEntity, IFileLocation } from 'api/file/file.type';
+import type {
+  IFileEntity,
+  IFileLocation,
+} from 'features/shared/file/file.type';
 
 export type IFileService = InstanceType<typeof FileService>;
 

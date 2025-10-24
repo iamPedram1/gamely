@@ -1,17 +1,17 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Services
-import FileService from 'api/file/file.service';
+import FileService from 'features/shared/file/file.service';
 
 // Utilities
 import sendResponse from 'core/utilites/response';
 
 // DTO
-import { FileMapper } from 'api/file/file.mapper';
+import { FileMapper } from 'features/shared/file/file.mapper';
 
 // Types
 import type { RequestHandler } from 'express';
-import type { IFileLocation } from 'api/file/file.type';
+import type { IFileLocation } from 'features/shared/file/file.type';
 
 @injectable()
 export default class FileController {

@@ -10,7 +10,7 @@ import {
 } from 'features/management/post/post.management.dto';
 
 // Services
-import FileService from 'api/file/file.service';
+import FileService from 'features/shared/file/file.service';
 import BaseService from 'core/services/base/base.service';
 import CommentService from 'features/shared/comment/comment.service';
 

@@ -1,7 +1,7 @@
 import { Express } from 'express';
 
 // Routers
-import fileRouter from 'api/file/file.route';
+import fileRouter from 'features/shared/file/file.route';
 
 // Client Routes
 import tagClientRouter from 'features/client/tag/tag.client.route';

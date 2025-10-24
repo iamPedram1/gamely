@@ -1,5 +1,8 @@
 // Types
-import { FileResponseDto, FileSummaryResponseDto } from 'api/file/file.dto';
+import {
+  FileResponseDto,
+  FileSummaryResponseDto,
+} from 'features/shared/file/file.dto';
 import type { IUser } from 'features/shared/user/user.types';
 
 export type IFileLocation = 'game' | 'post' | 'user';

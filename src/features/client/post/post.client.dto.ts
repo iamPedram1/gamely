@@ -1,7 +1,7 @@
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 
 // DTOs
-import { FileSummaryResponseDto } from 'api/file/file.dto';
+import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { pickLocaleField } from 'core/utilites/request-context';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
@@ -10,7 +10,7 @@ import { GameClientResponseDto } from 'features/client/game/game.client.dto';
 import { CategoryClientResponseDto } from 'features/client/category/category.client.dto';
 
 // Types
-import type { IFileSummary } from 'api/file/file.type';
+import type { IFileSummary } from 'features/shared/file/file.type';
 
 // <----------------   RESPONSE   ---------------->
 

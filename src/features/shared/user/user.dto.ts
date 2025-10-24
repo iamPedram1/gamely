@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 // DTO
-import { FileResponseDto } from 'api/file/file.dto';
+import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types

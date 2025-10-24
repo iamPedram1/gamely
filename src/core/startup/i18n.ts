@@ -6,14 +6,14 @@ import type { Express } from 'express';
 import { context } from 'core/middlewares/context';
 
 // Dictionaries
-import commonEN from '../locales/en/common';
-import modelsEN from '../locales/en/models';
-import errorEN from '../locales/en/error';
-import messagesEN from '../locales/en/messages';
-import commonFA from '../locales/fa/common';
-import modelsFA from '../locales/fa/models';
-import errorFA from '../locales/fa/error';
-import messagesFA from '../locales/fa/messages';
+import commonEN from '../../locales/en/common';
+import modelsEN from '../../locales/en/models';
+import errorEN from '../../locales/en/error';
+import messagesEN from '../../locales/en/messages';
+import commonFA from '../../locales/fa/common';
+import modelsFA from '../../locales/fa/models';
+import errorFA from '../../locales/fa/error';
+import messagesFA from '../../locales/fa/messages';
 
 export default async function i18nStartup(app: Express) {
   const resources = {

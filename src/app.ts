@@ -4,13 +4,13 @@ import express from 'express';
 dotenv.config({ quiet: true });
 
 // Startup
-import dbStartup from 'startup/db';
-import routesStartup from 'startup/routes';
+import dbStartup from 'core/startup/db';
+import routesStartup from 'core/startup/routes';
 
 // Utilities
 import logger from 'core/utilites/logger';
-import i18nStartup from 'startup/i18n';
-import baseStartup from 'startup/base';
+import i18nStartup from 'core/startup/i18n';
+import baseStartup from 'core/startup/base';
 import { appPort } from 'core/utilites/configs';
 
 const app = express();

@@ -6,7 +6,7 @@ import auth from 'core/middlewares/auth';
 import { uploadManyFiles, uploadOneFile } from 'core/middlewares/upload';
 
 // Module
-import FileController from 'api/file/file.controller';
+import FileController from 'features/shared/file/file.controller';
 
 // DTO
 const fileRouter = express.Router();

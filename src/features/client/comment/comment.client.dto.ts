@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 
 // DTO
-import { FileResponseDto } from 'api/file/file.dto';
+import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { commentStatus } from 'features/shared/comment/comment.constants';
 import { CommentStatusType } from 'features/shared/comment/comment.type';

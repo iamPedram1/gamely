@@ -1,7 +1,7 @@
 import { model, Model, FlattenMaps, HydratedDocument, Schema } from 'mongoose';
 
 // Types
-import type { IFileEntity } from 'api/file/file.type';
+import type { IFileEntity } from 'features/shared/file/file.type';
 
 export type FileDocument = HydratedDocument<IFileEntity>;
 export type FileLeanDocument = FlattenMaps<FileDocument>;

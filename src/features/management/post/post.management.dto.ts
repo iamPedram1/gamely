@@ -12,7 +12,7 @@ import {
 
 // DTOs
 import { BaseResponseDto } from 'core/dto/response';
-import { FileSummaryResponseDto } from 'api/file/file.dto';
+import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.management.dto';
 import {
@@ -24,7 +24,7 @@ import {
 import { IsSlug } from 'core/utilites/validation';
 
 // Types
-import type { IFileSummary } from 'api/file/file.type';
+import type { IFileSummary } from 'features/shared/file/file.type';
 import type { PostTranslation } from 'features/shared/post/post.type';
 import type { WithDictionaries } from 'core/types/translations';
 import { GameManagementResponseDto } from 'features/management/game/game.management.dto';

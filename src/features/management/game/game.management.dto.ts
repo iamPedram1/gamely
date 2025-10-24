@@ -11,11 +11,11 @@ import {
 
 // DTO
 import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
-import { FileSummaryResponseDto } from 'api/file/file.dto';
+import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types
-import type { IFileSummary } from 'api/file/file.type';
+import type { IFileSummary } from 'features/shared/file/file.type';
 import { IsSlug } from 'core/utilites/validation';
 import {
   createTranslationsWrapper,
