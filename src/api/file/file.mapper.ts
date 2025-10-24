@@ -3,7 +3,7 @@ import { singleton } from 'tsyringe';
 // Model
 import { FileDocument, FileLeanDocument } from 'api/file/file.model';
 
-// Dto
+// DTO
 import { FileResponseDto, FileSummaryResponseDto } from 'api/file/file.dto';
 
 // Mapper

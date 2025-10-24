@@ -3,7 +3,7 @@ import { delay, inject, injectable } from 'tsyringe';
 // Models
 import Game, { GameDocument } from 'api/game/game.model';
 
-// Dto
+// DTO
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 
 // Services

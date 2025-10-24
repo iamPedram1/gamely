@@ -4,7 +4,7 @@ import type { RequestHandler } from 'express';
 // Service
 import PostService from 'features/shared/post/post.service';
 
-// Dto
+// DTO
 import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities

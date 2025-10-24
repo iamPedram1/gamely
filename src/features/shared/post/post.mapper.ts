@@ -1,6 +1,6 @@
 import { singleton } from 'tsyringe';
 
-// Dto
+// DTO
 import {
   ClientPostResponseDto,
   ClientPostSummaryResponseDto,

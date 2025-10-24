@@ -14,7 +14,7 @@ import Category from 'api/category/category.model';
 // Controller
 import CategoryController from 'api/category/category.controller';
 
-// Dto
+// DTO
 import { BaseQueryDto } from 'core/dto/query';
 import {
   CreateCategoryDto,

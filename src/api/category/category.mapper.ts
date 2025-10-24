@@ -7,7 +7,7 @@ import {
   CategoryLeanDocument,
 } from 'api/category/category.model';
 
-// Dto
+// DTO
 import {
   CategoryResponseDto,
   CategorySummaryResponseDto,

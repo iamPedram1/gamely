@@ -1,7 +1,10 @@
 import { singleton } from 'tsyringe';
 
-// Dto
-import { UserResponseDto, UserSummaryResponseDto } from 'api/user/user.dto';
+// DTO
+import {
+  UserResponseDto,
+  UserSummaryResponseDto,
+} from 'features/shared/user/user.dto';
 
 // Mapper
 import { BaseMapper } from 'core/mappers/deprecated.base';

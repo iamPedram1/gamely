@@ -9,8 +9,8 @@ import {
   IsISO8601,
 } from 'class-validator';
 
-// Dto
-import { UserSummaryResponseDto } from 'api/user/user.dto';
+// DTO
+import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 

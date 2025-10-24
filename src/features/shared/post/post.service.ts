@@ -3,7 +3,7 @@ import { delay, inject, injectable } from 'tsyringe';
 // Models
 import Post from 'features/shared/post/post.model';
 
-// Dto
+// DTO
 import { CreatePostDto, UpdatePostDto } from 'api/post/dtos';
 
 // Services

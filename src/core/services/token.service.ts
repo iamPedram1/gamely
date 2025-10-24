@@ -9,7 +9,7 @@ import {
   jwtRefreshTokenKey,
   jwtAccessTokenExpiresInMinutes,
   jwtAccessTokenKey,
-} from 'core/utilites/configs';
+} from 'features/shared/auth/auth.constants';
 
 const tokenUtils = {
   verify<T>(token: string, secret: string, name: string) {

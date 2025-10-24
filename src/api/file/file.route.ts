@@ -8,7 +8,7 @@ import { uploadManyFiles, uploadOneFile } from 'core/middlewares/upload';
 // Module
 import FileController from 'api/file/file.controller';
 
-// Dto
+// DTO
 const fileRouter = express.Router();
 const fileController = container.resolve(FileController);
 

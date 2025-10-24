@@ -9,11 +9,11 @@ import UserService from 'features/shared/user/user.service';
 // Mapper
 import { UserMapper } from 'features/shared/user/user.mapper';
 import { RequestHandler } from 'express';
-import { UpdateProfileDto } from 'api/user/user.dto';
+import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 
 // Types
 @injectable()
-export default class UserController {
+export default class UserClientController {
   constructor(
     @inject(delay(() => UserService)) private userService: UserService,
     @inject(delay(() => UserMapper)) private userMapper: UserMapper
@@ -37,7 +37,7 @@ export default class UserController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      customName: 'Profile',
+      customName: req.t('common.profile'),
       body: {
         data: this.userMapper.toDto(user),
       },

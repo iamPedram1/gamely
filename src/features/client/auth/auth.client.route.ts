@@ -11,52 +11,52 @@ import { limitier } from 'core/middlewares/rateLimitter';
 import blockRequestWithToken from 'features/shared/auth/auth.middleware';
 
 // DTO
-import { RefreshTokenDto } from 'api/user/user.dto';
 import {
-  ChangePasswordDto,
   LoginDto,
-  RecoverPasswordDto,
   RegisterDto,
+  RefreshTokenDto,
+  ChangePasswordDto,
+  RecoverPasswordDto,
 } from 'features/shared/auth/auth.dto';
 
-const authPublicRouter = express.Router();
+const authClientRouter = express.Router();
 const authController = container.resolve(AuthController);
 
-authPublicRouter.post('/login', [
+authClientRouter.post('/login', [
   limitier,
   blockRequestWithToken,
   validateBody(LoginDto),
   authController.login,
 ]);
-authPublicRouter.post('/register', [
+authClientRouter.post('/register', [
   limitier,
   blockRequestWithToken,
   validateBody(RegisterDto),
   authController.register,
 ]);
-authPublicRouter.post('/recover-password', [
+authClientRouter.post('/recover-password', [
   limitier,
   blockRequestWithToken,
   validateBody(RecoverPasswordDto),
   authController.recoverPassword,
 ]);
-authPublicRouter.post('/change-password', [
+authClientRouter.post('/change-password', [
   limitier,
   blockRequestWithToken,
   validateBody(ChangePasswordDto),
   authController.changePassword,
 ]);
-authPublicRouter.post(
+authClientRouter.post(
   '/token/refresh',
   limitier,
   validateBody(RefreshTokenDto),
   authController.refreshToken
 );
-authPublicRouter.post(
+authClientRouter.post(
   '/token/revoke',
   limitier,
   auth(['user', 'author', 'admin']),
   authController.revokeToken
 );
 
-export default authPublicRouter;
+export default authClientRouter;

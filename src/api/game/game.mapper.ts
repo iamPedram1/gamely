@@ -3,7 +3,7 @@ import { singleton } from 'tsyringe';
 // Model
 import { GameDocument, GameLeanDocument } from 'api/game/game.model';
 
-// Dto
+// DTO
 import { GameResponseDto, GameSummaryResponseDto } from 'api/game/game.dto';
 
 // Mapper

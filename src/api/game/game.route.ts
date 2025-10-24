@@ -14,7 +14,7 @@ import Game from 'api/game/game.model';
 // Controller
 import GameController from 'api/game/game.controller';
 
-// Dto
+// DTO
 import { BaseQueryDto } from 'core/dto/query';
 import { CreateGameDto, UpdateGameDto } from 'api/game/game.dto';
 

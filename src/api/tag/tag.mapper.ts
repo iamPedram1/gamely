@@ -2,7 +2,7 @@
 import { singleton } from 'tsyringe';
 import { TagDocument, TagLeanDocument } from 'api/tag/tag.model';
 
-// Dto
+// DTO
 import { TagResponseDto, TagSummaryResponseDto } from 'api/tag/tag.dto';
 
 // Mapper

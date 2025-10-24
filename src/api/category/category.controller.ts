@@ -3,7 +3,7 @@ import { delay, inject, injectable } from 'tsyringe';
 // Service
 import CategoryService from 'api/category/category.service';
 
-// Dto
+// DTO
 import { CategoryMapper } from 'api/category/category.mapper';
 
 // Utilities

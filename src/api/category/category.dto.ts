@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 
 // DTO
-import { UserSummaryResponseDto } from 'api/user/user.dto';
+import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Types

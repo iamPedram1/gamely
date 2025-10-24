@@ -13,13 +13,13 @@ import {
   IsObject,
 } from 'class-validator';
 
-// Dtos
+// DTOs
 import { BaseResponseDto } from 'core/dto/response';
 import { GameResponseDto } from 'api/game/game.dto';
 import { TagSummaryResponseDto } from 'api/tag/tag.dto';
 import { FileSummaryResponseDto } from 'api/file/file.dto';
-import { UserSummaryResponseDto } from 'api/user/user.dto';
 import { createTranslationsWrapper } from 'core/dto/translation';
+import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { CategorySummaryResponseDto } from 'api/category/category.dto';
 
 // Types

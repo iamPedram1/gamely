@@ -6,7 +6,10 @@ import { requestContext, t } from 'core/utilites/request-context';
 
 // Utilities
 import tokenUtils from 'core/services/token.service';
-import { jwtAccessTokenKey, jwtTokenName } from 'core/utilites/configs';
+import {
+  jwtAccessTokenKey,
+  jwtTokenName,
+} from 'features/shared/auth/auth.constants';
 import { AnonymousError, UnauthorizedError } from 'core/utilites/errors';
 
 // Types
@@ -55,7 +58,6 @@ export default function auth(roles: UserRole[]) {
 
     const ctx = requestContext.getStore();
     if (ctx) ctx.user = req.user;
-    console.log('2 AUth =>', { reqUesr: req.user, ctxUser: ctx?.user });
 
     return next();
   };

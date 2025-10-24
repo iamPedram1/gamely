@@ -7,10 +7,11 @@ import Game from 'api/game/game.model';
 import User from 'features/shared/user/user.model';
 
 // Utils
-import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';
+import { prefixBaseUrl } from 'core/utilites/configs';
 
 // Types
 import { IGameEntity } from 'api/game/game.type';
+import { jwtTokenName } from 'features/shared/auth/auth.constants';
 
 describe('game routes', () => {
   afterAll(async () => {

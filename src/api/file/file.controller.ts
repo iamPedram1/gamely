@@ -6,7 +6,7 @@ import FileService from 'api/file/file.service';
 // Utilities
 import sendResponse from 'core/utilites/response';
 
-// Dto
+// DTO
 import { FileMapper } from 'api/file/file.mapper';
 
 // Types

@@ -12,7 +12,7 @@ import Post from 'features/shared/post/post.model';
 // Controller
 import CommentController from 'api/comment/comment.controller';
 
-// Dto
+// DTO
 import { CreateCommentDto } from 'api/comment/comment.dto';
 
 const commentRouter = express.Router();

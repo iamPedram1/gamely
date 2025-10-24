@@ -8,7 +8,7 @@ import { IRecoveryKey, IRefreshToken } from 'features/shared/user/user.model';
 import UserService from 'features/shared/user/user.service';
 import tokenUtils from 'core/services/token.service';
 
-// Dto
+// DTO
 import {
   ChangePasswordDto,
   LoginDto,
@@ -34,7 +34,7 @@ import {
   jwtRecoverPasswordKey,
   jwtRecoverPasswordKeyExpiresInMinutes,
   jwtRefreshTokenKey,
-} from 'core/utilites/configs';
+} from 'features/shared/auth/auth.constants';
 
 // Types
 import { IUserEntity } from 'features/shared/user/user.types';

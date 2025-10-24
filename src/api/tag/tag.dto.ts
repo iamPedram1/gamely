@@ -10,8 +10,8 @@ import {
   IsObject,
 } from 'class-validator';
 
-// Dto
-import { UserSummaryResponseDto } from 'api/user/user.dto';
+// DTO
+import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 export class TranslationDto {

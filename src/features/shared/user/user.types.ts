@@ -1,12 +1,10 @@
-import type { Types } from 'mongoose';
-import type {
+import {
   UserResponseDto,
   UserSummaryResponseDto,
-} from 'api/user/user.dto';
+} from 'features/shared/user/user.dto';
+import type { Types } from 'mongoose';
 
 export type UserRole = 'user' | 'author' | 'admin';
-
-export const UserRoleEnum: UserRole[] = ['user', 'author', 'admin'];
 
 interface PrivateKeys {
   recoveryKey: string | null;

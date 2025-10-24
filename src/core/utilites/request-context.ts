@@ -102,8 +102,10 @@ export const userContext = () => {
 
   return {
     ...user,
-    is: (role: UserRole) => user.role === role,
-    isNot: (role: UserRole) => user.role !== role,
+    is: (role: UserRole | UserRole[]): boolean =>
+      typeof role === 'string' ? user.role === role : role.includes(user.role),
+    isNot: (role: UserRole | UserRole[]): boolean =>
+      typeof role === 'string' ? user.role !== role : !role.includes(user.role),
   };
 };
 

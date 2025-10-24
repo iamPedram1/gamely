@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 // Models
 import Category from 'api/category/category.model';
 
-// Dto
+// DTO
 import {
   CreateCategoryDto,
   UpdateCategoryDto,

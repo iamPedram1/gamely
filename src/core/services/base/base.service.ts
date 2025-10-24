@@ -96,12 +96,7 @@ export default abstract class BaseService<
 
   protected get currentUser() {
     try {
-      const user = userContext();
-      return {
-        ...user,
-        is: (role: UserRole) => user.role === role,
-        isNot: (role: UserRole) => user.role !== role,
-      };
+      return userContext();
     } catch (error) {
       throw new AnonymousError('Something wrong with user context');
     }

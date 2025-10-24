@@ -4,7 +4,7 @@ import type { RequestHandler } from 'express';
 // Service
 import PostService from 'features/shared/post/post.service';
 
-// Dto
+// DTO
 import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities
@@ -42,23 +42,6 @@ export default class PostClientController {
           pagination,
           docs: docs.map((doc) => this.postMapper.toPublicDto(doc)),
         },
-      },
-    });
-  };
-
-  getAllSummaries: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
-    const docs = await this.postService.find({
-      reqQuery,
-      lean: true,
-      paginate: false,
-    });
-
-    sendResponse(res, 200, {
-      httpMethod: 'GET',
-      featureName: 'models.Post.plural',
-      body: {
-        data: docs.map((doc) => this.postMapper.toPublicSummaryDto(doc)),
       },
     });
   };

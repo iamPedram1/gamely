@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Response } from 'express';
-import { jwtCookieExpiresInMinutes } from 'core/utilites/configs';
 import { ValidationError } from 'class-validator';
+import { jwtCookieExpiresInMinutes } from 'features/shared/auth/auth.constants';
 
 export const setTokenCookie = (res: Response, token: string) => {
   res.cookie('Token', token, {

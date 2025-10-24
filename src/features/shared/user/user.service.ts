@@ -7,13 +7,15 @@ import User from 'features/shared/user/user.model';
 // Service
 import BaseService from 'core/services/base/base.service';
 
-// Dto
-import { UpdateProfileDto } from 'api/user/user.dto';
+// DTO
 import { RegisterDto } from 'features/shared/auth/auth.dto';
+import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 
 // Types
-import { UserDocument } from 'features/shared/user/user.model';
-import { IUserEntity } from 'features/shared/user/user.types';
+import type { IUserEntity } from 'features/shared/user/user.types';
+import type { UserDocument } from 'features/shared/user/user.model';
+import { ForbiddenError } from 'core/utilites/errors';
+import { UpdateUserDto } from 'features/management/user/user.management.dto';
 
 export type IUserService = InstanceType<typeof UserService>;
 
@@ -21,7 +23,7 @@ export type IUserService = InstanceType<typeof UserService>;
 export default class UserService extends BaseService<
   IUserEntity,
   RegisterDto,
-  UpdateProfileDto,
+  UpdateUserDto | UpdateProfileDto,
   UserDocument
 > {
   constructor() {
@@ -32,9 +34,15 @@ export default class UserService extends BaseService<
     return this.withTransaction(fn);
   }
 
-  async update(userId: string, data: UpdateProfileDto): Promise<IUserEntity> {
-    const user = await this.updateOneById(userId, data, { lean: true });
+  async update(
+    userId: string,
+    data: UpdateUserDto | UpdateProfileDto
+  ): Promise<IUserEntity> {
+    const isUpdatingSelf = this.currentUser.id === userId;
 
-    return user;
+    if (this.currentUser.isNot('admin') && !isUpdatingSelf)
+      throw new ForbiddenError();
+
+    return await this.updateOneById(userId, data, { lean: true });
   }
 }

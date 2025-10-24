@@ -14,7 +14,7 @@ import Tag from 'api/tag/tag.model';
 // Controller
 import TagController from 'api/tag/tag.controller';
 
-// Dto
+// DTO
 import { BaseQueryDto } from 'core/dto/query';
 import { CreateTagDto, UpdateTagDto } from 'api/tag/tag.dto';
 

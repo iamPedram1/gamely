@@ -1,15 +1,13 @@
-import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 import { isEmail } from 'class-validator';
+import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 
 // Utils
 import crypto from 'core/utilites/crypto';
 import tokenUtils from 'core/services/token.service';
+import { UserRoles } from 'features/shared/user/user.constants';
 
 // Types
-import {
-  UserRoleEnum,
-  type IUserEntity,
-} from 'features/shared/user/user.types';
+import type { IUserEntity } from 'features/shared/user/user.types';
 
 export interface IUserEntityMethods {
   generateToken(): string;
@@ -46,7 +44,7 @@ const userSchema = new Schema<
     },
     role: {
       type: String,
-      enum: UserRoleEnum,
+      enum: UserRoles,
       required: true,
       default: 'user',
       index: true,

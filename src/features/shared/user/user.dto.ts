@@ -7,7 +7,7 @@ import {
   Length,
 } from 'class-validator';
 
-// Dto
+// DTO
 import { FileResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
@@ -15,28 +15,22 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import type { Types } from 'mongoose';
 import type { UserRole } from 'features/shared/user/user.types';
 
-export class UpdateProfileDto {
+export abstract class BaseUserUpdate {
   @IsOptional()
   @Length(3, 255)
-  name: string;
+  abstract name: string;
 
   @IsOptional()
   @Length(1, 255)
-  bio: string;
+  abstract bio: string;
 
   @IsOptional()
   @Length(8, 255)
-  password: string;
+  abstract password: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
-  avatar: Types.ObjectId;
-}
-
-export class RefreshTokenDto {
-  @IsNotEmpty()
-  @IsJWT()
-  refreshToken: string;
+  abstract avatar: Types.ObjectId;
 }
 
 export class UserResponseDto extends BaseResponseDto {

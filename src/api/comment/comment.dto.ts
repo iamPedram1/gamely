@@ -7,7 +7,7 @@ import {
   IsMongoId,
 } from 'class-validator';
 
-// Dto
+// DTO
 import { FileResponseDto } from 'api/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
