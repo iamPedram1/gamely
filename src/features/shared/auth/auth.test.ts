@@ -10,7 +10,7 @@ import { prefixBaseUrl, jwtTokenName } from 'core/utilites/configs';
 
 // Types
 import { IUserEntity } from 'api/user/user.types';
-import { RegisterDto } from 'api/auth/auth.dto';
+import { RegisterDto } from 'features/shared/auth/auth.dto';
 
 describe('auth routes', () => {
   const registerURL = prefixBaseUrl('/auth/register');

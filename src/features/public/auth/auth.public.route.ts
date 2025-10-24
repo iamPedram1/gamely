@@ -2,13 +2,13 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Controllers
-import AuthController from 'api/auth/auth.controller';
+import AuthController from 'features/shared/auth/auth.controller';
 
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import { limitier } from 'core/middlewares/rateLimitter';
-import blockRequestWithToken from 'api/auth/auth.middleware';
+import blockRequestWithToken from 'features/shared/auth/auth.middleware';
 
 // DTO
 import { RefreshTokenDto } from 'api/user/user.dto';
@@ -17,46 +17,46 @@ import {
   LoginDto,
   RecoverPasswordDto,
   RegisterDto,
-} from 'api/auth/auth.dto';
+} from 'features/shared/auth/auth.dto';
 
-const authRouter = express.Router();
+const authPublicRouter = express.Router();
 const authController = container.resolve(AuthController);
 
-authRouter.post('/login', [
+authPublicRouter.post('/login', [
   limitier,
   blockRequestWithToken,
   validateBody(LoginDto),
   authController.login,
 ]);
-authRouter.post('/register', [
+authPublicRouter.post('/register', [
   limitier,
   blockRequestWithToken,
   validateBody(RegisterDto),
   authController.register,
 ]);
-authRouter.post('/recover-password', [
+authPublicRouter.post('/recover-password', [
   limitier,
   blockRequestWithToken,
   validateBody(RecoverPasswordDto),
   authController.recoverPassword,
 ]);
-authRouter.post('/change-password', [
+authPublicRouter.post('/change-password', [
   limitier,
   blockRequestWithToken,
   validateBody(ChangePasswordDto),
   authController.changePassword,
 ]);
-authRouter.post(
+authPublicRouter.post(
   '/token/refresh',
   limitier,
   validateBody(RefreshTokenDto),
   authController.refreshToken
 );
-authRouter.post(
+authPublicRouter.post(
   '/token/revoke',
   limitier,
   auth(['user', 'author', 'admin']),
   authController.revokeToken
 );
 
-export default authRouter;
+export default authPublicRouter;

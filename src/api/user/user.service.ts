@@ -1,4 +1,5 @@
 import { injectable } from 'tsyringe';
+import type { ClientSession } from 'mongoose';
 
 // Model
 import User from 'api/user/user.model';
@@ -6,15 +7,13 @@ import User from 'api/user/user.model';
 // Service
 import BaseService from 'core/services/base/base.service';
 
-// Utilities
-import crypto from 'core/utilites/crypto';
+// Dto
+import { UpdateProfileDto } from 'api/user/user.dto';
+import { RegisterDto } from 'features/shared/auth/auth.dto';
 
 // Types
 import { UserDocument } from 'api/user/user.model';
-import { UpdateProfileDto } from 'api/user/user.dto';
 import { IUserEntity } from 'api/user/user.types';
-import { RegisterDto } from 'api/auth/auth.dto';
-import { ClientSession } from 'mongoose';
 
 export type IUserService = InstanceType<typeof UserService>;
 

@@ -14,14 +14,17 @@ import {
   LoginDto,
   RecoverPasswordDto,
   RegisterDto,
-} from 'api/auth/auth.dto';
+} from 'features/shared/auth/auth.dto';
 
 // Utilities
 import logger from 'core/utilites/logger';
 import crypto from 'core/utilites/crypto';
 import { sendEmail } from 'core/utilites/mail';
 import { i18nInstance, t } from 'core/utilites/request-context';
-import { recoveryEnglishHtml, recoveryPersianHtml } from 'api/auth/auth.html';
+import {
+  recoveryEnglishHtml,
+  recoveryPersianHtml,
+} from 'features/shared/auth/auth.html';
 import {
   AnonymousError,
   ValidationError,

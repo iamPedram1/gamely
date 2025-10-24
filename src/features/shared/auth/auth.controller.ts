@@ -2,7 +2,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import AuthService from 'api/auth/auth.service';
+import AuthService from 'features/shared/auth/auth.service';
 
 // DTO
 import {
@@ -10,7 +10,7 @@ import {
   RegisterDto,
   ChangePasswordDto,
   RecoverPasswordDto,
-} from 'api/auth/auth.dto';
+} from 'features/shared/auth/auth.dto';
 
 // Utilities
 import sendResponse from 'core/utilites/response';
