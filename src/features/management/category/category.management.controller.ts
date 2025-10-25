@@ -48,7 +48,7 @@ export default class CategoryManagementController {
       reqQuery,
       lean: true,
       paginate: false,
-      select: 'title slug',
+      select: 'translations slug',
     });
 
     sendResponse(res, 200, {

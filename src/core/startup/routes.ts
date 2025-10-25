@@ -40,7 +40,7 @@ export default function routesStartup(app: Express) {
   // Management
   app.use(prefixManagementBaseUrl('/tags'), tagManagementRouter);
   app.use(prefixManagementBaseUrl('/posts'), postManagementRouter);
-  app.use(prefixManagementBaseUrl('/posts'), commentManagementRouter);
+  app.use(prefixManagementBaseUrl('/comments'), commentManagementRouter);
   app.use(prefixManagementBaseUrl('/users'), userManagementRouter);
   app.use(prefixManagementBaseUrl('/games'), gameManagementRouter);
   app.use(prefixManagementBaseUrl('/categories'), categoryManagementRouter);

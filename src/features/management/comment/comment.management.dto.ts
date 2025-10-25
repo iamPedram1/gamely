@@ -1,4 +1,4 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import { IsString, Length, IsOptional, IsIn } from 'class-validator';
 
 // DTO
@@ -11,6 +11,7 @@ import { commentStatus } from 'features/shared/comment/comment.constants';
 
 // Types
 import type { CommentStatusType } from 'features/shared/comment/comment.type';
+import { PostManagementSummaryResponseDto } from 'features/management/post/post.management.dto';
 
 export class UpdateCommentDto {
   @IsOptional()
@@ -43,6 +44,14 @@ export class CommentManagementResponseDto extends BaseResponseDto {
   @Expose()
   @Type(() => CommentManagementResponseDto)
   replies: CommentManagementResponseDto;
+
+  @Expose()
+  @Transform(({ obj }) =>
+    plainToInstance(PostManagementSummaryResponseDto, obj.postId, {
+      excludeExtraneousValues: true,
+    })
+  )
+  post: PostManagementSummaryResponseDto;
 }
 
 export class CommentManagementSummaryResponseDto extends BaseSummaryResponseDto {

@@ -20,7 +20,9 @@ export default class UserClientController {
   ) {}
 
   getProfile: RequestHandler = async (req, res) => {
-    const user = await this.userService.getOneById(req.user.id);
+    const user = await this.userService.getOneById(req.user.id, {
+      populate: 'avatar',
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

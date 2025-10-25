@@ -80,7 +80,7 @@ export class UpdateCategoryDto {
 
 export class CategoryManagementResponseDto extends BaseResponseDto {
   @Expose()
-  translation: WithDictionaries<CategoryTranslation>;
+  translations: WithDictionaries<CategoryTranslation>;
 
   @Expose()
   slug: string;
@@ -95,7 +95,7 @@ export class CategoryManagementResponseDto extends BaseResponseDto {
 
 export class CategoryManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  translation: WithDictionaries<CategoryTranslation>;
+  translations: WithDictionaries<CategoryTranslation>;
 
   @Expose()
   parentId: string | null;

@@ -24,7 +24,13 @@ export default class CommentManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const { pagination, docs } = await this.commentService.find({ lean: true });
+    const { pagination, docs } = await this.commentService.find({
+      lean: true,
+      populate: [
+        { path: 'creator', select: 'name status type' },
+        { path: 'postId', select: 'translations' },
+      ],
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -61,7 +67,7 @@ export default class CommentManagementController {
 
   update: RequestHandler = async (req, res) => {
     const dto = req.body as UpdateCommentDto;
-    const commentId = req.params.commentId;
+    const commentId = req.params.id;
     const body = await this.commentService.updateOneById(commentId, dto);
 
     sendResponse(res, 200, {

@@ -21,7 +21,7 @@ const commentController = container.resolve(CommentManagementController);
 commentManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
-commentManagementRouter.get('/', commentController.getPostComments);
+commentManagementRouter.get('/', commentController.getAll);
 commentManagementRouter.get(
   '/:id',
   validateParam(Comment, 'id', '_id', { isId: true }),
