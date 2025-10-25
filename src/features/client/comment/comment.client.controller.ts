@@ -23,11 +23,11 @@ export default class CommentClientController {
     @inject(delay(() => CommentService)) private commentService: CommentService
   ) {}
 
-  getApprovedPostComments: RequestHandler = async (req, res) => {
-    const id = req.params.id as string;
+  getComments: RequestHandler = async (req, res) => {
+    const postId = req.params.id as string;
     const query = req.query as unknown as IRequestQueryBase;
     const { pagination, docs } =
-      await this.commentService.getPostApprovedComments(id);
+      await this.commentService.getPostApprovedComments(postId);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

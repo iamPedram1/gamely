@@ -4,13 +4,14 @@ import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 // Utils
 import crypto from 'core/utilites/crypto';
 import tokenUtils from 'core/services/token.service';
-import { UserRoles } from 'features/shared/user/user.constants';
+import { userRoles, userStatus } from 'features/shared/user/user.constants';
 
 // Types
 import type { IUserEntity } from 'features/shared/user/user.types';
 
 export interface IUserEntityMethods {
   generateToken(): string;
+  isBlocked: () => boolean;
   compareRefreshToken(refreshToken: string): Promise<boolean>;
   generateRefreshToken(): string;
   generateAuthToken(): { token: string; refreshToken: string };
@@ -44,9 +45,15 @@ const userSchema = new Schema<
     },
     role: {
       type: String,
-      enum: UserRoles,
+      enum: userRoles,
       required: true,
       default: 'user',
+      index: true,
+    },
+    status: {
+      type: String,
+      enum: userStatus,
+      default: 'active',
       index: true,
     },
     name: {
@@ -109,6 +116,10 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.comparePassword = async function (password) {
   if (!this.password) return false;
   return await crypto.compare(password, this.password);
+};
+
+userSchema.methods.isBlocked = function () {
+  return this.status === 'blocked';
 };
 
 userSchema.methods.compareRefreshToken = async function (refreshToken: string) {

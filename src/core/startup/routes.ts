@@ -18,7 +18,7 @@ import tagManagementRouter from 'features/management/tag/tag.management.route';
 import postManagementRouter from 'features/management/post/post.management.route';
 import userManagementRouter from 'features/management/user/user.management.route';
 import commentManagementRouter from 'features/management/comment/comment.management.route';
-import categoryManagementnRouter from 'features/management/category/category.management.route';
+import categoryManagementRouter from 'features/management/category/category.management.route';
 
 // Middlewares
 import error from 'core/middlewares/error';
@@ -43,7 +43,7 @@ export default function routesStartup(app: Express) {
   app.use(prefixManagementBaseUrl('/posts'), commentManagementRouter);
   app.use(prefixManagementBaseUrl('/users'), userManagementRouter);
   app.use(prefixManagementBaseUrl('/games'), gameManagementRouter);
-  app.use(prefixManagementBaseUrl('/categories'), categoryManagementnRouter);
+  app.use(prefixManagementBaseUrl('/categories'), categoryManagementRouter);
 
   app.use(notFound);
   app.use(error);

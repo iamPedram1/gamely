@@ -7,7 +7,6 @@ import validateBody from 'core/middlewares/validateBody';
 import { validateParam } from 'core/middlewares/validateParams';
 
 // Model
-import Post from 'features/shared/post/post.model';
 import Comment from 'features/shared/comment/comment.model';
 
 // Controller
@@ -19,28 +18,27 @@ import { UpdateCommentDto } from 'features/management/comment/comment.management
 const commentManagementRouter = express.Router();
 const commentController = container.resolve(CommentManagementController);
 
-commentManagementRouter.use(auth(['author', 'admin']));
+commentManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
+commentManagementRouter.get('/', commentController.getPostComments);
 commentManagementRouter.get(
-  '/:id/comments',
-  validateParam(Post, 'id', '_id', { isId: true }),
+  '/:id',
+  validateParam(Comment, 'id', '_id', { isId: true }),
   commentController.getPostComments
 );
 
 // <----------------   PATCH   ---------------->
 commentManagementRouter.patch(
-  '/:postId/comments/:commentId',
-  validateParam(Post, 'postId', '_id', { isId: true }),
-  validateParam(Comment, 'commentId', '_id', { isId: true }),
+  '/:id',
+  validateParam(Comment, 'id', '_id', { isId: true }),
   validateBody(UpdateCommentDto),
   commentController.update
 );
 // <----------------   DELETE   ---------------->
 commentManagementRouter.delete(
-  '/:postId/comments/:commentId',
-  validateParam(Post, 'postId', '_id', { isId: true }),
-  validateParam(Comment, 'commentId', '_id', { isId: true }),
+  '/:id',
+  validateParam(Comment, 'id', '_id', { isId: true }),
   commentController.delete
 );
 

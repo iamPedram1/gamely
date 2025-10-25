@@ -22,11 +22,11 @@ const commentController = container.resolve(CommentClientController);
 commentClientRouter.get(
   '/:id/comments',
   validateObjectId(Post),
-  commentController.getApprovedPostComments
+  commentController.getComments
 );
 
 // <----------------   POST   ---------------->
-commentClientRouter.use(auth(['user', 'author', 'admin']));
+commentClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 commentClientRouter.post(
   '/:id/comments',
   validateObjectId(Post),

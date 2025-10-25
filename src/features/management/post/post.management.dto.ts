@@ -13,8 +13,10 @@ import {
 // DTOs
 import { BaseResponseDto } from 'core/dto/response';
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
+import { GameManagementResponseDto } from 'features/management/game/game.management.dto';
 import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.management.dto';
+import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
+import { CategoryManagementResponseDto } from 'features/management/category/category.management.dto';
 import {
   createTranslationsWrapper,
   IsTranslationsField,
@@ -27,8 +29,6 @@ import { IsSlug } from 'core/utilites/validation';
 import type { IFileSummary } from 'features/shared/file/file.type';
 import type { PostTranslation } from 'features/shared/post/post.type';
 import type { WithDictionaries } from 'core/types/translations';
-import { GameManagementResponseDto } from 'features/management/game/game.management.dto';
-import { CategoryManagementResponseDto } from 'features/management/category/category.management.dto';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
@@ -136,11 +136,11 @@ export class PostManagementResponseDto extends BasePostResponseDto {
 
   @Expose()
   @Transform(({ obj }) =>
-    plainToInstance(UserSummaryResponseDto, obj.creator, {
+    plainToInstance(UserManagementSummaryResponseDto, obj.creator, {
       excludeExtraneousValues: true,
     })
   )
-  author: UserSummaryResponseDto;
+  author: UserManagementSummaryResponseDto;
 
   @Expose()
   @Type(() => GameManagementResponseDto)

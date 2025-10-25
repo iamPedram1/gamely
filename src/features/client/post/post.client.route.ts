@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 
 // Middlewares
 import validateQuery from 'core/middlewares/validateQuery';
-import validateObjectId from 'core/middlewares/validateObjectId';
+import { validateParam } from 'core/middlewares/validateParams';
 
 // Model
 import Post from 'features/shared/post/post.model';
@@ -19,6 +19,9 @@ const postController = container.resolve(PostClientController);
 
 // <----------------   GET   ---------------->
 postClientRouter.get('/', [validateQuery(BaseQueryDto), postController.getAll]);
-postClientRouter.get('/:id', [validateObjectId(Post), postController.getOne]);
+postClientRouter.get('/:slug', [
+  validateParam(Post, 'slug', 'slug'),
+  postController.getOne,
+]);
 
 export default postClientRouter;

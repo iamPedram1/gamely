@@ -1,9 +1,12 @@
 import { Expose, Transform } from 'class-transformer';
 
-// DTO
-import { BaseResponseDto } from 'core/dto/response';
+// Utilities
 import { pickLocaleField } from 'core/utilites/request-context';
 
+// DTO
+import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+
+// <----------------   RESPONSE   ---------------->
 export class TagClientResponseDto extends BaseResponseDto {
   @Expose()
   @Transform(pickLocaleField('title'))
@@ -11,4 +14,15 @@ export class TagClientResponseDto extends BaseResponseDto {
 
   @Expose()
   slug: string;
+}
+
+export class TagClientSummaryResponseDto extends BaseSummaryResponseDto {
+  @Expose()
+  title: string;
+
+  @Expose()
+  slug: string;
+
+  @Expose()
+  postsCount: number;
 }

@@ -23,6 +23,21 @@ export default class CommentManagementController {
     @inject(delay(() => CommentService)) private commentService: CommentService
   ) {}
 
+  getAll: RequestHandler = async (req, res) => {
+    const { pagination, docs } = await this.commentService.find({ lean: true });
+
+    sendResponse(res, 200, {
+      httpMethod: 'GET',
+      featureName: 'models.Comment.plural',
+      body: {
+        data: {
+          pagination,
+          docs: docs.map((item) => this.commentMapper.toManagementDto(item)),
+        },
+      },
+    });
+  };
+
   getPostComments: RequestHandler = async (req, res) => {
     const id = req.params.id as string;
 

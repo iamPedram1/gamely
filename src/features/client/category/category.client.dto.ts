@@ -1,14 +1,14 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 
 // DTO
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
-
-// Types
+import { pickLocaleField } from 'core/utilites/request-context';
+import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
 
 // <----------------   RESPONSE   ---------------->
 export class CategoryClientResponseDto extends BaseResponseDto {
   @Expose()
+  @Transform(pickLocaleField('title'))
   title!: string;
 
   @Expose()
@@ -18,12 +18,13 @@ export class CategoryClientResponseDto extends BaseResponseDto {
   parentId!: string | null;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  @Type(() => UserClientSummaryResponseDto)
+  creator: UserClientSummaryResponseDto;
 }
 
 export class NestedCategoryClientResponseDto extends BaseSummaryResponseDto {
   @Expose()
+  @Transform(pickLocaleField('title'))
   title!: string;
 
   @Expose()
@@ -39,6 +40,7 @@ export class NestedCategoryClientResponseDto extends BaseSummaryResponseDto {
 
 export class CategoryClientSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
+  @Transform(pickLocaleField('title'))
   title!: string;
 
   @Expose()

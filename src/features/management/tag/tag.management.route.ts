@@ -24,7 +24,7 @@ import {
 const tagManagementRouter = express.Router();
 const tagController = container.resolve(TagManagementController);
 
-tagManagementRouter.use(auth(['author', 'admin']));
+tagManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
 tagManagementRouter.get(

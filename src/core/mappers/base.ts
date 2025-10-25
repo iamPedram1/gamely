@@ -56,6 +56,7 @@ export class BaseMapper<
       excludeExtraneousValues: true,
     });
   }
+
   public toManagementSummaryDto(entity: TDoc | TLean): TManagementSummaryDto {
     return plainToInstance(this.AdminSummaryDtoClass, this.toPlain(entity), {
       excludeExtraneousValues: true,

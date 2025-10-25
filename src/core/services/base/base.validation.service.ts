@@ -31,7 +31,7 @@ class BaseValidationService<
     throwError: boolean = true
   ) {
     let isMadeBySelf = false;
-    if (this.currentUser.is('admin')) return true;
+    if (this.currentUser.is(['admin', 'superAdmin'])) return true;
 
     if (typeof document === 'string') {
       isMadeBySelf = await this.queryService.isMadeBySelf(

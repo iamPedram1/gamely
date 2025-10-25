@@ -14,7 +14,7 @@ import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 const userClientRouter = express.Router();
 const userClientController = container.resolve(UserClientController);
 
-userClientRouter.use(auth(['user', 'admin', 'author']));
+userClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
 userClientRouter.get('/profile', userClientController.getProfile);

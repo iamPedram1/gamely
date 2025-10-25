@@ -21,30 +21,30 @@ import {
   UpdateCategoryDto,
 } from 'features/management/category/category.management.dto';
 
-const categoryManagementnRouter = express.Router();
+const categoryManagementRouter = express.Router();
 const categoryController = container.resolve(CategoryManagementController);
 
-categoryManagementnRouter.use(auth(['author', 'admin']));
+categoryManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
-categoryManagementnRouter.get(
+categoryManagementRouter.get(
   '/',
   validateQuery(BaseQueryDto),
   categoryController.getAll
 );
-categoryManagementnRouter.get(
+categoryManagementRouter.get(
   '/summaries',
   validateQuery(BaseQueryDto),
   categoryController.getAllSummaries
 );
-categoryManagementnRouter.get(
+categoryManagementRouter.get(
   '/:id',
   validateObjectId(Category),
   categoryController.getOne
 );
 
 // <----------------   POST   ---------------->
-categoryManagementnRouter.post(
+categoryManagementRouter.post(
   '/',
   validateBody(CreateCategoryDto),
   validateUniqueConflict(Category, 'slug'),
@@ -52,7 +52,7 @@ categoryManagementnRouter.post(
 );
 
 // <----------------   PATCH   ---------------->
-categoryManagementnRouter.patch(
+categoryManagementRouter.patch(
   '/:id',
   validateObjectId(Category),
   validateBody(UpdateCategoryDto),
@@ -61,10 +61,10 @@ categoryManagementnRouter.patch(
 );
 
 // <----------------   DELETE   ---------------->
-categoryManagementnRouter.delete(
+categoryManagementRouter.delete(
   '/:id',
   validateObjectId(Category),
   categoryController.delete
 );
 
-export default categoryManagementnRouter;
+export default categoryManagementRouter;

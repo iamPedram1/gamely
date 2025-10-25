@@ -1,12 +1,20 @@
 const errosTranslations = {
-  token_generic_error: 'خطا دسترسی، شناسه منقضی یا نامعتبر است',
+  token_generic_error: 'خطا دسترسی، شناسه کاربر منقضی یا نامعتبر است',
   refresh_token: {
     invalid: 'شناسه تازه سازی نامعتبر است',
     expired: 'شناسه تازه سازی منقضی شده است',
     missing: 'شناسه تازه سازی ارسال نشده است',
   },
-  recovery_token_invalid: 'شناسه بازیابی نامعتبر است',
-  recovery_token_expired: 'شناسه بازیابی منقضی شده',
+  recovery_token: {
+    invalid: 'شناسه بازیابی نامعتبر است',
+    expired: 'شناسه بازیابی منقضی شده',
+  },
+  user: {
+    self_block: 'نمیتوانید خودتان را مسدود کنید',
+    forbidden_block: 'شما دسترسی لازم برای مسدوسازی این کاربر را ندارید',
+    is_blocked: 'حساب شما توسط ادمین مسدود شده',
+    update_role: 'شما دسترسی لازم برای "تغییر نقش کاربر" ندارید',
+  },
   validation_failed: 'اعتبار سنجی با خطا مواجه شد',
   id_required: 'وارد کردن شناسه اجباریست',
   id_invalid: 'شناسه نامعتبر است',
@@ -30,8 +38,10 @@ const errosTranslations = {
   not_found_by_key_value: 'هیچ {{model}} با {{key}}={{value}} پیدا نشد',
   ids_array_empty: 'آرایه شناسه‌ها نمی‌تواند خالی باشد',
   batch_delete_failed: 'حذف گروهی برای {{model}} با خطا مواجه شد',
-  category_self_parent: 'دسته‌بندی نمیتواند والد خودش باشد',
-  category_circular_relationship: 'رابطه چرخشی‌ (دایره‌ای) شناسایی شد',
+  category: {
+    self_parent: 'دسته‌بندی نمیتواند والد خودش باشد',
+    circular_relationship: 'رابطه چرخشی‌ (دایره‌ای) شناسایی شد',
+  },
   jwt: {
     verify_expired: '{{name}} منقضی شده است',
     verify_invalid: '{{name}} نامعتبر است',

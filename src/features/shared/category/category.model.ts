@@ -22,13 +22,6 @@ const translationSchema = new Schema(
       maxlength: 255,
       required: true,
     },
-    description: {
-      type: String,
-      trim: true,
-      minlength: 10,
-      maxlength: 500,
-      required: true,
-    },
   },
   { _id: false }
 );

@@ -23,13 +23,13 @@ export default class UserManagementController {
   ) {}
 
   getOne: RequestHandler = async (req, res) => {
-    const user = await this.userService.getOneById(req.user.id);
+    const user = await this.userService.getOneById(req.params.id);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.User.singular',
       body: {
-        data: this.userMapper.toDto(user),
+        data: this.userMapper.toManagementDto(user),
       },
     });
   };
@@ -42,7 +42,7 @@ export default class UserManagementController {
       featureName: 'models.User.plural',
       body: {
         data: {
-          docs: user.docs.map((user) => this.userMapper.toDto(user)),
+          docs: user.docs.map((user) => this.userMapper.toManagementDto(user)),
           pagination: user.pagination,
         },
       },
@@ -55,19 +55,21 @@ export default class UserManagementController {
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.User.plural',
-      body: { data: users },
+      body: {
+        data: users.map((user) => this.userMapper.toManagementSummaryDto(user)),
+      },
     });
   };
 
   update: RequestHandler = async (req, res) => {
     const dto = req.body as UpdateUserDto;
-    const user = await this.userService.update(req.user.id, dto);
+    const user = await this.userService.update(req.params.id, dto);
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
       featureName: 'models.User.singular',
       body: {
-        data: this.userMapper.toDto(user),
+        data: this.userMapper.toManagementDto(user),
       },
     });
   };

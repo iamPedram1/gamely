@@ -10,15 +10,17 @@ import {
 } from 'class-validator';
 
 // DTO
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
 import {
   createTranslationsWrapper,
   IsTranslationsField,
 } from 'core/dto/translation';
-import { IsSlug } from 'core/utilites/validation';
 
-// Types
+// Utilities
+import { IsSlug } from 'core/utilites/validation';
+import { WithDictionaries } from 'core/types/translations';
+import { CategoryTranslation } from 'features/shared/category/category.type';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
@@ -78,26 +80,26 @@ export class UpdateCategoryDto {
 
 export class CategoryManagementResponseDto extends BaseResponseDto {
   @Expose()
-  title!: string;
+  translation: WithDictionaries<CategoryTranslation>;
 
   @Expose()
-  slug!: string;
+  slug: string;
 
   @Expose()
-  parentId!: string | null;
+  parentId: string | null;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  @Type(() => UserManagementSummaryResponseDto)
+  creator: UserManagementSummaryResponseDto;
 }
 
 export class CategoryManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  title!: string;
+  translation: WithDictionaries<CategoryTranslation>;
 
   @Expose()
-  parentId!: string | null;
+  parentId: string | null;
 
   @Expose()
-  slug!: string;
+  slug: string;
 }

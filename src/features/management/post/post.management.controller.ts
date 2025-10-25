@@ -40,7 +40,7 @@ export default class PostMangementController {
       body: {
         data: {
           pagination,
-          docs: docs.map((doc) => this.postMapper.toClientDto(doc)),
+          docs: docs.map((doc) => this.postMapper.toManagementDto(doc)),
         },
       },
     });
@@ -58,7 +58,7 @@ export default class PostMangementController {
       httpMethod: 'GET',
       featureName: 'models.Post.plural',
       body: {
-        data: docs.map((doc) => this.postMapper.toClientDto(doc)),
+        data: docs.map((doc) => this.postMapper.toManagementSummaryDto(doc)),
       },
     });
   };
@@ -75,11 +75,11 @@ export default class PostMangementController {
       ],
     });
 
-    sendResponse(res, post ? 200 : 400, {
+    sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.Post.singular',
       body: {
-        data: post ? this.postMapper.toClientDto(post) : null,
+        data: this.postMapper.toManagementDto(post),
       },
     });
   };
@@ -96,10 +96,10 @@ export default class PostMangementController {
       ],
     });
 
-    sendResponse(res, post ? 201 : 400, {
+    sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'models.Post.singular',
-      body: { data: post ? this.postMapper.toManagementDto(post) : null },
+      body: { data: this.postMapper.toManagementDto(post) },
     });
   };
 

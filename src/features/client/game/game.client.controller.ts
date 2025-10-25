@@ -44,7 +44,7 @@ export default class GameClientController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const game = await this.gameService.getOneById(req.params.id, {
+    const game = await this.gameService.getOneBySlug(req.params.slug, {
       lean: true,
       populate: 'coverImage',
     });

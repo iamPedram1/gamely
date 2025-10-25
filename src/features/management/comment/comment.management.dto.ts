@@ -1,18 +1,16 @@
 import { Expose, Transform, Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsString,
-  Length,
-  IsOptional,
-  IsIn,
-} from 'class-validator';
+import { IsString, Length, IsOptional, IsIn } from 'class-validator';
 
 // DTO
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+import { UserManagementResponseDto } from 'features/management/user/user.management.dto';
+
+// Constants
 import { commentStatus } from 'features/shared/comment/comment.constants';
-import { CommentStatusType } from 'features/shared/comment/comment.type';
-import { UserResponseDto } from 'features/shared/user/user.dto';
+
+// Types
+import type { CommentStatusType } from 'features/shared/comment/comment.type';
 
 export class UpdateCommentDto {
   @IsOptional()
@@ -32,8 +30,8 @@ export class CommentManagementResponseDto extends BaseResponseDto {
   content: string;
 
   @Expose()
-  @Type(() => UserResponseDto)
-  creator: UserResponseDto;
+  @Type(() => UserManagementResponseDto)
+  creator: UserManagementResponseDto;
 
   @Expose()
   @Transform(({ obj }) => obj.creator.avatar)

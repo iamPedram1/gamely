@@ -24,7 +24,7 @@ import {
 const gameManagementRouter = express.Router();
 const gameController = container.resolve(GameManagementController);
 
-gameManagementRouter.use(auth(['author', 'admin']));
+gameManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
 gameManagementRouter.get('/', [

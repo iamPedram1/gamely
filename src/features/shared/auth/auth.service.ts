@@ -29,6 +29,7 @@ import {
   AnonymousError,
   ValidationError,
   InternalServerError,
+  ForbiddenError,
 } from 'core/utilites/errors';
 import {
   jwtRecoverPasswordKey,
@@ -92,7 +93,7 @@ export default class AuthService {
       : false;
 
     if (!isRecoveryKeyCorrect)
-      throw new ValidationError(t('error.recovery_token_invalid'));
+      throw new ValidationError(t('error.recovery_token.invalid'));
 
     return await this.userService.mutateWithTransaction(async (session) => {
       user.password = data.password;
@@ -103,31 +104,32 @@ export default class AuthService {
   }
 
   async login(data: LoginDto) {
-    return this.userService.mutateWithTransaction(async (session) => {
-      const user = await this.userService.getOneByKey(
-        'email',
-        data.email.toLowerCase(),
-        { select: '+password', throwError: false }
-      );
+    const mask = t('error.invalid_credentials');
 
-      const mask = t('error.invalid_credentials');
+    const user = await this.userService.getOneByKey(
+      'email',
+      data.email.toLowerCase(),
+      { select: '+password', throwError: false }
+    );
 
-      if (!user) throw new AnonymousError('User not found', mask);
+    // Existance Check
+    if (!user) throw new AnonymousError('User not found', mask);
 
-      const isPasswordCorrect = await user.comparePassword(data.password);
-      if (!isPasswordCorrect)
-        throw new AnonymousError('Password is not correct', mask);
+    // Password Check
+    const isPasswordCorrect = await user.comparePassword(data.password);
+    if (!isPasswordCorrect)
+      throw new AnonymousError('Password is not correct', mask);
 
-      const { token, refreshToken } = user.generateAuthToken();
-      const res = await user
-        .set('refreshToken', refreshToken)
-        .save({ session });
+    // Status Check
+    if (user.isBlocked()) throw new ForbiddenError(t('error.user.is_blocked'));
 
-      if (!res)
-        throw new AnonymousError('Error occured while saving tokens', mask);
+    // Generate Token
+    const { token, refreshToken } = user.generateAuthToken();
+    const res = await user.set('refreshToken', refreshToken).save();
 
-      return { token, refreshToken };
-    });
+    if (!res) throw new AnonymousError('Error occured while saving tokens');
+
+    return { token, refreshToken };
   }
 
   async refreshToken(refreshToken: string) {

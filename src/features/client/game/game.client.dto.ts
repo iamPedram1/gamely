@@ -1,21 +1,12 @@
 import { Expose, Transform, Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsString,
-  Length,
-  IsOptional,
-  Matches,
-  IsMongoId,
-  IsISO8601,
-} from 'class-validator';
 
 // DTO
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Utilities
 import { pickLocaleField } from 'core/utilites/request-context';
+import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.type';
@@ -40,8 +31,8 @@ export class GameClientResponseDto extends BaseResponseDto {
   coverImage: IFileSummary;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  @Type(() => UserClientSummaryResponseDto)
+  creator: UserClientSummaryResponseDto;
 }
 
 export class GameClientSummaryResponseDto extends BaseSummaryResponseDto {

@@ -25,9 +25,7 @@ export default class UserClientController {
     sendResponse(res, 200, {
       httpMethod: 'GET',
       customName: req.t('common.profile'),
-      body: {
-        data: this.userMapper.toDto(user),
-      },
+      body: { data: this.userMapper.toProfileDto(user) },
     });
   };
 
@@ -38,9 +36,7 @@ export default class UserClientController {
     sendResponse(res, 200, {
       httpMethod: 'GET',
       customName: req.t('common.profile'),
-      body: {
-        data: this.userMapper.toDto(user),
-      },
+      body: { data: this.userMapper.toProfileDto(user) },
     });
   };
 }

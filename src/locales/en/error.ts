@@ -5,11 +5,19 @@ const errosTranslations = {
     expired: 'Refresh token is expired',
     missing: 'Refresh token is not provided',
   },
-  recovery_token_invalid: 'Recovery key is invalid',
-  recovery_token_expired: 'Recovery key is expired',
+  recovery_token: {
+    invalid: 'Recovery key is invalid',
+    expired: 'Recovery key is expired',
+  },
+  user: {
+    self_block: 'You cannot block yourself',
+    forbidden_block: "You don't have access to block this user",
+    is_blocked: 'Your account has been suspended by admin',
+    update_role: "You don't have access to change user roles",
+  },
   validation_failed: 'Validation failed',
   id_required: 'The id paramater is required',
-  id_invalid: 'The id paramater is required',
+  id_invalid: 'The id paramater is invalid',
   token_generic_error: 'Access denied, token is invalid or expired',
   uniqueness_error:
     "{{field}} '{{value}}' is already taken by another {{name}}`",

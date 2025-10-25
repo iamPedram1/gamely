@@ -68,6 +68,7 @@ export function validateParam<T>(
 ) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const value = req.params[paramKey];
+    console.log('validateParam', paramKey, modelKey, configs);
 
     if (configs?.isId) {
       if (!value) throw new ValidationError(req.t('error.id_required'));

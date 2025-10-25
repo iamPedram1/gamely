@@ -2,12 +2,14 @@ import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 
 // DTOs
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
-import { pickLocaleField } from 'core/utilites/request-context';
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
-import { TagClientSummaryResponseDto } from 'features/shared/tag/tag.dto';
 import { GameClientResponseDto } from 'features/client/game/game.client.dto';
+import { TagClientSummaryResponseDto } from 'features/client/tag/tag.client.dto';
+import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
 import { CategoryClientResponseDto } from 'features/client/category/category.client.dto';
+
+// Utilities
+import { pickLocaleField } from 'core/utilites/request-context';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.type';
@@ -35,11 +37,11 @@ export class ClientPostResponseDto extends BaseResponseDto {
 
   @Expose()
   @Transform(({ obj }) =>
-    plainToInstance(UserSummaryResponseDto, obj.creator, {
+    plainToInstance(UserClientSummaryResponseDto, obj.creator, {
       excludeExtraneousValues: true,
     })
   )
-  author: UserSummaryResponseDto;
+  author: UserClientSummaryResponseDto;
 
   @Expose()
   @Type(() => GameClientResponseDto)

@@ -14,7 +14,7 @@ import { UpdateUserDto } from 'features/management/user/user.management.dto';
 const userManagementRouter = express.Router();
 const userController = container.resolve(UserManagementController);
 
-userManagementRouter.use(auth(['admin']));
+userManagementRouter.use(auth(['admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
 userManagementRouter.get('/', userController.getAll);

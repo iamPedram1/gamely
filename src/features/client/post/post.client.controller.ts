@@ -47,7 +47,7 @@ export default class PostClientController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const post = await this.postService.getOneById(req.params.id, {
+    const post = await this.postService.getOneBySlug(req.params.slug, {
       lean: true,
       populate: [
         { path: 'creator', populate: 'avatar' },

@@ -3,7 +3,6 @@ import { container } from 'tsyringe';
 
 // Middlewares
 import validateQuery from 'core/middlewares/validateQuery';
-import validateObjectId from 'core/middlewares/validateObjectId';
 
 // Model
 import Tag from 'features/shared/tag/tag.model';
@@ -13,12 +12,17 @@ import TagClientController from 'features/client/tag/tag.client.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
+import { validateParam } from 'core/middlewares/validateParams';
 
 const tagClientRouter = express.Router();
 const tagController = container.resolve(TagClientController);
 
 // <----------------   GET   ---------------->
 tagClientRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
-tagClientRouter.get('/:id', validateObjectId(Tag), tagController.getOne);
+tagClientRouter.get(
+  '/:slug',
+  validateParam(Tag, 'slug', 'slug'),
+  tagController.getOne
+);
 
 export default tagClientRouter;

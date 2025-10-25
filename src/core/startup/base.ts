@@ -9,14 +9,11 @@ import { fileURLToPath } from 'url';
 import type { Express } from 'express';
 
 export default function baseStartup(app: Express) {
-  // @ts-ignore
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-
   app.disable('etag');
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json({ limit: '10kb' }));
-  app.use('/', express.static(path.join(__dirname, '../public')));
+  const publicPath = path.resolve(process.cwd(), 'public');
+  app.use('/', express.static(publicPath));
 
   // Security
   app.use(helmet());

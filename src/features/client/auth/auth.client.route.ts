@@ -55,7 +55,7 @@ authClientRouter.post(
 authClientRouter.post(
   '/token/revoke',
   limitier,
-  auth(['user', 'author', 'admin']),
+  auth(['user', 'author', 'admin', 'superAdmin']),
   authController.revokeToken
 );
 

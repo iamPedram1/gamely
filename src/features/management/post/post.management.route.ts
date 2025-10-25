@@ -24,7 +24,7 @@ import {
 export const postManagementRouter = express.Router();
 const postController = container.resolve(PostMangementController);
 
-postManagementRouter.use(auth(['author', 'admin']));
+postManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
 postManagementRouter.get('/', [

@@ -10,7 +10,11 @@ import {
   jwtAccessTokenKey,
   jwtTokenName,
 } from 'features/shared/auth/auth.constants';
-import { AnonymousError, UnauthorizedError } from 'core/utilites/errors';
+import {
+  AnonymousError,
+  ForbiddenError,
+  UnauthorizedError,
+} from 'core/utilites/errors';
 
 // Types
 import type { IToken } from 'features/shared/user/user.model';
@@ -35,13 +39,18 @@ export default function auth(roles: UserRole[]) {
       t('common.token')
     );
 
-    // Check Role
-    const user = await User.findById(userId).select('role').lean();
+    // Check User Exists
+    const user = await User.findById(userId).lean();
     if (!user)
       return next(
         new AnonymousError('User with given id does not exist', mask, 400)
       );
 
+    // Check Status
+    if (user.status === 'blocked')
+      throw new ForbiddenError(t('error.user.is_blocked'));
+
+    // Check Role
     if (!roles.includes(user.role))
       throw new AnonymousError(
         `Expected (${roles}) role but the role was (${user.role})`,
@@ -54,6 +63,7 @@ export default function auth(roles: UserRole[]) {
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status,
     };
 
     const ctx = requestContext.getStore();

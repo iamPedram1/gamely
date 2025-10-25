@@ -8,8 +8,8 @@ import {
 } from 'class-validator';
 
 // DTO
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
 import {
   createTranslationsWrapper,
   IsTranslationsField,
@@ -74,8 +74,8 @@ export class TagManagementResponseDto extends BaseResponseDto {
   slug: string;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  @Type(() => UserManagementSummaryResponseDto)
+  creator: UserManagementSummaryResponseDto;
 
   @Expose()
   translations: WithDictionaries<TagTranslation>;

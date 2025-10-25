@@ -10,17 +10,21 @@ import {
 } from 'class-validator';
 
 // DTO
-import { UserSummaryResponseDto } from 'features/shared/user/user.dto';
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
-
-// Types
-import type { IFileSummary } from 'features/shared/file/file.type';
-import { IsSlug } from 'core/utilites/validation';
+import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
 import {
   createTranslationsWrapper,
   IsTranslationsField,
 } from 'core/dto/translation';
+
+// Utilities
+import { IsSlug } from 'core/utilites/validation';
+
+// Types
+import type { IFileSummary } from 'features/shared/file/file.type';
+import { WithDictionaries } from 'core/types/translations';
+import { GameTranslation } from 'features/shared/game/game.type';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
@@ -95,13 +99,10 @@ export class UpdateGameDto {
 // <----------------   RESPONSE   ---------------->
 export class GameManagementResponseDto extends BaseResponseDto {
   @Expose()
-  title: string;
+  translations: WithDictionaries<GameTranslation>;
 
   @Expose()
   slug: string;
-
-  @Expose()
-  description: string;
 
   @Expose()
   releaseDate: string;
@@ -111,13 +112,13 @@ export class GameManagementResponseDto extends BaseResponseDto {
   coverImage: IFileSummary;
 
   @Expose()
-  @Type(() => UserSummaryResponseDto)
-  creator: UserSummaryResponseDto;
+  @Type(() => UserManagementSummaryResponseDto)
+  creator: UserManagementSummaryResponseDto;
 }
 
 export class GameManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  title!: string;
+  translations: WithDictionaries<Pick<GameTranslation, 'title'>>;
 
   @Expose()
   slug!: string;

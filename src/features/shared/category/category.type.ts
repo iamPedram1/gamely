@@ -1,13 +1,11 @@
 import { WithTranslations } from 'core/types/translations';
-import { NestedCategoryClientResponseDto } from 'features/client/category/category.client.dto';
 import type { Types } from 'mongoose';
 
-export interface GameTranslation {
+export interface CategoryTranslation {
   title: string;
-  description: string;
 }
 
-export interface ICategoryEntity extends WithTranslations<GameTranslation> {
+export interface ICategoryEntity extends WithTranslations<CategoryTranslation> {
   _id: Types.ObjectId;
   slug: string;
   parentId: Types.ObjectId | null;

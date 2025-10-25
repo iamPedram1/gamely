@@ -52,7 +52,9 @@ export default class TagClientController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const tag = await this.tagService.getOneById(req.params.id, { lean: true });
+    const tag = await this.tagService.getOneBySlug(req.params.slug, {
+      lean: true,
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

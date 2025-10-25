@@ -1,10 +1,8 @@
-import {
-  UserResponseDto,
-  UserSummaryResponseDto,
-} from 'features/shared/user/user.dto';
+import type { UserManagementResponseDto } from 'features/management/user/user.management.dto';
 import type { Types } from 'mongoose';
 
-export type UserRole = 'user' | 'author' | 'admin';
+export type UserRole = 'user' | 'author' | 'admin' | 'superAdmin';
+export type UserStatus = 'active' | 'blocked';
 
 interface PrivateKeys {
   recoveryKey: string | null;
@@ -18,11 +16,14 @@ export interface IUserEntity extends PrivateKeys {
   name: string;
   bio: string;
   email: string;
+  status: UserStatus;
   avatar: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type IUser = InstanceType<typeof UserResponseDto>;
-export type IUserSummary = InstanceType<typeof UserSummaryResponseDto>;
-export type IUserContext = Pick<IUser, 'id' | 'role' | 'name' | 'email'>;
+export type IUser = InstanceType<typeof UserManagementResponseDto>;
+export type IUserContext = Pick<
+  IUser,
+  'id' | 'role' | 'name' | 'email' | 'status'
+>;
