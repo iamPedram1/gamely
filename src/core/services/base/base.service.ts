@@ -34,15 +34,19 @@ import type {
 import type {
   BaseMutateOptions,
   BaseQueryOptions,
+  BuildQuery,
   FindResult,
   IBaseMutateService,
   IBaseQueryService,
   IBaseService,
   IBaseValidationService,
+  NestedKeyOf,
+  NestedValueOf,
   NullableQueryResult,
   OrAndFilter,
 } from 'core/types/base.service.type';
 import { UserRole } from 'features/shared/user/user.types';
+import { QueryFilterBuilder } from 'core/utilites/filter';
 
 type Q<
   TSchema,
@@ -184,9 +188,9 @@ export default abstract class BaseService<
    * @param match - Value to compare.
    * @returns True if a document exists, false otherwise.
    */
-  async existsByKey<K extends keyof TSchema>(
+  async existsByKey<K extends NestedKeyOf<TSchema>>(
     key: K,
-    match: TSchema[K]
+    match: NestedValueOf<TSchema, K>
   ): Promise<boolean> {
     return this.queries.existsByKey(key, match);
   }
@@ -220,6 +224,18 @@ export default abstract class BaseService<
       | undefined
   ): Promise<FindResult<TDoc, TLean, TPaginate>> {
     return await this.queries.find(options);
+  }
+
+  /**
+   * Builds a powerful, type-safe Mongoose filter object
+   * with advanced filtering capabilities.
+   */
+  public buildFilterFromQuery<TQuery extends Record<string, any>>(
+    query: TQuery,
+    rules: BuildQuery<TQuery, TSchema>
+  ): FilterQuery<TSchema> {
+    const builder = new QueryFilterBuilder<TSchema>(query, rules);
+    return builder.build();
   }
 
   async aggregate<TPaginate extends boolean = true>(
@@ -291,12 +307,12 @@ export default abstract class BaseService<
    * @throws {NotFoundError} If not found and throwError is true.
    */
   async getOneByKey<
-    K extends keyof TSchema,
+    K extends NestedKeyOf<TSchema>,
     TLean extends boolean = false,
     TThrowError extends boolean = true,
   >(
     key: K,
-    value: TSchema[K],
+    value: NestedValueOf<TSchema, K>,
     options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
       lean?: TLean;
       throwError?: TThrowError;
@@ -372,7 +388,7 @@ export default abstract class BaseService<
    * @param options - Mutation options.
    * @returns MongoDB update result.
    */
-  async updateManyByReference<K extends keyof TSchema>(
+  async updateManyByReference<K extends NestedKeyOf<TSchema>>(
     referenceId: string,
     referenceKey: K,
     value: any,
@@ -414,10 +430,10 @@ export default abstract class BaseService<
    * @returns MongoDB update result.
    * @throws {NotFoundError} If no matching references found.
    */
-  async updateManyByReferences<K extends keyof TSchema>(
+  async updateManyByReferences<K extends NestedKeyOf<TSchema>>(
     referenceIds: string[],
     referenceKey: K,
-    value: TSchema[K],
+    value: NestedValueOf<TSchema, K>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     return this.mutations.updateManyByReferences(
@@ -507,7 +523,7 @@ export default abstract class BaseService<
    * @returns MongoDB update result.
    */
   async removeIdFromArrayField(
-    keyName: keyof TSchema,
+    keyName: NestedKeyOf<TSchema>,
     id: string,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
@@ -523,7 +539,7 @@ export default abstract class BaseService<
    * @throws {NotFoundError} If no documents are matched.
    */
   async removeIdsFromArrayField(
-    keyName: keyof TSchema,
+    keyName: NestedKeyOf<TSchema>,
     ids: string[],
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {

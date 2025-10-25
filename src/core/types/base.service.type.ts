@@ -121,3 +121,97 @@ export type OrAndFilter<T> = {
   $or?: FilterQuery<T>[];
   $and?: FilterQuery<T>[];
 };
+
+// Helper type to check if a type is a primitive or should be treated as a leaf
+type Primitive =
+  | string
+  | number
+  | boolean
+  | bigint
+  | symbol
+  | null
+  | undefined
+  | Date;
+
+// Helper to detect ObjectId and other special MongoDB types
+type IsSpecialType<T> = T extends { _bsontype: string } ? true : false;
+
+// Helper type to get nested paths, excluding array/object methods and special types
+export type NestedKeyOf<T> =
+  IsSpecialType<T> extends true
+    ? never
+    : T extends Primitive | Array<any>
+      ? never
+      : T extends object
+        ? {
+            [K in keyof T & string]: IsSpecialType<T[K]> extends true
+              ? K // Stop at ObjectId, treat as leaf
+              : T[K] extends Primitive
+                ? K
+                : T[K] extends Array<any>
+                  ? K // Stop at array level
+                  : T[K] extends object
+                    ? K | `${K}.${NestedKeyOf<T[K]>}`
+                    : K;
+          }[keyof T & string]
+        : never;
+
+// Helper type to get the value type at a nested path
+export type NestedValueOf<
+  T,
+  P extends string,
+> = P extends `${infer K}.${infer Rest}`
+  ? K extends keyof T
+    ? NestedValueOf<T[K], Rest>
+    : never
+  : P extends keyof T
+    ? T[P]
+    : never;
+
+export interface BuildQuery<TQuery, TSchema> {
+  /** Apply filters with configurable logic operator */
+  filterBy?: FilterRule<keyof TQuery, NestedKeyOf<TSchema>>[];
+  /** Apply regex search filters */
+  searchBy?: SearchRule<keyof TQuery, NestedKeyOf<TSchema>>[];
+  /** Apply range filters */
+  rangeBy?: RangeRule<keyof TQuery, NestedKeyOf<TSchema>>[];
+  /** Apply existence checks */
+  existsBy?: ExistsRule<keyof TQuery, NestedKeyOf<TSchema>>[];
+  /** Apply array element matching */
+  arrayBy?: ArrayRule<keyof TQuery, NestedKeyOf<TSchema>>[];
+}
+
+export interface FilterRule<TQueryKey, TModelKey> {
+  queryKey: TQueryKey;
+  modelKey: TModelKey;
+  operator?: '$eq' | '$ne' | '$gt' | '$gte' | '$lt' | '$lte' | '$in' | '$nin';
+  logic?: 'and' | 'or'; // 👈 New: determines AND vs OR behavior
+  transform?: (value: any) => any;
+}
+
+export interface SearchRule<TQueryKey, TModelKey> {
+  queryKey: TQueryKey;
+  modelKeys: TModelKey[];
+  operator?: 'and' | 'or'; // How to combine multiple modelKeys
+  options?: 'i' | 'im' | 'ims';
+  matchMode?: 'contains' | 'startsWith' | 'endsWith' | 'exact';
+}
+
+export interface RangeRule<TQueryKey, TModelKey> {
+  queryKeyStart?: TQueryKey;
+  queryKeyEnd?: TQueryKey;
+  modelKey: TModelKey;
+}
+
+export interface ExistsRule<TQueryKey, TModelKey> {
+  queryKey: TQueryKey;
+  modelKey: TModelKey;
+  checkExists?: boolean;
+}
+
+export interface ArrayRule<TQueryKey, TModelKey> {
+  queryKey: TQueryKey;
+  modelKey: TModelKey;
+  operator?: '$all' | '$elemMatch' | '$size' | '$in';
+  condition?: Record<string, any>;
+}

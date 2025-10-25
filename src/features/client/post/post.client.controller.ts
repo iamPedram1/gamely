@@ -9,6 +9,7 @@ import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities
 import sendResponse from 'core/utilites/response';
+import { postPopulate } from 'features/shared/post/post.constant';
 
 // Types
 import type { IRequestQueryBase } from 'core/types/query';
@@ -25,13 +26,7 @@ export default class PostClientController {
     const { pagination, docs } = await this.postService.find({
       reqQuery,
       lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-      ],
+      populate: postPopulate,
     });
 
     sendResponse(res, 200, {
@@ -49,13 +44,7 @@ export default class PostClientController {
   getOne: RequestHandler = async (req, res) => {
     const post = await this.postService.getOneBySlug(req.params.slug, {
       lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-      ],
+      populate: postPopulate,
     });
 
     sendResponse(res, 200, {

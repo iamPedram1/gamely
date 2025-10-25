@@ -22,6 +22,8 @@ import type { IApiBatchResponse } from 'core/utilites/response';
 import type { BaseTFunction } from 'core/services/base/base.service';
 import type {
   BaseMutateOptions,
+  NestedKeyOf,
+  NestedValueOf,
   OrAndFilter,
 } from 'core/types/base.service.type';
 
@@ -112,19 +114,19 @@ class BaseMutateService<
     return result;
   }
 
-  async updateManyByReference<K extends keyof TSchema>(
+  async updateManyByReference<K extends NestedKeyOf<TSchema>>(
     id: string,
     referenceKey: K,
-    value: TSchema[K],
+    value: NestedValueOf<TSchema, K>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     return this.updateManyByReferences([id], referenceKey, value, options);
   }
 
-  async updateManyByReferences<K extends keyof TSchema>(
+  async updateManyByReferences<K extends NestedKeyOf<TSchema>>(
     ids: string[],
     referenceKey: K,
-    value: TSchema[K],
+    value: NestedValueOf<TSchema, K>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     const query = this.model.updateMany(
@@ -256,7 +258,7 @@ class BaseMutateService<
 
   // <----------------   ARRAY FIELD   ---------------->
   async removeIdFromArrayField(
-    keyName: keyof AnyKeys<TSchema>,
+    keyName: NestedKeyOf<TSchema>,
     id: string,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
@@ -264,7 +266,7 @@ class BaseMutateService<
   }
 
   async removeIdsFromArrayField(
-    keyName: keyof TSchema,
+    keyName: NestedKeyOf<TSchema>,
     ids: string[],
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {

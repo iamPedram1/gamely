@@ -2,7 +2,7 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import validateQuery from 'core/middlewares/validateQuery';
+import { validateQuery } from 'core/middlewares/validateQuery';
 
 // Model
 import Tag from 'features/shared/tag/tag.model';

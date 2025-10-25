@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import validateObjectId from 'core/middlewares/validateObjectId';
-import validateQuery from 'core/middlewares/validateQuery';
+import { validateQuery } from 'core/middlewares/validateQuery';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model

@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 
 // Middlewares
 import validateObjectId from 'core/middlewares/validateObjectId';
-import validateQuery from 'core/middlewares/validateQuery';
+import { validateQuery } from 'core/middlewares/validateQuery';
 
 // Model
 import Game from 'features/shared/game/game.model';

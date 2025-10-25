@@ -14,6 +14,8 @@ import {
   AggregateReturn,
   BaseQueryOptions,
   FindResult,
+  NestedKeyOf,
+  NestedValueOf,
   NullableQueryResult,
 } from 'core/types/base.service.type';
 
@@ -57,9 +59,9 @@ class BaseQueryService<
     return this.exists({ slug } as FilterQuery<TSchema>);
   }
 
-  async existsByKey<K extends keyof TSchema>(
+  async existsByKey<K extends NestedKeyOf<TSchema>>(
     key: K,
-    match: TSchema[K]
+    match: NestedValueOf<TSchema, K>
   ): Promise<boolean> {
     return this.exists({ [key]: match } as FilterQuery<TSchema>);
   }
@@ -109,12 +111,12 @@ class BaseQueryService<
   }
 
   async getOneByKey<
-    K extends keyof TSchema,
+    K extends NestedKeyOf<TSchema>,
     TLean extends boolean = false,
     TThrowError extends boolean = true,
   >(
     key: K,
-    value: TSchema[K],
+    value: NestedValueOf<TSchema, K>,
     options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
       lean?: TLean;
       throwError?: TThrowError;

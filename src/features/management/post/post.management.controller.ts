@@ -8,30 +8,42 @@ import PostService from 'features/shared/post/post.service';
 import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities
+import { postPopulate } from 'features/shared/post/post.constant';
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // Types
-import type { IRequestQueryBase } from 'core/types/query';
+import { PostQueryDto } from 'features/shared/post/post.dto';
 
 @injectable()
-export default class PostMangementController {
+export default class PostManagementController {
   constructor(
     @inject(delay(() => PostMapper)) private postMapper: PostMapper,
     @inject(delay(() => PostService)) private postService: PostService
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.postService.find({
-      reqQuery,
-      lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
+    const query = req.query as unknown as PostQueryDto;
+    const filter = this.postService.buildFilterFromQuery(query, {
+      filterBy: [
+        { queryKey: 'game', modelKey: 'game', logic: 'and' },
+        { queryKey: 'category', modelKey: 'category', logic: 'and' },
+        { queryKey: 'tag', modelKey: 'tags', logic: 'and' },
       ],
+      searchBy: [
+        {
+          options: 'i',
+          operator: 'or',
+          queryKey: 'search',
+          modelKeys: ['translations.en.title', 'translations.fa.title'],
+        },
+      ],
+    });
+
+    const { pagination, docs } = await this.postService.find({
+      reqQuery: query,
+      lean: true,
+      populate: postPopulate,
+      filter,
     });
 
     sendResponse(res, 200, {
@@ -47,7 +59,7 @@ export default class PostMangementController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const reqQuery = req.query as unknown as PostQueryDto;
     const docs = await this.postService.find({
       reqQuery,
       lean: true,
@@ -66,13 +78,7 @@ export default class PostMangementController {
   getOne: RequestHandler = async (req, res) => {
     const post = await this.postService.getOneById(req.params.id, {
       lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-      ],
+      populate: postPopulate,
     });
 
     sendResponse(res, 200, {
@@ -87,13 +93,6 @@ export default class PostMangementController {
   create: RequestHandler = async (req, res) => {
     const post = await this.postService.create(req.body, req.user.id, {
       lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-      ],
     });
 
     sendResponse(res, 201, {
@@ -130,21 +129,15 @@ export default class PostMangementController {
   };
 
   update: RequestHandler = async (req, res) => {
-    const body = await this.postService.updateOneById(req.params.id, req.body, {
+    const post = await this.postService.updateOneById(req.params.id, req.body, {
       lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'category' },
-        { path: 'game' },
-        { path: 'tags' },
-        { path: 'coverImage' },
-      ],
+      populate: postPopulate,
     });
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',
       featureName: 'models.Post.singular',
-      body: { data: this.postMapper.toManagementDto(body) },
+      body: { data: this.postMapper.toManagementDto(post) },
     });
   };
 }

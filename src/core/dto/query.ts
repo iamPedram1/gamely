@@ -1,5 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsInt, Min, Max, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+  IsIn,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class BaseQueryDto {
   @IsOptional()
@@ -18,4 +26,9 @@ export class BaseQueryDto {
   @IsOptional()
   @IsIn(['title', 'createdAt', '-createdAt'])
   sort?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 150)
+  search?: string;
 }
