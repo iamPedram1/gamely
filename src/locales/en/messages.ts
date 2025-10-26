@@ -13,6 +13,10 @@ const messageTranslations = {
     location_not_provided: 'File location not provided',
     location_invalid: 'File location is not valid',
   },
+  comment: {
+    create_success:
+      'Comment created successfully and will be visible after admin review',
+  },
   batch: {
     completed: 'Batch operation completed successfuly',
     completed_with_error: 'Batch operation completed with some errors',

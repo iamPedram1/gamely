@@ -17,6 +17,7 @@ import {
   NestedKeyOf,
   NestedValueOf,
   NullableQueryResult,
+  RelatedLookup,
 } from 'core/types/base.service.type';
 
 /**
@@ -34,6 +35,10 @@ class BaseQueryService<
     protected readonly model: Model<TSchema>,
     protected readonly t: BaseTFunction
   ) {}
+
+  async countDocuments(filter: FilterQuery<TSchema>): Promise<number> {
+    return await this.model.countDocuments(filter).lean();
+  }
 
   // <----------------   EXISTANCE   ---------------->
 
@@ -149,7 +154,7 @@ class BaseQueryService<
     const enrichedQuery = this.applyQueryOptions(query, options);
 
     if (options?.paginate ?? true) {
-      return paginate<TDoc, TDoc>(enrichedQuery, options?.reqQuery) as any;
+      return paginate<TDoc, TDoc>(enrichedQuery, options?.query) as any;
     }
 
     return enrichedQuery.exec();
@@ -175,7 +180,7 @@ class BaseQueryService<
       const result = await paginateAggregate<TResult>(
         this.model,
         aggPipeline,
-        options?.reqQuery
+        options?.query
       );
 
       return result as AggregateReturn<TResult, TPaginate>;
@@ -183,6 +188,42 @@ class BaseQueryService<
 
     const docs = await this.model.aggregate<TResult>(aggPipeline).exec();
     return docs as AggregateReturn<TResult, TPaginate>;
+  }
+
+  async findWithRelatedCounts<
+    TResult = TSchema,
+    TPaginate extends boolean | undefined = true,
+  >(
+    lookups: RelatedLookup<TSchema>[],
+    options?: BaseQueryOptions<TSchema> & { paginate?: TPaginate }
+  ): Promise<AggregateReturn<TResult, TPaginate>> {
+    const pipeline: PipelineStage[] = [];
+
+    for (const lookup of lookups) {
+      pipeline.push({
+        $lookup: {
+          from: lookup.from,
+          localField: String(lookup.localField),
+          foreignField: lookup.foreignField,
+          as: `${lookup.asField}_docs`,
+          ...(lookup.matchStage
+            ? { pipeline: [{ $match: lookup.matchStage }] }
+            : {}),
+        },
+      });
+
+      pipeline.push({
+        $addFields: {
+          [lookup.asField]: { $size: `$${lookup.asField}_docs` },
+        },
+      });
+
+      pipeline.push({
+        $project: { [`${lookup.asField}_docs`]: 0 },
+      });
+    }
+
+    return this.aggregate<TResult, TPaginate>(pipeline, options);
   }
 
   // <----------------   PRIVATE METHODS   ---------------->

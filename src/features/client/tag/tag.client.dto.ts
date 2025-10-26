@@ -14,15 +14,16 @@ export class TagClientResponseDto extends BaseResponseDto {
 
   @Expose()
   slug: string;
+
+  @Expose()
+  postsCount: string;
 }
 
 export class TagClientSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
+  @Transform(pickLocaleField('title'))
   title: string;
 
   @Expose()
   slug: string;
-
-  @Expose()
-  postsCount: number;
 }

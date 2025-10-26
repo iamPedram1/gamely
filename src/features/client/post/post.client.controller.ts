@@ -1,6 +1,11 @@
 import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
+// Models
+import Tag from 'features/shared/tag/tag.model';
+import Game from 'features/shared/game/game.model';
+import Category from 'features/shared/category/category.model';
+
 // Service
 import PostService from 'features/shared/post/post.service';
 
@@ -12,7 +17,8 @@ import sendResponse from 'core/utilites/response';
 import { postPopulate } from 'features/shared/post/post.constant';
 
 // Types
-import type { IRequestQueryBase } from 'core/types/query';
+import { mapSlugToId } from 'core/utilites/filter';
+import { PostClientQueryDto } from 'features/client/post/post.client.dto';
 
 @injectable()
 export default class PostClientController {
@@ -22,9 +28,37 @@ export default class PostClientController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as PostClientQueryDto;
+    const filter = await this.postService.buildFilterFromQuery(query, {
+      filterBy: [
+        {
+          queryKey: 'game',
+          modelKey: 'game',
+          transform: mapSlugToId(Game),
+        },
+        {
+          queryKey: 'tag',
+          modelKey: 'tags',
+          transform: mapSlugToId(Tag),
+        },
+        {
+          queryKey: 'category',
+          modelKey: 'category',
+          transform: mapSlugToId(Category),
+        },
+      ],
+      searchBy: [
+        {
+          queryKey: 'search',
+          modelKeys: ['translations.en.title', 'translations.fa'],
+          operator: 'or',
+        },
+      ],
+    });
+
     const { pagination, docs } = await this.postService.find({
-      reqQuery,
+      query,
+      filter,
       lean: true,
       populate: postPopulate,
     });

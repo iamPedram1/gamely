@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import express from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
-import { fileURLToPath } from 'url';
 import type { Express } from 'express';
 
 export default function baseStartup(app: Express) {
@@ -14,6 +13,7 @@ export default function baseStartup(app: Express) {
   app.use(express.json({ limit: '10kb' }));
   const publicPath = path.resolve(process.cwd(), 'public');
   app.use('/', express.static(publicPath));
+  app.set('query parser', 'extended');
 
   // Security
   app.use(helmet());
@@ -41,7 +41,11 @@ export default function baseStartup(app: Express) {
   app.use(mongoSanitize());
 
   // Paramater Polution
-  app.use(hpp());
+  app.use(
+    hpp({
+      whitelist: ['tag', 'game', 'category', 'creator'],
+    })
+  );
 
   if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('dev'));

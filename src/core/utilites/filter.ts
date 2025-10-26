@@ -1,10 +1,9 @@
-import type { FilterQuery } from 'mongoose';
+import type { FilterQuery, Model } from 'mongoose';
 import type {
   ArrayRule,
   BuildQuery,
   ExistsRule,
   FilterRule,
-  NestedKeyOf,
   RangeRule,
   SearchRule,
 } from 'core/types/base.service.type';
@@ -25,8 +24,8 @@ export class QueryFilterBuilder<TSchema> {
   /**
    * Main entry point - builds the complete filter
    */
-  public build(): FilterQuery<TSchema> {
-    this.processFilters();
+  public async build(): Promise<FilterQuery<TSchema>> {
+    await this.processFilters();
     this.processSearchFilters();
     this.processRangeFilters();
     this.processExistsFilters();
@@ -39,9 +38,9 @@ export class QueryFilterBuilder<TSchema> {
   // Filter Processors
   // ==========================================================================
 
-  private processFilters(): void {
+  private async processFilters(): Promise<void> {
     for (const rule of this.rules.filterBy ?? []) {
-      const condition = this.buildFilterCondition(rule);
+      const condition = await this.buildFilterCondition(rule);
       if (!condition) continue;
 
       const logic = rule.logic ?? 'and'; // Default to AND
@@ -93,13 +92,15 @@ export class QueryFilterBuilder<TSchema> {
   // Condition Builders
   // ==========================================================================
 
-  private buildFilterCondition(
+  private async buildFilterCondition(
     rule: FilterRule<any, any>
-  ): FilterQuery<TSchema> | null {
+  ): Promise<FilterQuery<TSchema> | null> {
     const value = this.query[rule.queryKey];
     if (ValueHelper.isEmpty(value)) return null;
 
-    const transformedValue = rule.transform ? rule.transform(value) : value;
+    const transformedValue = rule.transform
+      ? await rule.transform(value)
+      : value;
     const operator = rule.operator ?? '$eq';
 
     return {
@@ -109,6 +110,19 @@ export class QueryFilterBuilder<TSchema> {
 
   private buildOperatorCondition(operator: string, value: any): any {
     // Handle array operators
+    const allowedOps = [
+      '$eq',
+      '$ne',
+      '$in',
+      '$nin',
+      '$gte',
+      '$lte',
+      '$all',
+      '$elemMatch',
+      '$size',
+    ];
+    if (!allowedOps.includes(operator)) throw new Error('Invalid operator');
+
     if (operator === '$in' || operator === '$nin') {
       return {
         [operator]: Array.isArray(value) ? value : [value],
@@ -131,6 +145,7 @@ export class QueryFilterBuilder<TSchema> {
     if (ValueHelper.isEmpty(value)) return [];
 
     const searchValue = String(value).trim();
+    if (searchValue.length > 100) throw new Error('Search query too long');
     if (!searchValue) return [];
 
     const regex = RegexHelper.buildSearchRegex(
@@ -305,4 +320,19 @@ class RegexHelper {
         return escaped;
     }
   }
+}
+
+export function mapSlugToId<T>(Model: Model<T>) {
+  return async (slug: string | string[]) => {
+    if (!slug) return null;
+
+    const query = typeof slug === 'string' ? { slug } : { slug: { $in: slug } };
+
+    const docs = await Model.find(query).select('_id').lean();
+
+    // Return a single _id if input was string, array of _ids if array
+    if (typeof slug === 'string')
+      return (String(docs[0]?._id || '') || undefined) ?? null;
+    return docs.map((d) => String(d._id));
+  };
 }

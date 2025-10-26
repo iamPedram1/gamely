@@ -15,9 +15,9 @@ import Post from 'features/shared/post/post.model';
 import PostManagementController from 'features/management/post/post.management.controller';
 
 // DTO
-import { PostQueryDto } from 'features/shared/post/post.dto';
 import {
   CreatePostDto,
+  PostManagementQueryDto,
   UpdatePostDto,
 } from 'features/management/post/post.management.dto';
 
@@ -28,11 +28,11 @@ postManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 
 // <----------------   GET   ---------------->
 postManagementRouter.get('/', [
-  softValidateQuery(PostQueryDto),
+  softValidateQuery(PostManagementQueryDto),
   postController.getAll,
 ]);
 postManagementRouter.get('/summaries', [
-  softValidateQuery(PostQueryDto),
+  softValidateQuery(PostManagementQueryDto),
   postController.getAllSummaries,
 ]);
 postManagementRouter.get('/:id', [

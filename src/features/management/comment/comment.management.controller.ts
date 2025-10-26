@@ -11,7 +11,10 @@ import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 import { CommentMapper } from 'features/shared/comment/comment.mapper';
 
 // DTO
-import { UpdateCommentDto } from 'features/management/comment/comment.management.dto';
+import {
+  CommentManagementQueryDto,
+  UpdateCommentDto,
+} from 'features/management/comment/comment.management.dto';
 
 // Types
 import type { IRequestQueryBase } from 'core/types/query';
@@ -24,11 +27,20 @@ export default class CommentManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
+    const query = req.query as unknown as CommentManagementQueryDto;
+    const filter = await this.commentService.buildFilterFromQuery(query, {
+      searchBy: [{ queryKey: 'search', modelKeys: ['creator'], options: 'i' }],
+      filterBy: [
+        { queryKey: 'post', modelKey: 'postId', logic: 'or' },
+        { queryKey: 'user', modelKey: 'creator', logic: 'or' },
+      ],
+    });
     const { pagination, docs } = await this.commentService.find({
       lean: true,
+      filter,
       populate: [
+        { path: 'postId', select: '_id translations' },
         { path: 'creator', select: 'name status type' },
-        { path: 'postId', select: 'translations' },
       ],
     });
 
@@ -67,8 +79,7 @@ export default class CommentManagementController {
 
   update: RequestHandler = async (req, res) => {
     const dto = req.body as UpdateCommentDto;
-    const commentId = req.params.id;
-    const body = await this.commentService.updateOneById(commentId, dto);
+    const body = await this.commentService.updateOneById(req.params.id, dto);
 
     sendResponse(res, 200, {
       httpMethod: 'PATCH',

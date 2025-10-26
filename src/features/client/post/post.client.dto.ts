@@ -1,6 +1,8 @@
+import { IsOptional, IsString } from 'class-validator';
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 
 // DTOs
+import { BaseQueryDto } from 'core/dto/query';
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { GameClientResponseDto } from 'features/client/game/game.client.dto';
@@ -67,4 +69,23 @@ export class ClientPostSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(pickLocaleField('title'))
   title: string;
+}
+
+// <----------------   QUERY   ---------------->
+export class PostClientQueryDto extends BaseQueryDto {
+  @IsOptional()
+  @IsString({ each: true })
+  tag: string | string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  category: string | string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  creator: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  game: string;
 }

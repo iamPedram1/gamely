@@ -7,6 +7,8 @@ import GameService from 'features/shared/game/game.service';
 import { GameMapper } from 'features/shared/game/game.mapper';
 
 // Utilities
+import { BaseQueryDto } from 'core/dto/query';
+import { gamePopulate } from 'features/shared/game/game.constant';
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
 
 // Types
@@ -21,14 +23,24 @@ export default class GameManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } = await this.gameService.find({
-      reqQuery,
-      lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'coverImage' },
+    const query = req.query as unknown as BaseQueryDto;
+    const filter = this.gameService.buildFilterFromQuery(query, {
+      searchBy: [
+        {
+          operator: 'or',
+          matchMode: 'contains',
+          options: 'i',
+          queryKey: 'search',
+          modelKeys: ['translations.en.title', 'translations.fa.title'],
+        },
       ],
+    });
+
+    const { pagination, docs } = await this.gameService.find({
+      filter,
+      query,
+      lean: true,
+      populate: gamePopulate,
     });
 
     sendResponse(res, 200, {
@@ -44,9 +56,9 @@ export default class GameManagementController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as IRequestQueryBase;
     const docs = await this.gameService.find({
-      reqQuery,
+      query,
       paginate: false,
       lean: true,
     });
@@ -77,10 +89,7 @@ export default class GameManagementController {
 
   create: RequestHandler = async (req, res) => {
     const game = await this.gameService.create(req.body, req.user.id, {
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'coverImage' },
-      ],
+      populate: gamePopulate,
     });
 
     sendResponse(res, 201, {
@@ -119,10 +128,7 @@ export default class GameManagementController {
   update: RequestHandler = async (req, res) => {
     const body = await this.gameService.updateOneById(req.params.id, req.body, {
       lean: true,
-      populate: [
-        { path: 'creator', populate: 'avatar' },
-        { path: 'coverImage' },
-      ],
+      populate: gamePopulate,
     });
 
     sendResponse(res, 200, {

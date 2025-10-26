@@ -8,7 +8,7 @@ export interface ICommentEntity {
   _id: Types.ObjectId;
   type: CommentType;
   status: CommentStatusType;
-  comment: string;
+  message: string;
   postId: Types.ObjectId;
   creator: Types.ObjectId;
   threadId?: Types.ObjectId | null;

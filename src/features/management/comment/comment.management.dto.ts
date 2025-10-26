@@ -1,23 +1,24 @@
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
-import { IsString, Length, IsOptional, IsIn } from 'class-validator';
+import { IsString, Length, IsOptional, IsIn, IsMongoId } from 'class-validator';
 
 // DTO
+import { BaseQueryDto } from 'core/dto/query';
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { UserManagementResponseDto } from 'features/management/user/user.management.dto';
+import { PostManagementSummaryResponseDto } from 'features/management/post/post.management.dto';
 
 // Constants
 import { commentStatus } from 'features/shared/comment/comment.constants';
 
 // Types
 import type { CommentStatusType } from 'features/shared/comment/comment.type';
-import { PostManagementSummaryResponseDto } from 'features/management/post/post.management.dto';
 
 export class UpdateCommentDto {
   @IsOptional()
   @IsString()
   @Length(10, 500)
-  comment: string;
+  message: string;
 
   @IsOptional()
   @IsString()
@@ -27,8 +28,7 @@ export class UpdateCommentDto {
 
 export class CommentManagementResponseDto extends BaseResponseDto {
   @Expose()
-  @Transform(({ obj }) => obj.comment)
-  content: string;
+  message: string;
 
   @Expose()
   @Type(() => UserManagementResponseDto)
@@ -56,6 +56,17 @@ export class CommentManagementResponseDto extends BaseResponseDto {
 
 export class CommentManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  @Transform(({ obj }) => obj.comment)
-  content: string;
+  message: string;
+}
+
+// <----------------   QUERY  ---------------->
+
+export class CommentManagementQueryDto extends BaseQueryDto {
+  @IsOptional()
+  @IsMongoId({ each: true })
+  user: string;
+
+  @IsOptional()
+  @IsMongoId({ each: true })
+  post: string;
 }

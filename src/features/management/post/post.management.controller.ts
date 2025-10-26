@@ -10,9 +10,9 @@ import { PostMapper } from 'features/shared/post/post.mapper';
 // Utilities
 import { postPopulate } from 'features/shared/post/post.constant';
 import sendResponse, { sendBatchResponse } from 'core/utilites/response';
+import { PostManagementQueryDto } from 'features/management/post/post.management.dto';
 
 // Types
-import { PostQueryDto } from 'features/shared/post/post.dto';
 
 @injectable()
 export default class PostManagementController {
@@ -22,8 +22,8 @@ export default class PostManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as PostQueryDto;
-    const filter = this.postService.buildFilterFromQuery(query, {
+    const dto = req.query as unknown as PostManagementQueryDto;
+    const filter = this.postService.buildFilterFromQuery(dto, {
       filterBy: [
         { queryKey: 'game', modelKey: 'game', logic: 'and' },
         { queryKey: 'category', modelKey: 'category', logic: 'and' },
@@ -40,7 +40,7 @@ export default class PostManagementController {
     });
 
     const { pagination, docs } = await this.postService.find({
-      reqQuery: query,
+      query: dto,
       lean: true,
       populate: postPopulate,
       filter,
@@ -59,9 +59,9 @@ export default class PostManagementController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as PostQueryDto;
+    const query = req.query as unknown as PostManagementQueryDto;
     const docs = await this.postService.find({
-      reqQuery,
+      query,
       lean: true,
       paginate: false,
     });

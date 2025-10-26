@@ -32,6 +32,7 @@ import type {
   FilterQuery,
 } from 'mongoose';
 import type {
+  AggregateReturn,
   BaseMutateOptions,
   BaseQueryOptions,
   BuildQuery,
@@ -44,6 +45,7 @@ import type {
   NestedValueOf,
   NullableQueryResult,
   OrAndFilter,
+  RelatedLookup,
 } from 'core/types/base.service.type';
 import { UserRole } from 'features/shared/user/user.types';
 import { QueryFilterBuilder } from 'core/utilites/filter';
@@ -200,6 +202,14 @@ export default abstract class BaseService<
   }
 
   // =====================
+  // COUNT OPERATIONS
+  // =====================
+
+  async countDocuments(filter: FilterQuery<TSchema>): Promise<number> {
+    return this.queries.countDocuments(filter);
+  }
+
+  // =====================
   // FIND OPERATIONS
   // =====================
 
@@ -212,7 +222,7 @@ export default abstract class BaseService<
    *  - `populate`: relations to populate
    *  - `lean`: return plain objects instead of hydrated docs
    *  - `paginate`: whether to paginate results (default: true)
-   *  - `reqQuery`: query parameters for the `paginate` utility
+   *  - `query`: query parameters for the `paginate` utility
    * @returns Either a paginated result or an array of documents.
    */
   async find<TLean extends boolean = false, TPaginate extends boolean = true>(
@@ -230,12 +240,12 @@ export default abstract class BaseService<
    * Builds a powerful, type-safe Mongoose filter object
    * with advanced filtering capabilities.
    */
-  public buildFilterFromQuery<TQuery extends Record<string, any>>(
+  public async buildFilterFromQuery<TQuery extends Record<string, any>>(
     query: TQuery,
     rules: BuildQuery<TQuery, TSchema>
-  ): FilterQuery<TSchema> {
+  ): Promise<FilterQuery<TSchema>> {
     const builder = new QueryFilterBuilder<TSchema>(query, rules);
-    return builder.build();
+    return await builder.build();
   }
 
   async aggregate<TPaginate extends boolean = true>(
@@ -245,6 +255,37 @@ export default abstract class BaseService<
     }
   ) {
     return this.queries.aggregate(pipeline, options);
+  }
+
+  /**
+   * Add counts of related collections to documents.
+   *
+   * Example:
+   * ```ts
+   * // Count posts and comments for each tag
+   * const result = await service.findWithRelatedCounts([
+   *   { from: 'posts', localField: '_id', foreignField: 'tags', asField: 'postsCount' },
+   *   { from: 'comments', localField: '_id', foreignField: 'tags', asField: 'commentsCount' },
+   * ]);
+   *
+   * // Count only published posts
+   * const filtered = await service.findWithRelatedCounts([
+   *   { from: 'posts', localField: '_id', foreignField: 'tags', asField: 'postsCount', matchStage: { status: 'published' } },
+   * ], { paginate: false });
+   * ```
+   *
+   * @param lookups Related collections to count
+   * @param options Optional query options (pagination, sorting, etc.)
+   * @returns Documents with added count fields
+   */
+  async findWithRelatedCounts<
+    TResult = TSchema,
+    TPaginate extends boolean | undefined = true,
+  >(
+    lookups: RelatedLookup<TSchema>[],
+    options?: BaseQueryOptions<TSchema> & { paginate?: TPaginate }
+  ): Promise<AggregateReturn<TResult, TPaginate>> {
+    return this.queries.findWithRelatedCounts(lookups, options);
   }
 
   /**

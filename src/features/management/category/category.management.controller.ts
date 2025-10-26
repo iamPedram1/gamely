@@ -23,9 +23,9 @@ export default class CategoryManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as IRequestQueryBase;
     const { pagination, docs } = await this.categoryService.find({
-      reqQuery,
+      query,
       lean: true,
       populate: [{ path: 'creator', populate: 'avatar' }],
     });
@@ -43,9 +43,9 @@ export default class CategoryManagementController {
   };
 
   getAllSummaries: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as IRequestQueryBase;
     const docs = await this.categoryService.find({
-      reqQuery,
+      query,
       lean: true,
       paginate: false,
       select: 'translations slug',

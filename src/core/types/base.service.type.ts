@@ -70,7 +70,7 @@ interface BaseCommonOptions<TLean extends boolean = boolean> {
 export interface BaseQueryOptions<TSchema, TLean extends boolean = boolean>
   extends BaseCommonOptions<TLean> {
   /** Request query for pagination */
-  reqQuery?: Partial<IRequestQueryBase>;
+  query?: Partial<IRequestQueryBase>;
   /** Filter object for queries */
   filter?: FilterQuery<TSchema>;
   /** Fields to select */
@@ -214,4 +214,32 @@ export interface ArrayRule<TQueryKey, TModelKey> {
   modelKey: TModelKey;
   operator?: '$all' | '$elemMatch' | '$size' | '$in';
   condition?: Record<string, any>;
+}
+
+export interface RelatedLookup<TSchema> {
+  /**
+   * The collection name of the related documents (e.g., 'posts', 'comments')
+   */
+  from: string;
+
+  /**
+   * Field in the current model to match with the related collection.
+   * Can be a key of TSchema or a string (for nested paths)
+   */
+  localField: keyof TSchema;
+
+  /**
+   * Field in the related collection to match with localField
+   */
+  foreignField: string;
+
+  /**
+   * The name of the count field to add in the result (e.g., 'postsCount')
+   */
+  asField: string;
+
+  /**
+   * Optional additional $match stage inside the lookup to filter related documents
+   */
+  matchStage?: Record<string, unknown>;
 }

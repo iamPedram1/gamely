@@ -38,6 +38,7 @@ export function softValidateQuery<T extends Record<any, any>>(
 ) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     // Convert query to DTO instance
+    console.log(req.query);
     const dto = plainToInstance(DtoClass, req.query, {
       enableImplicitConversion: true,
     });

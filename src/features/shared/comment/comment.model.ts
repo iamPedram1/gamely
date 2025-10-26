@@ -14,7 +14,7 @@ export type CommentLeanDocument = FlattenMaps<CommentDocument>;
 
 const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
   {
-    comment: {
+    message: {
       type: String,
       trim: true,
       minlength: 3,

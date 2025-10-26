@@ -22,9 +22,9 @@ export default class CategoryClientController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as IRequestQueryBase;
     const { pagination, docs } = await this.categoryService.find({
-      reqQuery,
+      query,
       lean: true,
       populate: [{ path: 'creator', populate: 'avatar' }],
     });

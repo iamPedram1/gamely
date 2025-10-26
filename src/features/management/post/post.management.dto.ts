@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 
 // DTOs
+import { BaseQueryDto } from 'core/dto/query';
 import { BaseResponseDto } from 'core/dto/response';
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { GameManagementResponseDto } from 'features/management/game/game.management.dto';
@@ -119,6 +120,7 @@ export class UpdatePostDto {
   @IsMongoId()
   category: string;
 
+  @IsOptional()
   @IsTranslationsField(UpdateTranslationsDto)
   translations: UpdateTranslationsDto;
 }
@@ -165,4 +167,24 @@ export class PostManagementResponseDto extends BasePostResponseDto {
 export class PostManagementSummaryResponseDto extends BasePostResponseDto {
   @Expose()
   translations: WithDictionaries<Pick<PostTranslation, 'title'>>;
+}
+
+// <----------------   QUERY   ---------------->
+
+export class PostManagementQueryDto extends BaseQueryDto {
+  @IsOptional()
+  @IsMongoId({ each: true })
+  tag: string | string[];
+
+  @IsOptional()
+  @IsMongoId({ each: true })
+  category: string | string[];
+
+  @IsOptional()
+  @IsMongoId({ each: true })
+  creator: string;
+
+  @IsOptional()
+  @IsMongoId({ each: true })
+  game: string;
 }

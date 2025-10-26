@@ -21,11 +21,18 @@ export default class TagClientController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
-    const { docs, pagination } = await this.tagService.find({
-      reqQuery,
-      lean: true,
-    });
+    const query = req.query as unknown as IRequestQueryBase;
+    const { docs, pagination } = await this.tagService.findWithRelatedCounts(
+      [
+        {
+          from: 'posts',
+          localField: '_id',
+          foreignField: 'tags',
+          asField: 'postsCount',
+        },
+      ],
+      { lean: true }
+    );
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -35,18 +42,6 @@ export default class TagClientController {
           pagination,
           docs: docs.map((doc) => this.tagMapper.toClientDto(doc)),
         },
-      },
-    });
-  };
-
-  getAllSummaries: RequestHandler = async (req, res) => {
-    const docs = await this.tagService.getWithPostsCount();
-
-    sendResponse(res, 200, {
-      httpMethod: 'GET',
-      featureName: 'models.Tag.plural',
-      body: {
-        data: docs.map((doc) => this.tagMapper.toClientSummaryDto(doc)),
       },
     });
   };

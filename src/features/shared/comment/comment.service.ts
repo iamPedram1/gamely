@@ -41,7 +41,7 @@ export interface ICommentService
   extends IBaseService<ICommentEntity, CreateCommentInput, UpdateCommentDto> {
   getPostComments: (
     postId: string,
-    reqQuery?: IRequestQueryBase
+    query?: IRequestQueryBase
   ) => Promise<WithPagination<CommentLeanDocument>>;
 }
 
@@ -84,10 +84,10 @@ class CommentService extends BaseService<
 
   async getPostComments(
     postId: string,
-    reqQuery?: IRequestQueryBase
+    query?: IRequestQueryBase
   ): Promise<WithPagination<CommentLeanDocument>> {
     const firstLevel = await super.find({
-      reqQuery,
+      query,
       lean: true,
       filter: { postId, type: 'main' },
       populate: [{ path: 'creator', populate: 'avatar' }],
@@ -112,23 +112,43 @@ class CommentService extends BaseService<
     };
   }
 
-  async getPostApprovedComments(postId: string) {
-    return await this.find({
-      filter: { postId, status: 'approved' },
+  async getPostApprovedComments(postId: string, query: any) {
+    const firstLevel = await super.find({
+      query,
       lean: true,
+      filter: { postId, status: 'approved', type: 'main' },
+      populate: [{ path: 'creator', populate: 'avatar' }],
+    });
+
+    const ids = firstLevel.docs.map((doc) => String(doc._id));
+    const replies = await super.find({
+      filter: {
+        postId,
+        type: 'reply',
+        status: 'approved',
+        threadId: { $in: ids },
+      },
+      lean: true,
+      paginate: false,
       populate: 'creator',
     });
+
+    const allComments = [
+      ...firstLevel.docs,
+      ...replies,
+    ] as CommentWithReplies[];
+
+    return {
+      docs: this.attachReplies(allComments),
+      pagination: firstLevel.pagination,
+    };
   }
 
   async create(
     data: CreateCommentInput,
     userId?: string,
     options?: BaseMutateOptions
-  ): Promise<
-    Document<unknown, {}, ICommentEntity, {}, {}> &
-      ICommentEntity &
-      Required<{ _id: Types.ObjectId }> & { __v: number }
-  > {
+  ): Promise<CommentDocument> {
     if (data.replyToCommentId) {
       const cm = await this.getOneById(data.replyToCommentId, { lean: true });
       data.type = 'reply';

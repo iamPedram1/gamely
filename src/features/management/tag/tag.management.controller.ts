@@ -27,9 +27,9 @@ export default class TagManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as IRequestQueryBase;
     const { docs, pagination } = await this.tagService.find({
-      reqQuery,
+      query,
       lean: true,
     });
 

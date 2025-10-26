@@ -14,6 +14,10 @@ const messageTranslations = {
   user: {
     profile_updated: 'پروفایل با موفقیت بروزرسانی شد',
   },
+  comment: {
+    create_success:
+      'کامنت شما با موفقیت ایجاد شد و پس از تایید ادمین نمایش داده خواهد شد',
+  },
   file: {
     upload_some_failed: 'بارگذاری برخی فایل‌ها ناموفق بود',
     upload_success_singular: 'فایل با موفقیت بارگذاری شد',

@@ -21,9 +21,9 @@ export default class GameClientController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const reqQuery = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as IRequestQueryBase;
     const { pagination, docs } = await this.gameService.find({
-      reqQuery,
+      query,
       lean: true,
       populate: [
         { path: 'creator', populate: 'avatar' },

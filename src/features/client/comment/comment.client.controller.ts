@@ -27,7 +27,7 @@ export default class CommentClientController {
     const postId = req.params.id as string;
     const query = req.query as unknown as IRequestQueryBase;
     const { pagination, docs } =
-      await this.commentService.getPostApprovedComments(postId);
+      await this.commentService.getPostApprovedComments(postId, query);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -49,10 +49,13 @@ export default class CommentClientController {
       req.user.id
     );
 
-    sendResponse(res, comment ? 201 : 400, {
+    sendResponse(res, 201, {
       httpMethod: 'POST',
       featureName: 'models.Comment.singular',
-      body: { data: this.commentMapper.toClientDto(comment) },
+      body: {
+        data: this.commentMapper.toClientDto(comment),
+        message: req.t('messages.comment.create_success'),
+      },
     });
   };
 }
