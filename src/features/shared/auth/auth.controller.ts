@@ -13,7 +13,7 @@ import {
 } from 'features/shared/auth/auth.dto';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 @injectable()
 export default class AuthController {

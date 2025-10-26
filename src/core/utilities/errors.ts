@@ -1,4 +1,4 @@
-import { t } from 'core/utilites/request-context';
+import { t } from 'core/utilities/request-context';
 
 interface CustomErrorOptions {
   cause: string[];

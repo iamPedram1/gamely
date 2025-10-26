@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import FileService from 'features/shared/file/file.service';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 // DTO
 import { FileMapper } from 'features/shared/file/file.mapper';

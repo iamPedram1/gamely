@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import logger from 'core/utilites/logger';
-import { appDbUrl } from 'core/utilites/configs';
+import logger from 'core/utilities/logger';
+import { appDbUrl } from 'core/utilities/configs';
 
 export default function dbStartup() {
   mongoose

@@ -7,7 +7,7 @@ import {
   Matches,
   IsMongoId,
   IsNotEmptyObject,
-} from 'class-validator';
+} from 'core/utilities/validation';
 
 // DTO
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
@@ -18,7 +18,7 @@ import {
 } from 'core/dto/translation';
 
 // Utilities
-import { IsSlug } from 'core/utilites/validation';
+import { IsSlug } from 'core/utilities/validation';
 import { WithDictionaries } from 'core/types/translations';
 import { CategoryTranslation } from 'features/shared/category/category.type';
 

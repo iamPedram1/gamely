@@ -9,7 +9,7 @@ import { GameMapper } from 'features/shared/game/game.mapper';
 // Utilities
 import { BaseQueryDto } from 'core/dto/query';
 import { gamePopulate } from 'features/shared/game/game.constant';
-import sendResponse, { sendBatchResponse } from 'core/utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilities/response';
 
 // Types
 import type { RequestHandler } from 'express';

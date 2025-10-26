@@ -10,8 +10,8 @@ import File, { FileDocument } from 'features/shared/file/file.model';
 import BaseService from 'core/services/base/base.service';
 
 // Utilities
-import { t } from 'core/utilites/request-context';
-import { AnonymousError, BadRequestError } from 'core/utilites/errors';
+import { t } from 'core/utilities/request-context';
+import { AnonymousError, BadRequestError } from 'core/utilities/errors';
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';

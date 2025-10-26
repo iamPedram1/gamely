@@ -17,10 +17,10 @@ import {
 } from 'features/shared/auth/auth.dto';
 
 // Utilities
-import logger from 'core/utilites/logger';
-import crypto from 'core/utilites/crypto';
-import { sendEmail } from 'core/utilites/mail';
-import { i18nInstance, t } from 'core/utilites/request-context';
+import logger from 'core/utilities/logger';
+import crypto from 'core/utilities/crypto';
+import { sendEmail } from 'core/utilities/mail';
+import { i18nInstance, t } from 'core/utilities/request-context';
 import {
   recoveryEnglishHtml,
   recoveryPersianHtml,
@@ -30,7 +30,7 @@ import {
   ValidationError,
   InternalServerError,
   ForbiddenError,
-} from 'core/utilites/errors';
+} from 'core/utilities/errors';
 import {
   jwtRecoverPasswordKey,
   jwtRecoverPasswordKeyExpiresInMinutes,

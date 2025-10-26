@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import TagService from 'features/shared/tag/tag.service';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 // Mapper
 import { TagMapper } from 'features/shared/tag/tag.mapper';

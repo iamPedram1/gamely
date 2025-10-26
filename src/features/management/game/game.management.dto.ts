@@ -7,7 +7,7 @@ import {
   IsMongoId,
   IsISO8601,
   IsNotEmptyObject,
-} from 'class-validator';
+} from 'core/utilities/validation';
 
 // DTO
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
@@ -19,7 +19,7 @@ import {
 } from 'core/dto/translation';
 
 // Utilities
-import { IsSlug } from 'core/utilites/validation';
+import { IsSlug } from 'core/utilities/validation';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.type';

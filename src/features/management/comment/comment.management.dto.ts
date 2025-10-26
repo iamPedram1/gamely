@@ -1,5 +1,11 @@
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
-import { IsString, Length, IsOptional, IsIn, IsMongoId } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsOptional,
+  IsIn,
+  IsMongoId,
+} from 'core/utilities/validation';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';

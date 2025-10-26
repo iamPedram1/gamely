@@ -15,7 +15,7 @@ import BaseService from 'core/services/base/base.service';
 
 // Types
 import type { ITagEntity } from 'features/shared/tag/tag.type';
-import type { IApiBatchResponse } from 'core/utilites/response';
+import type { IApiBatchResponse } from 'core/utilities/response';
 import type { TagDocument } from 'features/shared/tag/tag.model';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 

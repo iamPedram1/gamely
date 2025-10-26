@@ -15,10 +15,10 @@ import {
   AnonymousError,
   NotFoundError,
   ValidationError,
-} from 'core/utilites/errors';
+} from 'core/utilities/errors';
 
 // Types
-import type { IApiBatchResponse } from 'core/utilites/response';
+import type { IApiBatchResponse } from 'core/utilities/response';
 import type { BaseTFunction } from 'core/services/base/base.service';
 import type {
   BaseMutateOptions,

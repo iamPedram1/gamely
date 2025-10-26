@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 
 // Utilites
-import { AnonymousError } from 'core/utilites/errors';
+import { AnonymousError } from 'core/utilities/errors';
 import { jwtTokenName } from 'features/shared/auth/auth.constants';
 
 export default function blockRequestWithToken(

@@ -1,5 +1,5 @@
 import { isValidObjectId, Model } from 'mongoose';
-import { NotFoundError, ValidationError } from 'core/utilites/errors';
+import { NotFoundError, ValidationError } from 'core/utilities/errors';
 
 // Types
 import type { Request, Response, NextFunction } from 'express';

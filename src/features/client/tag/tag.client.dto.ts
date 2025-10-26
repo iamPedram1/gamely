@@ -1,7 +1,7 @@
 import { Expose, Transform } from 'class-transformer';
 
 // Utilities
-import { pickLocaleField } from 'core/utilites/request-context';
+import { pickLocaleField } from 'core/utilities/request-context';
 
 // DTO
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';

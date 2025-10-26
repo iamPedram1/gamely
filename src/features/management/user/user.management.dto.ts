@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'core/utilities/validation';
 
 // DTO
 import { BaseUserUpdate } from 'features/shared/user/user.dto';

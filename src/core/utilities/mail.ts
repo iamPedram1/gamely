@@ -1,5 +1,5 @@
 import SibApiV3Sdk from '@sendinblue/client';
-import { emailApiKey, fromEmail } from 'core/utilites/configs';
+import { emailApiKey, fromEmail } from 'core/utilities/configs';
 
 interface SendEmailProps {
   to: string;

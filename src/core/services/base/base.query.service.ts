@@ -1,5 +1,5 @@
-import paginate, { paginateAggregate } from 'core/utilites/pagination';
-import { NotFoundError } from 'core/utilites/errors';
+import paginate, { paginateAggregate } from 'core/utilities/pagination';
+import { NotFoundError } from 'core/utilities/errors';
 
 // Types
 import type { BaseTFunction } from 'core/services/base/base.service';

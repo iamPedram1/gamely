@@ -2,7 +2,7 @@ import { isEmail } from 'class-validator';
 import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
 
 // Utils
-import crypto from 'core/utilites/crypto';
+import crypto from 'core/utilities/crypto';
 import tokenUtils from 'core/services/token.service';
 import { userRoles, userStatus } from 'features/shared/user/user.constants';
 

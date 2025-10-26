@@ -12,7 +12,7 @@ const config: Config = {
     '^dto/(.*)$': '<rootDir>/src/dto/$1',
     '^services/(.*)$': '<rootDir>/src/services/$1',
     '^startup/(.*)$': '<rootDir>/src/startup/$1',
-    '^utilites/(.*)$': '<rootDir>/src/utilites/$1',
+    '^utilities/(.*)$': '<rootDir>/src/utilities/$1',
   },
 };
 

@@ -5,7 +5,7 @@ import type { RequestHandler } from 'express';
 import CommentService from 'features/shared/comment/comment.service';
 
 // Utilities
-import sendResponse, { sendBatchResponse } from 'core/utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilities/response';
 
 // Mapper
 import { CommentMapper } from 'features/shared/comment/comment.mapper';

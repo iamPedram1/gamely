@@ -1,12 +1,12 @@
 import type { HydratedDocument, Model, Types } from 'mongoose';
 
 // Utilities
-import { AnonymousError, ValidationError } from 'core/utilites/errors';
+import { AnonymousError, ValidationError } from 'core/utilities/errors';
 
 // Types
 import BaseQueryService from 'core/services/base/base.query.service';
 import { BaseTFunction } from 'core/services/base/base.service';
-import { userContext } from 'core/utilites/request-context';
+import { userContext } from 'core/utilities/request-context';
 import { UserRole } from 'features/shared/user/user.types';
 
 /**

@@ -6,13 +6,13 @@ import BaseMutateService from 'core/services/base/base.mutate.service';
 import BaseValidationService from 'core/services/base/base.validation.service';
 
 // Utilities
-import { AnonymousError } from 'core/utilites/errors';
-import { IApiBatchResponse } from 'core/utilites/response';
+import { AnonymousError } from 'core/utilities/errors';
+import { IApiBatchResponse } from 'core/utilities/response';
 import {
   i18nInstance,
   t as translator,
   userContext,
-} from 'core/utilites/request-context';
+} from 'core/utilities/request-context';
 
 // Types
 import type { i18n } from 'i18next';
@@ -48,7 +48,7 @@ import type {
   RelatedLookup,
 } from 'core/types/base.service.type';
 import { UserRole } from 'features/shared/user/user.types';
-import { QueryFilterBuilder } from 'core/utilites/filter';
+import { QueryFilterBuilder } from 'core/utilities/filter';
 
 type Q<
   TSchema,

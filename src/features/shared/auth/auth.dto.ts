@@ -1,4 +1,10 @@
-import { IsEmail, IsJWT, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsJWT,
+  IsNotEmpty,
+  IsString,
+  Length,
+} from 'core/utilities/validation';
 
 export class RecoverPasswordDto {
   @IsNotEmpty()

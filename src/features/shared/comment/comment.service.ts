@@ -12,7 +12,7 @@ import BaseService from 'core/services/base/base.service';
 import PostService from 'features/shared/post/post.service';
 
 // Utilities
-import { ForbiddenError } from 'core/utilites/errors';
+import { ForbiddenError } from 'core/utilities/errors';
 
 // Types
 import type { Document, Types } from 'mongoose';

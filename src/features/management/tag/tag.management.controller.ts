@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import TagService from 'features/shared/tag/tag.service';
 
 // Utilities
-import sendResponse, { sendBatchResponse } from 'core/utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilities/response';
 
 // DTO
 import {

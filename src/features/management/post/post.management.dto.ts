@@ -8,7 +8,8 @@ import {
   IsNumber,
   Min,
   IsNotEmptyObject,
-} from 'class-validator';
+  MinLength,
+} from 'core/utilities/validation';
 
 // DTOs
 import { BaseQueryDto } from 'core/dto/query';
@@ -24,7 +25,7 @@ import {
 } from 'core/dto/translation';
 
 // Utilities
-import { IsSlug } from 'core/utilites/validation';
+import { IsSlug } from 'core/utilities/validation';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.type';
@@ -45,7 +46,7 @@ export class CreateTranslationDto {
 
   @IsNotEmpty()
   @IsString()
-  @Length(1)
+  @MinLength(1)
   content: string;
 }
 

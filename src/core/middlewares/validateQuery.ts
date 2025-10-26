@@ -5,7 +5,7 @@ import {
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import type { Request, Response, NextFunction } from 'express';
 // Utilities
-import { ValidationError } from 'core/utilites/errors';
+import { ValidationError } from 'core/utilities/errors';
 
 export function validateQuery<T>(DtoClass: ClassConstructor<T>) {
   return async (req: Request, _res: Response, next: NextFunction) => {

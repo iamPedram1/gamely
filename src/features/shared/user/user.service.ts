@@ -22,7 +22,7 @@ import {
   BadRequestError,
   ForbiddenError,
   ValidationError,
-} from 'core/utilites/errors';
+} from 'core/utilities/errors';
 
 export type IUserService = InstanceType<typeof UserService>;
 

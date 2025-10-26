@@ -1,4 +1,4 @@
-import { IsMongoId, IsOptional, Length } from 'class-validator';
+import { IsMongoId, IsOptional, Length } from 'core/utilities/validation';
 
 // DTO
 

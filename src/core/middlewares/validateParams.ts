@@ -1,5 +1,5 @@
 import { TranslationKeys } from 'core/types/i18n';
-import { NotFoundError, ValidationError } from 'core/utilites/errors';
+import { NotFoundError, ValidationError } from 'core/utilities/errors';
 import { Request, Response, NextFunction } from 'express';
 import { isValidObjectId, Model } from 'mongoose';
 

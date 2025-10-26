@@ -7,7 +7,7 @@ import GameService from 'features/shared/game/game.service';
 import { GameMapper } from 'features/shared/game/game.mapper';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 // Types
 import type { RequestHandler } from 'express';

@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'core/utilities/validation';
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 
 // DTOs
@@ -11,7 +11,7 @@ import { UserClientSummaryResponseDto } from 'features/client/user/user.client.d
 import { CategoryClientResponseDto } from 'features/client/category/category.client.dto';
 
 // Utilities
-import { pickLocaleField } from 'core/utilites/request-context';
+import { pickLocaleField } from 'core/utilities/request-context';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.type';

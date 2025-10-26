@@ -1,6 +1,6 @@
 import type { Response } from 'express';
 import { ModelsTranslationKeys } from 'core/types/i18n';
-import { t } from 'core/utilites/request-context';
+import { t } from 'core/utilities/request-context';
 
 type HttpMethod =
   | 'GET'

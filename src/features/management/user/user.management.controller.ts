@@ -1,7 +1,7 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 // Service
 import UserService from 'features/shared/user/user.service';

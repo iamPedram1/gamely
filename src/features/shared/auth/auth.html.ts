@@ -1,4 +1,4 @@
-import { userAppUrl } from 'core/utilites/configs';
+import { userAppUrl } from 'core/utilities/configs';
 
 export const recoveryEnglishHtml = (name: string, key: string) => {
   const recoveryUrl = `${userAppUrl}/password-recovery/${key}`;

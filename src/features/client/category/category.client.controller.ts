@@ -7,7 +7,7 @@ import CategoryService from 'features/shared/category/category.service';
 import { CategoryMapper } from 'features/shared/category/category.mapper';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 // Types
 import type { RequestHandler } from 'express';

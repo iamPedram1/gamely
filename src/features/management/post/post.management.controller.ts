@@ -9,7 +9,7 @@ import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities
 import { postPopulate } from 'features/shared/post/post.constant';
-import sendResponse, { sendBatchResponse } from 'core/utilites/response';
+import sendResponse, { sendBatchResponse } from 'core/utilities/response';
 import { PostManagementQueryDto } from 'features/management/post/post.management.dto';
 
 // Types

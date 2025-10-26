@@ -1,5 +1,5 @@
-import { decodeHtmlEntities } from 'core/utilites/helperPack';
-import sendResponse from 'core/utilites/response';
+import { decodeHtmlEntities } from 'core/utilities/helperPack';
+import sendResponse from 'core/utilities/response';
 import type { Request, Response, NextFunction } from 'express';
 
 const notFound = (req: Request, res: Response, next: NextFunction) => {

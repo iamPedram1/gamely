@@ -1,5 +1,5 @@
-import { t } from 'core/utilites/request-context';
-import { ValidationError } from 'core/utilites/errors';
+import { t } from 'core/utilities/request-context';
+import { ValidationError } from 'core/utilities/errors';
 import type { Model } from 'mongoose';
 import type { TranslationKeys } from 'core/types/i18n';
 import type { Request, Response, NextFunction } from 'express';

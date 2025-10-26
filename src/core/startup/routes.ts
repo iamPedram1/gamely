@@ -25,7 +25,7 @@ import error from 'core/middlewares/error';
 import notFound from 'core/middlewares/notFound';
 
 // Utilities
-import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilites/configs';
+import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);

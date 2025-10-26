@@ -7,7 +7,7 @@ import Tag from 'features/shared/tag/tag.model';
 import User from 'features/shared/user/user.model';
 
 // Utils
-import { prefixBaseUrl } from 'core/utilites/configs';
+import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
 import { ITagEntity } from 'features/shared/tag/tag.type';

@@ -19,7 +19,7 @@ import {
   BadRequestError,
   NotFoundError,
   ValidationError,
-} from 'core/utilites/errors';
+} from 'core/utilities/errors';
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';

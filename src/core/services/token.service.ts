@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import type { Types } from 'mongoose';
 
 // Utilites
-import { t } from 'core/utilites/request-context';
-import { InternalServerError, ValidationError } from 'core/utilites/errors';
+import { t } from 'core/utilities/request-context';
+import { InternalServerError, ValidationError } from 'core/utilities/errors';
 import {
   jwtRefreshTokenExpiresInDays,
   jwtRefreshTokenKey,

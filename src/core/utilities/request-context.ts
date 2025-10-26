@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import { AnonymousError, InternalServerError } from 'core/utilites/errors';
+import { AnonymousError, InternalServerError } from 'core/utilities/errors';
 
 // Types
 import type { i18n as I18nType } from 'i18next';

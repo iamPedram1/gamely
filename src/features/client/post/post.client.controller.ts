@@ -13,11 +13,11 @@ import PostService from 'features/shared/post/post.service';
 import { PostMapper } from 'features/shared/post/post.mapper';
 
 // Utilities
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 import { postPopulate } from 'features/shared/post/post.constant';
 
 // Types
-import { mapSlugToId } from 'core/utilites/filter';
+import { mapSlugToId } from 'core/utilities/filter';
 import { PostClientQueryDto } from 'features/client/post/post.client.dto';
 
 @injectable()

@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import { IsObject, ValidateNested } from 'class-validator';
+import { IsObject, ValidateNested } from 'core/utilities/validation';
 
 export function createTranslationsWrapper<
   T extends new (...args: any[]) => any,

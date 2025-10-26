@@ -1,6 +1,6 @@
 import multer, { MulterError } from 'multer';
-import { BadRequestError } from 'core/utilites/errors';
-import { t } from 'core/utilites/request-context';
+import { BadRequestError } from 'core/utilities/errors';
+import { t } from 'core/utilities/request-context';
 
 type UploadOptions = {
   fieldName: string;

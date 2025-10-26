@@ -7,7 +7,7 @@ import {
   IsIn,
   IsString,
   Length,
-} from 'class-validator';
+} from 'core/utilities/validation';
 
 export class BaseQueryDto {
   @IsOptional()

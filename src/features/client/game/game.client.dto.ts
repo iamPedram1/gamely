@@ -5,7 +5,7 @@ import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Utilities
-import { pickLocaleField } from 'core/utilites/request-context';
+import { pickLocaleField } from 'core/utilities/request-context';
 import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
 
 // Types

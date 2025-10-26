@@ -1,8 +1,8 @@
 import { MulterError } from 'multer';
 
 // Utilities
-import logger from 'core/utilites/logger';
-import sendResponse from 'core/utilites/response';
+import logger from 'core/utilities/logger';
+import sendResponse from 'core/utilities/response';
 import {
   AnonymousError,
   BadRequestError,
@@ -11,7 +11,7 @@ import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
-} from 'core/utilites/errors';
+} from 'core/utilities/errors';
 
 // Types
 import type { Request, Response, NextFunction } from 'express';

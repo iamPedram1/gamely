@@ -2,7 +2,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 
 // DTO
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
-import { pickLocaleField } from 'core/utilites/request-context';
+import { pickLocaleField } from 'core/utilities/request-context';
 import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
 
 // <----------------   RESPONSE   ---------------->

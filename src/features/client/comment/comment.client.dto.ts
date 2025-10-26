@@ -5,7 +5,7 @@ import {
   Length,
   IsOptional,
   IsMongoId,
-} from 'class-validator';
+} from 'core/utilities/validation';
 
 // DTO
 import { FileResponseDto } from 'features/shared/file/file.dto';

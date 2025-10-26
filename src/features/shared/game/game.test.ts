@@ -7,7 +7,7 @@ import Game from 'features/shared/game/game.model';
 import User from 'features/shared/user/user.model';
 
 // Utils
-import { prefixBaseUrl } from 'core/utilites/configs';
+import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
 import { IGameEntity } from 'features/shared/game/game.type';

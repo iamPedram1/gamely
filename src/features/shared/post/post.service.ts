@@ -18,13 +18,13 @@ import CommentService from 'features/shared/comment/comment.service';
 import { PostValidation } from 'features/shared/post/post.validation';
 
 // Utilities
-import logger from 'core/utilites/logger';
+import logger from 'core/utilities/logger';
 
 // Types
 import type { IPostEntity } from 'features/shared/post/post.type';
 import type { PostDocument } from 'features/shared/post/post.model';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
-import type { IApiBatchResponse } from 'core/utilites/response';
+import type { IApiBatchResponse } from 'core/utilities/response';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()

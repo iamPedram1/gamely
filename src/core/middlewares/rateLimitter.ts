@@ -1,5 +1,5 @@
 import { rateLimit } from 'express-rate-limit';
-import sendResponse from 'core/utilites/response';
+import sendResponse from 'core/utilities/response';
 
 export const limitier = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes

@@ -15,7 +15,7 @@ import BaseService from 'core/services/base/base.service';
 
 // Types
 import type { IGameEntity } from 'features/shared/game/game.type';
-import type { IApiBatchResponse } from 'core/utilites/response';
+import type { IApiBatchResponse } from 'core/utilities/response';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 
 export type IGameService = InstanceType<typeof GameService>;

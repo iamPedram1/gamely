@@ -2,7 +2,7 @@
 import User from 'features/shared/user/user.model';
 
 // Middlewares
-import { requestContext, t } from 'core/utilites/request-context';
+import { requestContext, t } from 'core/utilities/request-context';
 
 // Utilities
 import tokenUtils from 'core/services/token.service';
@@ -14,7 +14,7 @@ import {
   AnonymousError,
   ForbiddenError,
   UnauthorizedError,
-} from 'core/utilites/errors';
+} from 'core/utilities/errors';
 
 // Types
 import type { IToken } from 'features/shared/user/user.model';

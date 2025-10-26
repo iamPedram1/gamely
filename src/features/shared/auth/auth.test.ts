@@ -6,7 +6,7 @@ import request from 'supertest';
 import User from 'features/shared/user/user.model';
 
 // Utils
-import { prefixBaseUrl } from 'core/utilites/configs';
+import { prefixBaseUrl } from 'core/utilities/configs';
 import { jwtTokenName } from 'features/shared/auth/auth.constants';
 
 // Types
