@@ -4,12 +4,16 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
+import { validateParam } from 'core/middlewares/validateParams';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
 import validateObjectId from 'core/middlewares/validateObjectId';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
+import Tag from 'features/shared/tag/tag.model';
 import Post from 'features/shared/post/post.model';
+import Game from 'features/shared/game/game.model';
+import Category from 'features/shared/category/category.model';
 
 // Controller
 import PostManagementController from 'features/management/post/post.management.controller';
@@ -48,9 +52,15 @@ postManagementRouter.delete('/:id', [
 ]);
 
 // <----------------   POST   ---------------->
+const mutateValidation = [
+  validateParam(Game, 'game', '_id', { type: 'id' }),
+  validateParam(Tag, 'tags', '_id', { type: 'idArray' }),
+  validateParam(Category, 'category', '_id', { type: 'id' }),
+];
 postManagementRouter.post('/', [
-  validateUniqueConflict(Post, 'slug'),
   validateBody(CreatePostDto),
+  validateUniqueConflict(Post, 'slug'),
+  ...mutateValidation,
   postController.create,
 ]);
 
@@ -59,6 +69,7 @@ postManagementRouter.patch('/:id', [
   validateObjectId(Post),
   validateBody(UpdatePostDto),
   validateUniqueConflict(Post, 'slug'),
+  ...mutateValidation,
   postController.update,
 ]);
 

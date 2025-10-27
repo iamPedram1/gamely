@@ -17,23 +17,29 @@ import type { IRequestQueryBase } from 'core/types/query';
 import type { WithPagination } from 'core/types/paginate';
 import BaseValidationService from 'core/services/base/base.validation.service';
 
-/** Mongoose populate option */
+/** Options for Mongoose session (transactions) */
 export interface BaseSessionOptions {
+  /** Optional Mongoose client session */
   session?: ClientSession;
 }
 
+/** Options for Mongoose populate */
 export interface BasePopulateOptions {
+  /** Populate field(s) */
   populate?: PopulateOptions | PopulateOptions[] | string;
 }
 
+/** Result of getting a single document */
 export type GetOneResult<TLean, TDoc> =
   | (TLean extends true ? FlattenMaps<TDoc> : TDoc)
   | null;
 
+/** Generic query result type */
 export type QueryResult<TDoc, TLean extends boolean> = TLean extends true
   ? FlattenMaps<TDoc>
   : TDoc;
 
+/** Nullable query result type with optional throw behavior */
 export type NullableQueryResult<
   TDoc,
   TLean extends boolean,
@@ -42,15 +48,18 @@ export type NullableQueryResult<
   ? QueryResult<TDoc, TLean>
   : QueryResult<TDoc, TLean> | null;
 
+/** Return type of aggregation queries */
 export type AggregateReturn<
   TResult,
   TPaginate extends boolean | undefined,
 > = TPaginate extends true ? WithPagination<TResult> : TResult[];
 
+/** Result of array queries */
 export type ArrayQueryResult<TDoc, TLean extends boolean> = TLean extends true
   ? FlattenMaps<TDoc>[]
   : TDoc[];
 
+/** Result of find queries with optional pagination */
 export type FindResult<
   TDoc,
   TLean extends boolean,
@@ -59,6 +68,7 @@ export type FindResult<
   ? ArrayQueryResult<TDoc, TLean>
   : WithPagination<QueryResult<TDoc, TLean>>;
 
+/** Common options for query/mutation services */
 interface BaseCommonOptions<TLean extends boolean = boolean> {
   /** Return plain JS object instead of Mongoose document */
   lean?: TLean;
@@ -69,39 +79,42 @@ interface BaseCommonOptions<TLean extends boolean = boolean> {
 /** Query options for BaseQueryService */
 export interface BaseQueryOptions<TSchema, TLean extends boolean = boolean>
   extends BaseCommonOptions<TLean> {
-  /** Request query for pagination */
+  /** Request query parameters for pagination and filtering */
   query?: Partial<IRequestQueryBase>;
-  /** Filter object for queries */
+  /** Filter object for querying documents */
   filter?: FilterQuery<TSchema>;
   /** Fields to select */
   select?: string;
-  /** Sort object */
+  /** Sort order object */
   sort?: Record<string, 1 | -1>;
-  /** Limit number of documents */
+  /** Maximum number of documents to return */
   limit?: number;
-  /** Skip number of documents */
+  /** Number of documents to skip */
   skip?: number;
-  /** Enable/disable pagination */
+  /** Enable or disable pagination */
   paginate?: boolean;
 }
 
-/** Options for mutation operations */
+/** Options for mutation operations (create/update/delete) */
 export interface BaseMutateOptions<TLean extends boolean = boolean>
   extends BaseCommonOptions<TLean> {
-  /** Mongoose client session for transactions */
+  /** Mongoose client session for transactional operations */
   session?: mongo.ClientSession;
 }
 
+/** BaseQueryService type alias */
 export type IBaseQueryService<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = BaseQueryService<TSchema, TDoc>;
 
+/** BaseValidationService type alias */
 export type IBaseValidationService<
   TSchema,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = BaseValidationService<TSchema, TDoc>;
 
+/** BaseMutateService type alias */
 export type IBaseMutateService<
   TSchema,
   TCreateDto,
@@ -109,7 +122,7 @@ export type IBaseMutateService<
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = BaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>;
 
-// Combined type of BaseService instance
+/** Combined BaseService type alias */
 export type IBaseService<
   TSchema,
   TCreateDto,
@@ -117,12 +130,15 @@ export type IBaseService<
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > = BaseService<TSchema, TCreateDto, TUpdateDto, TDoc>;
 
+/** Logical OR/AND filter object */
 export type OrAndFilter<T> = {
+  /** Array of conditions to combine with $or */
   $or?: FilterQuery<T>[];
+  /** Array of conditions to combine with $and */
   $and?: FilterQuery<T>[];
 };
 
-// Helper type to check if a type is a primitive or should be treated as a leaf
+/** Primitive types treated as leaf nodes */
 type Primitive =
   | string
   | number
@@ -133,10 +149,10 @@ type Primitive =
   | undefined
   | Date;
 
-// Helper to detect ObjectId and other special MongoDB types
+/** Detect MongoDB special types like ObjectId */
 type IsSpecialType<T> = T extends { _bsontype: string } ? true : false;
 
-// Helper type to get nested paths, excluding array/object methods and special types
+/** Nested keys of an object, recursively excluding primitives, arrays, and special types */
 export type NestedKeyOf<T> =
   IsSpecialType<T> extends true
     ? never
@@ -145,18 +161,18 @@ export type NestedKeyOf<T> =
       : T extends object
         ? {
             [K in keyof T & string]: IsSpecialType<T[K]> extends true
-              ? K // Stop at ObjectId, treat as leaf
+              ? K
               : T[K] extends Primitive
                 ? K
                 : T[K] extends Array<any>
-                  ? K // Stop at array level
+                  ? K
                   : T[K] extends object
                     ? K | `${K}.${NestedKeyOf<T[K]>}`
                     : K;
           }[keyof T & string]
         : never;
 
-// Helper type to get the value type at a nested path
+/** Value type at a nested path */
 export type NestedValueOf<
   T,
   P extends string,
@@ -168,78 +184,92 @@ export type NestedValueOf<
     ? T[P]
     : never;
 
+/** Build query configuration object */
 export interface BuildQuery<TQuery, TSchema> {
-  /** Apply filters with configurable logic operator */
+  /** Filters with configurable logic operators */
   filterBy?: FilterRule<keyof TQuery, NestedKeyOf<TSchema>>[];
-  /** Apply regex search filters */
+  /** Search rules with regex */
   searchBy?: SearchRule<keyof TQuery, NestedKeyOf<TSchema>>[];
-  /** Apply range filters */
+  /** Range-based filtering */
   rangeBy?: RangeRule<keyof TQuery, NestedKeyOf<TSchema>>[];
-  /** Apply existence checks */
+  /** Check existence of fields */
   existsBy?: ExistsRule<keyof TQuery, NestedKeyOf<TSchema>>[];
-  /** Apply array element matching */
+  /** Filter on array elements */
   arrayBy?: ArrayRule<keyof TQuery, NestedKeyOf<TSchema>>[];
 }
 
+/** Filter rule configuration */
 export interface FilterRule<TQueryKey, TModelKey> {
+  /** Query parameter key */
   queryKey: TQueryKey;
+  /** Corresponding model key */
   modelKey: TModelKey;
+  /** Comparison operator */
   operator?: '$eq' | '$ne' | '$gt' | '$gte' | '$lt' | '$lte' | '$in' | '$nin';
-  logic?: 'and' | 'or'; // 👈 New: determines AND vs OR behavior
+  /** Logic operator for multiple filters */
+  logic?: 'and' | 'or';
+  /** Optional transform function for query value */
   transform?: (value: any) => any;
 }
 
+/** Search rule configuration */
 export interface SearchRule<TQueryKey, TModelKey> {
+  /** Query parameter key */
   queryKey: TQueryKey;
+  /** Corresponding model keys to search */
   modelKeys: TModelKey[];
-  operator?: 'and' | 'or'; // How to combine multiple modelKeys
+  /** Logic operator for multiple fields */
+  operator?: 'and' | 'or';
+  /** Regex options (case-insensitive, multiline, etc.) */
   options?: 'i' | 'im' | 'ims';
+  /** Mode of string matching */
   matchMode?: 'contains' | 'startsWith' | 'endsWith' | 'exact';
+  /** Optional transform function for query value */
+  transform?: (value: any) => any;
 }
 
+/** Range filter rule configuration */
 export interface RangeRule<TQueryKey, TModelKey> {
+  /** Query key for start value */
   queryKeyStart?: TQueryKey;
+  /** Query key for end value */
   queryKeyEnd?: TQueryKey;
+  /** Corresponding model key */
   modelKey: TModelKey;
 }
 
+/** Exists filter rule configuration */
 export interface ExistsRule<TQueryKey, TModelKey> {
+  /** Query parameter key */
   queryKey: TQueryKey;
+  /** Model key to check existence */
   modelKey: TModelKey;
+  /** Check if field exists */
   checkExists?: boolean;
 }
 
+/** Array filter rule configuration */
 export interface ArrayRule<TQueryKey, TModelKey> {
+  /** Query parameter key */
   queryKey: TQueryKey;
+  /** Model key containing array */
   modelKey: TModelKey;
+  /** Operator for array query */
   operator?: '$all' | '$elemMatch' | '$size' | '$in';
+  /** Condition object for element matching */
   condition?: Record<string, any>;
 }
 
+/** Configuration for related collection lookup */
 export interface RelatedLookup<TSchema> {
-  /**
-   * The collection name of the related documents (e.g., 'posts', 'comments')
-   */
+  /** Name of the related collection */
   from: string;
-
-  /**
-   * Field in the current model to match with the related collection.
-   * Can be a key of TSchema or a string (for nested paths)
-   */
+  /** Local field in current model */
   localField: keyof TSchema;
-
-  /**
-   * Field in the related collection to match with localField
-   */
+  /** Field in related collection */
   foreignField: string;
-
-  /**
-   * The name of the count field to add in the result (e.g., 'postsCount')
-   */
+  /** Field name to store count in result */
   asField: string;
-
-  /**
-   * Optional additional $match stage inside the lookup to filter related documents
-   */
+  /** Optional additional $match stage for filtering related documents */
   matchStage?: Record<string, unknown>;
 }

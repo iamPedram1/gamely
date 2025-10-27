@@ -75,4 +75,9 @@ export class CommentManagementQueryDto extends BaseQueryDto {
   @IsOptional()
   @IsMongoId({ each: true })
   post: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(commentStatus)
+  status: string;
 }

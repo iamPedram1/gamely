@@ -5,6 +5,7 @@ import CategoryService from 'features/shared/category/category.service';
 
 // DTO
 import { CategoryMapper } from 'features/shared/category/category.mapper';
+import { CategoryManagementQueryDto } from 'features/management/category/category.management.dto';
 
 // Utilities
 import sendResponse from 'core/utilities/response';
@@ -23,9 +24,19 @@ export default class CategoryManagementController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as CategoryManagementQueryDto;
+    const filter = await this.categoryService.buildFilterFromQuery(query, {
+      searchBy: [
+        {
+          queryKey: 'search',
+          modelKeys: ['translations.en.title', 'translations.fa.title', 'slug'],
+          options: 'i',
+        },
+      ],
+    });
     const { pagination, docs } = await this.categoryService.find({
       query,
+      filter,
       lean: true,
       populate: [{ path: 'creator', populate: 'avatar' }],
     });

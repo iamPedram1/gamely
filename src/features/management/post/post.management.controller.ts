@@ -23,11 +23,11 @@ export default class PostManagementController {
 
   getAll: RequestHandler = async (req, res) => {
     const dto = req.query as unknown as PostManagementQueryDto;
-    const filter = this.postService.buildFilterFromQuery(dto, {
+    const filter = await this.postService.buildFilterFromQuery(dto, {
       filterBy: [
+        { queryKey: 'tag', modelKey: 'tags', logic: 'and' },
         { queryKey: 'game', modelKey: 'game', logic: 'and' },
         { queryKey: 'category', modelKey: 'category', logic: 'and' },
-        { queryKey: 'tag', modelKey: 'tags', logic: 'and' },
       ],
       searchBy: [
         {
@@ -38,6 +38,7 @@ export default class PostManagementController {
         },
       ],
     });
+    console.log(filter);
 
     const { pagination, docs } = await this.postService.find({
       query: dto,

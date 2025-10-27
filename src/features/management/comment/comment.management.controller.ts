@@ -29,8 +29,9 @@ export default class CommentManagementController {
   getAll: RequestHandler = async (req, res) => {
     const query = req.query as unknown as CommentManagementQueryDto;
     const filter = await this.commentService.buildFilterFromQuery(query, {
-      searchBy: [{ queryKey: 'search', modelKeys: ['creator'], options: 'i' }],
+      searchBy: [{ queryKey: 'search', modelKeys: ['message'], options: 'i' }],
       filterBy: [
+        { queryKey: 'status', modelKey: 'status', logic: 'and' },
         { queryKey: 'post', modelKey: 'postId', logic: 'or' },
         { queryKey: 'user', modelKey: 'creator', logic: 'or' },
       ],
@@ -89,7 +90,7 @@ export default class CommentManagementController {
   };
 
   delete: RequestHandler = async (req, res) => {
-    await this.commentService.deleteOneById(req.params.commentId);
+    await this.commentService.deleteOneById(req.params.id);
     sendResponse(res, 200, {
       httpMethod: 'DELETE',
       featureName: 'models.Comment.singular',

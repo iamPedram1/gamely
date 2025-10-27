@@ -2,6 +2,7 @@ import { Expose, Type } from 'class-transformer';
 import { IsIn, IsOptional, IsString } from 'core/utilities/validation';
 
 // DTO
+import { BaseQueryDto } from 'core/dto/query';
 import { BaseUserUpdate } from 'features/shared/user/user.dto';
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
@@ -59,4 +60,18 @@ export class UserManagementSummaryResponseDto extends BaseSummaryResponseDto {
 
   @Expose()
   bio: string;
+}
+
+// <----------------   QUERY   ---------------->
+
+export class UserManagementQueryDto extends BaseQueryDto {
+  @IsOptional()
+  @IsString()
+  @IsIn(userRoles)
+  role: UserRole;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(userStatus)
+  status: UserStatus;
 }

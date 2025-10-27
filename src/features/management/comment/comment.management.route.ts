@@ -24,21 +24,21 @@ commentManagementRouter.use(auth(['author', 'admin', 'superAdmin']));
 commentManagementRouter.get('/', commentController.getAll);
 commentManagementRouter.get(
   '/:id',
-  validateParam(Comment, 'id', '_id', { isId: true }),
+  validateParam(Comment, 'id', '_id', { type: 'id' }),
   commentController.getPostComments
 );
 
 // <----------------   PATCH   ---------------->
 commentManagementRouter.patch(
   '/:id',
-  validateParam(Comment, 'id', '_id', { isId: true }),
+  validateParam(Comment, 'id', '_id', { type: 'id' }),
   validateBody(UpdateCommentDto),
   commentController.update
 );
 // <----------------   DELETE   ---------------->
 commentManagementRouter.delete(
   '/:id',
-  validateParam(Comment, 'id', '_id', { isId: true }),
+  validateParam(Comment, 'id', '_id', { type: 'id' }),
   commentController.delete
 );
 

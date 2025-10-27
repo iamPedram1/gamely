@@ -7,7 +7,10 @@ import sendResponse from 'core/utilities/response';
 import UserService from 'features/shared/user/user.service';
 
 // DTO
-import { UpdateUserDto } from 'features/management/user/user.management.dto';
+import {
+  UpdateUserDto,
+  UserManagementQueryDto,
+} from 'features/management/user/user.management.dto';
 
 // Mapper
 import { UserMapper } from 'features/shared/user/user.mapper';
@@ -23,7 +26,10 @@ export default class UserManagementController {
   ) {}
 
   getOne: RequestHandler = async (req, res) => {
-    const user = await this.userService.getOneById(req.params.id);
+    const user = await this.userService.getOneById(req.params.id, {
+      lean: true,
+      populate: 'avatar',
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -35,7 +41,21 @@ export default class UserManagementController {
   };
 
   getAll: RequestHandler = async (req, res) => {
-    const user = await this.userService.find();
+    const query = req.query as unknown as UserManagementQueryDto;
+    const filter = await this.userService.buildFilterFromQuery(query, {
+      searchBy: [
+        { queryKey: 'search', modelKeys: ['name', 'email'], options: 'i' },
+      ],
+      filterBy: [
+        { queryKey: 'role', modelKey: 'role', logic: 'and' },
+        { queryKey: 'status', modelKey: 'status', logic: 'and' },
+      ],
+    });
+    const user = await this.userService.find({
+      filter,
+      populate: 'avatar',
+      lean: true,
+    });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

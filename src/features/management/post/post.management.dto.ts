@@ -187,5 +187,5 @@ export class PostManagementQueryDto extends BaseQueryDto {
 
   @IsOptional()
   @IsMongoId({ each: true })
-  game: string;
+  game: string | string[];
 }

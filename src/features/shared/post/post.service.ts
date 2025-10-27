@@ -10,8 +10,8 @@ import {
 } from 'features/management/post/post.management.dto';
 
 // Services
-import FileService from 'features/shared/file/file.service';
 import BaseService from 'core/services/base/base.service';
+import FileService from 'features/shared/file/file.service';
 import CommentService from 'features/shared/comment/comment.service';
 
 // Validations
@@ -42,31 +42,6 @@ class PostService extends BaseService<
     super(Post);
   }
 
-  async getPostsBy(
-    keyName: keyof IPostEntity,
-    value: IPostEntity[typeof keyName]
-  ): Promise<PostDocument[]> {
-    return await super.find({
-      filter: { [keyName]: value },
-      lean: true,
-      paginate: false,
-    });
-  }
-
-  async create(
-    data: CreatePostDto,
-    userId?: string,
-    options?: BaseMutateOptions
-  ): Promise<PostDocument> {
-    await Promise.all([
-      this.postValidation.validateGame(data.game),
-      this.postValidation.validateTags(data.tags),
-      this.postValidation.validateCategory(data.category),
-    ]);
-
-    return await super.create(data, userId, options);
-  }
-
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
     return await super.batchDelete(ids, {
       ...(this.currentUser.isNot('admin') && {
@@ -82,15 +57,7 @@ class PostService extends BaseService<
       | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
       | undefined
   ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
-    const validations = [
-      this.currentUser.is('author') && (await this.assertOwnership(id)),
-      payload.game && this.postValidation.validateGame(payload.game),
-      payload.tags && this.postValidation.validateTags(payload.tags),
-      payload.category &&
-        this.postValidation.validateCategory(payload.category),
-    ].filter(Boolean) as Promise<void>[];
-
-    await Promise.all(validations);
+    if (this.currentUser.is('author')) await this.assertOwnership(id);
 
     return await super.updateOneById(id, payload, options);
   }

@@ -10,6 +10,7 @@ import {
 } from 'core/utilities/validation';
 
 // DTO
+import { BaseQueryDto } from 'core/dto/query';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
 import {
@@ -103,3 +104,7 @@ export class CategoryManagementSummaryResponseDto extends BaseSummaryResponseDto
   @Expose()
   slug: string;
 }
+
+// <----------------   QUERY   ---------------->
+
+export class CategoryManagementQueryDto extends BaseQueryDto {}
