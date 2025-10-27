@@ -1,12 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { delay, inject, injectable } from 'tsyringe';
 
-// Model
-import { IRecoveryKey, IRefreshToken } from 'features/shared/user/user.model';
-
 // Service
-import UserService from 'features/shared/user/user.service';
 import tokenUtils from 'core/services/token.service';
+import UserService from 'features/shared/user/user.service';
+import SessionService from 'features/shared/session/session.service';
 
 // DTO
 import {
@@ -34,16 +32,17 @@ import {
 import {
   jwtRecoverPasswordKey,
   jwtRecoverPasswordKeyExpiresInMinutes,
-  jwtRefreshTokenKey,
 } from 'features/shared/auth/auth.constants';
 
 // Types
-import { IUserEntity } from 'features/shared/user/user.types';
+import { CreateSessionDto } from 'features/shared/session/session.dto';
+import { IRecoveryKey, IUserEntity } from 'features/shared/user/user.types';
 
 @injectable()
 export default class AuthService {
   constructor(
-    @inject(delay(() => UserService)) private userService: UserService
+    @inject(delay(() => UserService)) private userService: UserService,
+    @inject(delay(() => SessionService)) private sessionService: SessionService
   ) {}
 
   async register(data: RegisterDto): Promise<IUserEntity> {
@@ -87,6 +86,7 @@ export default class AuthService {
     const user = await this.userService.getOneById(key.userId, {
       select: '+recoveryKey',
     });
+    const userId = user._id.toHexString();
 
     const isRecoveryKeyCorrect = user.recoveryKey
       ? await crypto.compare(data.recoveryKey, user.recoveryKey)
@@ -96,14 +96,19 @@ export default class AuthService {
       throw new ValidationError(t('error.recovery_token.invalid'));
 
     return await this.userService.mutateWithTransaction(async (session) => {
-      user.password = data.password;
       user.recoveryKey = null;
-      if (user.refreshToken) user.refreshToken = null;
-      await user.save({ session });
+      user.password = data.password;
+      await Promise.all([
+        user.save({ session }),
+        this.sessionService.deleteManyByKey('userId', userId, {
+          session,
+          lean: true,
+        }),
+      ]);
     });
   }
 
-  async login(data: LoginDto) {
+  async login(data: LoginDto, sessionData: CreateSessionDto) {
     const mask = t('error.invalid_credentials');
 
     const user = await this.userService.getOneByKey(
@@ -124,42 +129,15 @@ export default class AuthService {
     if (user.isBlocked()) throw new ForbiddenError(t('error.user.is_blocked'));
 
     // Generate Token
-    const { token, refreshToken } = user.generateAuthToken();
-    const res = await user.set('refreshToken', refreshToken).save();
-
-    if (!res) throw new AnonymousError('Error occured while saving tokens');
-
-    return { token, refreshToken };
-  }
-
-  async refreshToken(refreshToken: string) {
-    const { userId } = this.verifyRefreshJwt(refreshToken);
-    const user = await this.userService.getOneById(userId, {
-      select: '+refreshToken',
+    const session = await this.sessionService.createSession({
+      ...sessionData,
+      userId: user._id.toHexString(),
     });
 
-    if (!(await user.compareRefreshToken(refreshToken)))
-      throw new ValidationError(t('error.refresh_token.invalid'));
+    if (!session)
+      throw new AnonymousError('Error occured while creating session');
 
-    const newAuth = user.generateAuthToken();
-
-    const res = await user.set('refreshToken', newAuth.refreshToken).save();
-
-    if (!res)
-      throw new AnonymousError('An error occured while generating token');
-
-    return newAuth;
-  }
-
-  async clearToken(userId: string) {
-    const user = await this.userService.getOneById(userId);
-
-    if (user.refreshToken) {
-      const res = await user.set('refreshToken', null).save();
-
-      if (!res)
-        throw new AnonymousError('An error occured while cleaning up token');
-    }
+    return session;
   }
 
   private verifyRecoveryJwt(recoveryKey: string) {
@@ -167,14 +145,6 @@ export default class AuthService {
       recoveryKey,
       jwtRecoverPasswordKey,
       t('common.recoveryKey')
-    );
-  }
-
-  private verifyRefreshJwt(refreshToken: string) {
-    return tokenUtils.verify<IRefreshToken>(
-      refreshToken,
-      jwtRefreshTokenKey,
-      t('common.refreshToken')
     );
   }
 

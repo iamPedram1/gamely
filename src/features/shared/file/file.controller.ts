@@ -11,7 +11,7 @@ import { FileMapper } from 'features/shared/file/file.mapper';
 
 // Types
 import type { RequestHandler } from 'express';
-import type { IFileLocation } from 'features/shared/file/file.type';
+import type { IFileLocation } from 'features/shared/file/file.types';
 
 @injectable()
 export default class FileController {

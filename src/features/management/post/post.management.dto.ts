@@ -28,8 +28,8 @@ import {
 import { IsSlug } from 'core/utilities/validation';
 
 // Types
-import type { IFileSummary } from 'features/shared/file/file.type';
-import type { PostTranslation } from 'features/shared/post/post.type';
+import type { IFileSummary } from 'features/shared/file/file.types';
+import type { PostTranslation } from 'features/shared/post/post.types';
 import type { WithDictionaries } from 'core/types/translations';
 
 // <----------------   CREATE   ---------------->

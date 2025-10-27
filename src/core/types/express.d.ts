@@ -10,6 +10,7 @@ declare global {
       user: IUserContext;
       i18n: i18n;
       t: TypedTFunction;
+      clientIp: string;
     }
   }
 }

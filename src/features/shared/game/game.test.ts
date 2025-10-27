@@ -10,8 +10,8 @@ import User from 'features/shared/user/user.model';
 import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
-import { IGameEntity } from 'features/shared/game/game.type';
-import { jwtTokenName } from 'features/shared/auth/auth.constants';
+import { IGameEntity } from 'features/shared/game/game.types';
+import { jwtAccessTokenName } from 'features/shared/session/session.constants';
 
 describe('game routes', () => {
   afterAll(async () => {
@@ -48,7 +48,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .post(prefixBaseUrl('/games'))
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send(payload);
     };
 
@@ -123,7 +123,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .patch(prefixBaseUrl(`/games/${gameId}`))
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send(payload);
     };
 
@@ -201,7 +201,7 @@ describe('game routes', () => {
     const exec = async () => {
       return await request(server)
         .delete(prefixBaseUrl(`/games/${gameId}`))
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send();
     };
 

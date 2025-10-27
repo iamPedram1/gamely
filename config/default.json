@@ -2,7 +2,7 @@
   "PORT": 3000,
   "User_App_URL": "http://localhost:5173",
   "VERSION": 1,
-  "JWT_AccessToken_ExpiresInMinutes": 99999999,
+  "JWT_AccessToken_ExpiresInMinutes": 2,
   "JWT_RecoverPasswordKey_ExpiresInMinutes": 10,
   "JWT_RefreshToken_ExpiresInDays": 30,
   "JWT_Cookie_ExpiresInMinuets": 30,

@@ -21,7 +21,7 @@ import type { IRequestQueryBase } from 'core/types/query';
 import type {
   CommentType,
   ICommentEntity,
-} from 'features/shared/comment/comment.type';
+} from 'features/shared/comment/comment.types';
 import type {
   BaseMutateOptions,
   IBaseService,
@@ -29,7 +29,7 @@ import type {
 import type {
   CommentDocument,
   CommentLeanDocument,
-} from 'features/shared/comment/comment.model';
+} from 'features/shared/comment/comment.types';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;

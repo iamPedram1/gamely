@@ -1,14 +1,18 @@
 // Types
-import {
+import type { FlattenMaps, HydratedDocument, ObjectId } from 'mongoose';
+import type { IUser } from 'features/shared/user/user.types';
+import type {
   FileResponseDto,
   FileSummaryResponseDto,
 } from 'features/shared/file/file.dto';
-import type { IUser } from 'features/shared/user/user.types';
+
+export type FileDocument = HydratedDocument<IFileEntity>;
+export type FileLeanDocument = FlattenMaps<FileDocument>;
 
 export type IFileLocation = 'game' | 'post' | 'user';
 
 export interface IFileEntity extends Omit<Document, 'location'> {
-  _id: string;
+  _id: ObjectId;
   creator: IUser;
   createdAt: Date;
   updatedAt: Date;

@@ -1,5 +1,8 @@
 // Types
-import type { Types } from 'mongoose';
+import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
+
+export type CommentDocument = HydratedDocument<ICommentEntity>;
+export type CommentLeanDocument = FlattenMaps<CommentDocument>;
 
 export type CommentType = 'main' | 'reply';
 export type CommentStatusType = 'approved' | 'rejected' | 'pending';

@@ -1,17 +1,7 @@
-import {
-  model,
-  Model,
-  FlattenMaps,
-  HydratedDocument,
-  Schema,
-  Types,
-} from 'mongoose';
+import { model, Model, Schema, Types } from 'mongoose';
 
 // Types
-import type { IPostEntity } from 'features/shared/post/post.type';
-
-export type PostDocument = HydratedDocument<IPostEntity>;
-export type PostLeanDocument = FlattenMaps<PostDocument>;
+import type { IPostEntity } from 'features/shared/post/post.types';
 
 const translationSchema = new Schema(
   {

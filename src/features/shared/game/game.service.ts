@@ -1,7 +1,7 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import Game, { GameDocument } from 'features/shared/game/game.model';
+import Game from 'features/shared/game/game.model';
 
 // DTO
 import {
@@ -14,9 +14,12 @@ import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Types
-import type { IGameEntity } from 'features/shared/game/game.type';
 import type { IApiBatchResponse } from 'core/utilities/response';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
+import type {
+  GameDocument,
+  IGameEntity,
+} from 'features/shared/game/game.types';
 
 export type IGameService = InstanceType<typeof GameService>;
 

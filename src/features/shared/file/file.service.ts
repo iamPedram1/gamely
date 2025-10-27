@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { singleton } from 'tsyringe';
 
 // Models
-import File, { FileDocument } from 'features/shared/file/file.model';
+import File from 'features/shared/file/file.model';
 
 // Services
 import BaseService from 'core/services/base/base.service';
@@ -18,7 +18,8 @@ import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type {
   IFileEntity,
   IFileLocation,
-} from 'features/shared/file/file.type';
+  FileDocument,
+} from 'features/shared/file/file.types';
 
 export type IFileService = InstanceType<typeof FileService>;
 

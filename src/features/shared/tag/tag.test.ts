@@ -10,8 +10,8 @@ import User from 'features/shared/user/user.model';
 import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
-import { ITagEntity } from 'features/shared/tag/tag.type';
-import { jwtTokenName } from 'features/shared/auth/auth.constants';
+import { ITagEntity } from 'features/shared/tag/tag.types';
+import { jwtAccessTokenName } from 'features/shared/session/session.constants';
 
 describe('tag routes', () => {
   afterAll(async () => {
@@ -49,7 +49,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .post(prefixBaseUrl('/tags'))
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send(payload);
     };
 
@@ -124,7 +124,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .patch(prefixBaseUrl(`/tags/${tagId}`))
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send(payload);
     };
 
@@ -202,7 +202,7 @@ describe('tag routes', () => {
     const exec = async () => {
       return await request(server)
         .delete(prefixBaseUrl(`/tags/${tagId}`))
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send();
     };
 

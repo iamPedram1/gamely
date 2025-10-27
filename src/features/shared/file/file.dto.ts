@@ -1,6 +1,6 @@
 import { Expose, Transform } from 'class-transformer';
 import { appUrl } from 'core/utilities/configs';
-import { IFileLocation } from 'features/shared/file/file.type';
+import { IFileLocation } from 'features/shared/file/file.types';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 export class FileResponseDto extends BaseResponseDto {
   @Expose()

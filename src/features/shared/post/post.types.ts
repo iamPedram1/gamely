@@ -1,10 +1,13 @@
-import type { Types } from 'mongoose';
+import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 import type { WithTranslations } from 'core/types/translations';
 import type { PostManagementResponseDto } from 'features/management/post/post.management.dto';
 import type {
   ClientPostSummaryResponseDto,
   ClientPostResponseDto,
 } from 'features/client/post/post.client.dto';
+
+export type PostDocument = HydratedDocument<IPostEntity>;
+export type PostLeanDocument = FlattenMaps<PostDocument>;
 
 export interface PostTranslation {
   title: string;

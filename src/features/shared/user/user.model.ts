@@ -1,29 +1,15 @@
 import { isEmail } from 'class-validator';
-import { FlattenMaps, HydratedDocument, Model, Schema, model } from 'mongoose';
+import { Model, Schema, model } from 'mongoose';
 
 // Utils
 import crypto from 'core/utilities/crypto';
-import tokenUtils from 'core/services/token.service';
 import { userRoles, userStatus } from 'features/shared/user/user.constants';
 
 // Types
-import type { IUserEntity } from 'features/shared/user/user.types';
-
-export interface IUserEntityMethods {
-  generateToken(): string;
-  isBlocked: () => boolean;
-  compareRefreshToken(refreshToken: string): Promise<boolean>;
-  generateRefreshToken(): string;
-  generateAuthToken(): { token: string; refreshToken: string };
-  validateToken(token: string, refreshToken: string): boolean;
-  comparePassword(candidatePassword: string): Promise<boolean>;
-}
-
-export type IToken = { userId: string };
-export type IRefreshToken = { userId: string };
-export type IRecoveryKey = { userId: string };
-export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
-export type UserLeanDocument = FlattenMaps<IUserEntity>;
+import type {
+  IUserEntity,
+  IUserEntityMethods,
+} from 'features/shared/user/user.types';
 
 const userSchema = new Schema<
   IUserEntity,
@@ -31,12 +17,6 @@ const userSchema = new Schema<
   IUserEntityMethods
 >(
   {
-    refreshToken: {
-      type: String,
-      default: null,
-      trim: true,
-      select: false,
-    },
     recoveryKey: {
       type: String,
       default: null,
@@ -98,21 +78,6 @@ const userSchema = new Schema<
   { timestamps: true }
 );
 
-userSchema.methods.generateToken = function () {
-  return tokenUtils.generateToken(this._id);
-};
-
-userSchema.methods.generateAuthToken = function () {
-  const token = this.generateToken();
-  const refreshToken = this.generateRefreshToken();
-
-  return { token, refreshToken };
-};
-
-userSchema.methods.generateRefreshToken = function () {
-  return tokenUtils.generateRefreshToken(this._id);
-};
-
 userSchema.methods.comparePassword = async function (password) {
   if (!this.password) return false;
   return await crypto.compare(password, this.password);
@@ -122,13 +87,8 @@ userSchema.methods.isBlocked = function () {
   return this.status === 'blocked';
 };
 
-userSchema.methods.compareRefreshToken = async function (refreshToken: string) {
-  if (!refreshToken || !this.refreshToken) return false;
-  return await crypto.compare(refreshToken, this.refreshToken);
-};
-
-const hashableFields = ['password', 'refreshToken', 'recoveryKey'] as const;
 const methods = ['findOneAndUpdate', 'updateOne'] as const;
+const hashableFields = ['password', 'recoveryKey'] as const;
 
 userSchema.pre('save', async function (next) {
   try {

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
@@ -5,6 +6,7 @@ import type { RequestHandler } from 'express';
 import AuthService from 'features/shared/auth/auth.service';
 
 // DTO
+import { UpdateSessionDto } from 'features/shared/session/session.dto';
 import {
   LoginDto,
   RegisterDto,
@@ -14,6 +16,7 @@ import {
 
 // Utilities
 import sendResponse from 'core/utilities/response';
+import { jwtRefreshTokenExpiresInDays } from 'features/shared/session/session.constants';
 
 @injectable()
 export default class AuthController {
@@ -58,38 +61,27 @@ export default class AuthController {
   };
 
   login: RequestHandler = async (req, res) => {
-    const dto = req.body as LoginDto;
+    const loginDto = req.body as LoginDto;
 
-    const { token, refreshToken } = await this.authService.login(dto);
+    const sessionDto = new UpdateSessionDto();
+    sessionDto.generatedAt = new Date();
+    sessionDto.lastActivity = new Date();
+    sessionDto.ip = req.clientIp || '';
+    sessionDto.userAgent = req.headers['user-agent'] || '';
+    sessionDto.refreshToken = req.body.refreshToken;
+    sessionDto.expiresAt = dayjs()
+      .add(jwtRefreshTokenExpiresInDays, 'days')
+      .toDate();
+
+    const { accessToken, refreshToken } = await this.authService.login(
+      loginDto,
+      sessionDto
+    );
 
     sendResponse(res, 200, {
       body: {
-        data: { token, refreshToken },
+        data: { accessToken, refreshToken },
         message: req.t('messages.auth.login_success'),
-      },
-    });
-  };
-
-  refreshToken: RequestHandler = async (req, res) => {
-    const newAuth = await this.authService.refreshToken(req.body.refreshToken);
-
-    sendResponse(res, 200, {
-      httpMethod: 'POST',
-      body: {
-        message: req.t('messages.auth.token_refresh_success'),
-        data: newAuth,
-      },
-    });
-  };
-
-  revokeToken: RequestHandler = async (req, res) => {
-    await this.authService.clearToken(req.user.id);
-
-    sendResponse(res, 200, {
-      httpMethod: 'POST',
-      body: {
-        data: null,
-        message: req.t('common.operation_completed_successfully'),
       },
     });
   };

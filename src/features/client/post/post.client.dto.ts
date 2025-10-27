@@ -14,7 +14,7 @@ import { CategoryClientResponseDto } from 'features/client/category/category.cli
 import { pickLocaleField } from 'core/utilities/request-context';
 
 // Types
-import type { IFileSummary } from 'features/shared/file/file.type';
+import type { IFileSummary } from 'features/shared/file/file.types';
 
 // <----------------   RESPONSE   ---------------->
 

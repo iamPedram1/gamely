@@ -23,11 +23,11 @@ import {
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';
-import type { CategoryDocument } from 'features/shared/category/category.model';
+import type { CategoryDocument } from 'features/shared/category/category.types';
 import type {
   ICategoryEntity,
   INestedCategoryEntity,
-} from 'features/shared/category/category.type';
+} from 'features/shared/category/category.types';
 
 type ParentMap = Record<string, number[]>;
 

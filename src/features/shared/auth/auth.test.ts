@@ -7,7 +7,7 @@ import User from 'features/shared/user/user.model';
 
 // Utils
 import { prefixBaseUrl } from 'core/utilities/configs';
-import { jwtTokenName } from 'features/shared/auth/auth.constants';
+import { jwtAccessTokenName } from 'features/shared/session/session.constants';
 
 // Types
 import { IUserEntity } from 'features/shared/user/user.types';
@@ -44,7 +44,7 @@ describe('auth routes', () => {
     const exec = async () => {
       return await request(server)
         .post(registerURL)
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send(payload);
     };
 
@@ -104,7 +104,7 @@ describe('auth routes', () => {
     const exec = async () => {
       return await request(server)
         .post(loginURL)
-        .set(jwtTokenName, token)
+        .set(jwtAccessTokenName, token)
         .send(payload);
     };
 
@@ -139,7 +139,7 @@ describe('auth routes', () => {
       const result = await exec();
 
       expect(result.status).toBe(200);
-      expect(result.headers).toHaveProperty(jwtTokenName);
+      expect(result.headers).toHaveProperty(jwtAccessTokenName);
     });
   });
 });

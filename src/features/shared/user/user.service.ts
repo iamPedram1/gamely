@@ -17,7 +17,7 @@ import type { IUserEntity } from 'features/shared/user/user.types';
 import type {
   UserDocument,
   UserLeanDocument,
-} from 'features/shared/user/user.model';
+} from 'features/shared/user/user.types';
 import {
   BadRequestError,
   ForbiddenError,

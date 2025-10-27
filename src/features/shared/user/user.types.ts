@@ -1,12 +1,20 @@
 import type { UserManagementResponseDto } from 'features/management/user/user.management.dto';
-import type { Types } from 'mongoose';
+import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
+
+export interface IUserEntityMethods {
+  isBlocked: () => boolean;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
+
+export type IRecoveryKey = { userId: string };
+export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
+export type UserLeanDocument = FlattenMaps<IUserEntity>;
 
 export type UserRole = 'user' | 'author' | 'admin' | 'superAdmin';
 export type UserStatus = 'active' | 'blocked';
 
 interface PrivateKeys {
   recoveryKey: string | null;
-  refreshToken: string | null;
   password: string;
 }
 

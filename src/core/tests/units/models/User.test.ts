@@ -1,7 +1,7 @@
 import User from 'features/shared/user/user.model';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import { jwtAccessTokenKey } from 'features/shared/auth/auth.constants';
+import { jwtAccessTokenKey } from 'features/shared/session/session.constants';
 
 describe('UserModel Unit Tests', () => {
   describe('generateAuthToken', () => {

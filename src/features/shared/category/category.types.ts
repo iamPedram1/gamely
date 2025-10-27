@@ -1,5 +1,8 @@
 import { WithTranslations } from 'core/types/translations';
-import type { Types } from 'mongoose';
+import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
+
+export type CategoryDocument = HydratedDocument<ICategoryEntity>;
+export type CategoryLeanDocument = FlattenMaps<CategoryDocument>;
 
 export interface CategoryTranslation {
   title: string;

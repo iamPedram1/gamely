@@ -21,8 +21,8 @@ import { PostValidation } from 'features/shared/post/post.validation';
 import logger from 'core/utilities/logger';
 
 // Types
-import type { IPostEntity } from 'features/shared/post/post.type';
-import type { PostDocument } from 'features/shared/post/post.model';
+import type { IPostEntity } from 'features/shared/post/post.types';
+import type { PostDocument } from 'features/shared/post/post.types';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { IApiBatchResponse } from 'core/utilities/response';
 

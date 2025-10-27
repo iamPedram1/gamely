@@ -9,7 +9,7 @@ import { pickLocaleField } from 'core/utilities/request-context';
 import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
 
 // Types
-import type { IFileSummary } from 'features/shared/file/file.type';
+import type { IFileSummary } from 'features/shared/file/file.types';
 
 export class GameClientResponseDto extends BaseResponseDto {
   @Expose()

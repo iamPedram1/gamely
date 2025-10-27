@@ -22,9 +22,9 @@ import {
 import { IsSlug } from 'core/utilities/validation';
 
 // Types
-import type { IFileSummary } from 'features/shared/file/file.type';
+import type { IFileSummary } from 'features/shared/file/file.types';
 import { WithDictionaries } from 'core/types/translations';
-import { GameTranslation } from 'features/shared/game/game.type';
+import { GameTranslation } from 'features/shared/game/game.types';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {

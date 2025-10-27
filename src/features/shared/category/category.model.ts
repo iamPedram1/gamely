@@ -1,17 +1,7 @@
-import {
-  model,
-  Schema,
-  Types,
-  Model,
-  FlattenMaps,
-  HydratedDocument,
-} from 'mongoose';
+import { model, Schema, Types, Model } from 'mongoose';
 
 // Types
-import type { ICategoryEntity } from 'features/shared/category/category.type';
-
-export type CategoryDocument = HydratedDocument<ICategoryEntity>;
-export type CategoryLeanDocument = FlattenMaps<CategoryDocument>;
+import type { ICategoryEntity } from 'features/shared/category/category.types';
 
 const translationSchema = new Schema(
   {

@@ -1,11 +1,5 @@
 import { singleton } from 'tsyringe';
 
-// Model
-import {
-  GameDocument,
-  GameLeanDocument,
-} from 'features/shared/game/game.model';
-
 // DTO
 import {
   GameClientResponseDto,
@@ -18,6 +12,12 @@ import {
 
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
+
+// Types
+import {
+  GameDocument,
+  GameLeanDocument,
+} from 'features/shared/game/game.types';
 
 export type IGameMapper = InstanceType<typeof GameMapper>;
 

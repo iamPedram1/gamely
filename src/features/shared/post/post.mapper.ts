@@ -17,7 +17,7 @@ import { BaseMapper } from 'core/mappers/base';
 import {
   PostDocument,
   PostLeanDocument,
-} from 'features/shared/post/post.model';
+} from 'features/shared/post/post.types';
 
 export type IPostMapper = InstanceType<typeof PostMapper>;
 

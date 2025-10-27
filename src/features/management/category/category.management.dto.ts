@@ -21,7 +21,7 @@ import {
 // Utilities
 import { IsSlug } from 'core/utilities/validation';
 import { WithDictionaries } from 'core/types/translations';
-import { CategoryTranslation } from 'features/shared/category/category.type';
+import { CategoryTranslation } from 'features/shared/category/category.types';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {

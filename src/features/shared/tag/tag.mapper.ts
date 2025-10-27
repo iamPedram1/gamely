@@ -1,6 +1,6 @@
 // Model
 import { singleton } from 'tsyringe';
-import { TagDocument, TagLeanDocument } from 'features/shared/tag/tag.model';
+import { TagDocument, TagLeanDocument } from 'features/shared/tag/tag.types';
 
 // DTO
 import {
@@ -16,7 +16,7 @@ import {
 import { BaseMapper } from 'core/mappers/base';
 
 // Type
-import { ITagEntity } from 'features/shared/tag/tag.type';
+import { ITagEntity } from 'features/shared/tag/tag.types';
 
 export type ITagMapper = InstanceType<typeof TagMapper>;
 

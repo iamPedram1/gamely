@@ -14,9 +14,9 @@ import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Types
-import type { ITagEntity } from 'features/shared/tag/tag.type';
+import type { ITagEntity } from 'features/shared/tag/tag.types';
 import type { IApiBatchResponse } from 'core/utilities/response';
-import type { TagDocument } from 'features/shared/tag/tag.model';
+import type { TagDocument } from 'features/shared/tag/tag.types';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 
 export type ITagService = InstanceType<typeof TagService>;

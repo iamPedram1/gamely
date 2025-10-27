@@ -20,7 +20,7 @@ import { IsSlug } from 'core/utilities/validation';
 
 // Types
 import type { WithDictionaries } from 'core/types/translations';
-import type { TagTranslation } from 'features/shared/tag/tag.type';
+import type { TagTranslation } from 'features/shared/tag/tag.types';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {

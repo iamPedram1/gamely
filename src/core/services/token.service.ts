@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import type { Types } from 'mongoose';
 
 // Utilites
 import { t } from 'core/utilities/request-context';
@@ -9,14 +8,13 @@ import {
   jwtRefreshTokenKey,
   jwtAccessTokenExpiresInMinutes,
   jwtAccessTokenKey,
-} from 'features/shared/auth/auth.constants';
+} from 'features/shared/session/session.constants';
 
 const tokenUtils = {
   verify<T>(token: string, secret: string, name: string) {
     try {
       return jwt.verify(token, secret) as T;
     } catch (error) {
-      console.log({ error, token, secret, name });
       if (error instanceof jwt.TokenExpiredError)
         throw new ValidationError(t('error.jwt.verify_expired', { name }));
       if (error instanceof jwt.JsonWebTokenError)
@@ -25,15 +23,15 @@ const tokenUtils = {
       throw new InternalServerError();
     }
   },
-  generateToken(userId: Types.ObjectId) {
-    const obj = { userId: userId.toHexString() };
+  generateAccessToken(userId: string, sessionId: string) {
+    const obj = { userId, sessionId };
 
     return jwt.sign(obj, jwtAccessTokenKey, {
       expiresIn: `${jwtAccessTokenExpiresInMinutes}m`,
     });
   },
-  generateRefreshToken(id: Types.ObjectId) {
-    const obj = { userId: id.toHexString() };
+  generateRefreshToken(userId: string, sessionId: string) {
+    const obj = { userId, sessionId };
     return jwt.sign(obj, jwtRefreshTokenKey, {
       expiresIn: `${jwtRefreshTokenExpiresInDays}d`,
     });

@@ -17,7 +17,7 @@ import { BaseMapper } from 'core/mappers/base';
 import type {
   CommentDocument,
   CommentLeanDocument,
-} from 'features/shared/comment/comment.model';
+} from 'features/shared/comment/comment.types';
 
 export type ICommentMapper = InstanceType<typeof CommentMapper>;
 

@@ -2,14 +2,14 @@ import type { Request, Response, NextFunction } from 'express';
 
 // Utilites
 import { AnonymousError } from 'core/utilities/errors';
-import { jwtTokenName } from 'features/shared/auth/auth.constants';
+import { jwtAccessTokenName } from 'features/shared/session/session.constants';
 
 export default function blockRequestWithToken(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const token = req.header(jwtTokenName);
+  const token = req.header(jwtAccessTokenName);
 
   if (token)
     throw new AnonymousError(

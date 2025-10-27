@@ -4,6 +4,7 @@ import path from 'path';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import express from 'express';
+import requestIp from 'request-ip';
 import mongoSanitize from 'express-mongo-sanitize';
 import type { Express } from 'express';
 
@@ -39,6 +40,7 @@ export default function baseStartup(app: Express) {
   });
 
   app.use(mongoSanitize());
+  app.use(requestIp.mw());
 
   // Paramater Polution
   app.use(

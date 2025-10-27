@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 // Controllers
 import AuthController from 'features/shared/auth/auth.controller';
+import SessionController from 'features/shared/session/session.controller';
 
 // Middlewares
 import auth from 'core/middlewares/auth';
@@ -14,13 +15,17 @@ import blockRequestWithToken from 'features/shared/auth/auth.middleware';
 import {
   LoginDto,
   RegisterDto,
-  RefreshTokenDto,
   ChangePasswordDto,
   RecoverPasswordDto,
 } from 'features/shared/auth/auth.dto';
+import {
+  RefreshTokenDto,
+  RevokeTokenDto,
+} from 'features/shared/session/session.dto';
 
 const authClientRouter = express.Router();
 const authController = container.resolve(AuthController);
+const sessionController = container.resolve(SessionController);
 
 authClientRouter.post('/login', [
   limitier,
@@ -50,13 +55,14 @@ authClientRouter.post(
   '/token/refresh',
   limitier,
   validateBody(RefreshTokenDto),
-  authController.refreshToken
+  sessionController.refreshToken
 );
 authClientRouter.post(
   '/token/revoke',
   limitier,
   auth(['user', 'author', 'admin', 'superAdmin']),
-  authController.revokeToken
+  validateBody(RevokeTokenDto),
+  sessionController.revokeToken
 );
 
 export default authClientRouter;

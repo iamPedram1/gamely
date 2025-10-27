@@ -1,10 +1,7 @@
-import { model, Model, FlattenMaps, HydratedDocument, Schema } from 'mongoose';
+import { model, Model, Schema } from 'mongoose';
 
 // Types
-import type { IGameEntity } from 'features/shared/game/game.type';
-
-export type GameDocument = HydratedDocument<IGameEntity>;
-export type GameLeanDocument = FlattenMaps<GameDocument>;
+import type { IGameEntity } from 'features/shared/game/game.types';
 
 const translationSchema = new Schema(
   {

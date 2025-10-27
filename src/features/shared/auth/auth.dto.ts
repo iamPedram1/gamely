@@ -12,12 +12,6 @@ export class RecoverPasswordDto {
   email: string;
 }
 
-export class RefreshTokenDto {
-  @IsNotEmpty()
-  @IsJWT()
-  refreshToken: string;
-}
-
 export class ChangePasswordDto {
   @IsNotEmpty()
   @IsJWT()

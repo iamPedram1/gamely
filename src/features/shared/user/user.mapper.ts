@@ -18,7 +18,7 @@ import { BaseMapper } from 'core/mappers/base';
 import type {
   UserDocument,
   UserLeanDocument,
-} from 'features/shared/user/user.model';
+} from 'features/shared/user/user.types';
 import { plainToInstance } from 'class-transformer';
 
 export type IUserMapper = InstanceType<typeof UserMapper>;

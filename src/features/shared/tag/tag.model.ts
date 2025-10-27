@@ -1,10 +1,7 @@
-import { model, Schema, Model, FlattenMaps, HydratedDocument } from 'mongoose';
+import { model, Schema, Model } from 'mongoose';
 
 // Types
-import type { ITagEntity } from 'features/shared/tag/tag.type';
-
-export type TagDocument = HydratedDocument<ITagEntity>;
-export type TagLeanDocument = FlattenMaps<TagDocument>;
+import type { ITagEntity } from 'features/shared/tag/tag.types';
 
 const translationSchema = new Schema(
   {

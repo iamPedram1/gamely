@@ -1,11 +1,5 @@
 import { singleton } from 'tsyringe';
 
-// Model
-import {
-  FileDocument,
-  FileLeanDocument,
-} from 'features/shared/file/file.model';
-
 // DTO
 import {
   FileResponseDto,
@@ -14,6 +8,12 @@ import {
 
 // Mapper
 import { BaseMapper } from 'core/mappers/deprecated.base';
+
+// Types
+import {
+  FileDocument,
+  FileLeanDocument,
+} from 'features/shared/file/file.types';
 
 export type IFileMapper = InstanceType<typeof FileMapper>;
 

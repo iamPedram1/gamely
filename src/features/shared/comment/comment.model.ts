@@ -1,4 +1,4 @@
-import { model, Schema, Model, FlattenMaps, HydratedDocument } from 'mongoose';
+import { model, Schema, Model } from 'mongoose';
 
 // Constants
 import {
@@ -7,10 +7,7 @@ import {
 } from 'features/shared/comment/comment.constants';
 
 // Types
-import type { ICommentEntity } from 'features/shared/comment/comment.type';
-
-export type CommentDocument = HydratedDocument<ICommentEntity>;
-export type CommentLeanDocument = FlattenMaps<CommentDocument>;
+import type { ICommentEntity } from 'features/shared/comment/comment.types';
 
 const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
   {

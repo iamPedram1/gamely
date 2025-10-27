@@ -18,7 +18,7 @@ import { PostManagementSummaryResponseDto } from 'features/management/post/post.
 import { commentStatus } from 'features/shared/comment/comment.constants';
 
 // Types
-import type { CommentStatusType } from 'features/shared/comment/comment.type';
+import type { CommentStatusType } from 'features/shared/comment/comment.types';
 
 export class UpdateCommentDto {
   @IsOptional()

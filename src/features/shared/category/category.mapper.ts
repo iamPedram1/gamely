@@ -5,7 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import {
   CategoryDocument,
   CategoryLeanDocument,
-} from 'features/shared/category/category.model';
+} from 'features/shared/category/category.types';
 
 // DTO
 import {
@@ -20,7 +20,7 @@ import {
 
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
-import { INestedCategoryEntity } from 'features/shared/category/category.type';
+import { INestedCategoryEntity } from 'features/shared/category/category.types';
 
 export type ICategoryMapper = InstanceType<typeof CategoryMapper>;
 

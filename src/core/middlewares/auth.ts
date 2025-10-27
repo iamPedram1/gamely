@@ -8,8 +8,8 @@ import { requestContext, t } from 'core/utilities/request-context';
 import tokenUtils from 'core/services/token.service';
 import {
   jwtAccessTokenKey,
-  jwtTokenName,
-} from 'features/shared/auth/auth.constants';
+  jwtAccessTokenName,
+} from 'features/shared/session/session.constants';
 import {
   AnonymousError,
   ForbiddenError,
@@ -17,14 +17,14 @@ import {
 } from 'core/utilities/errors';
 
 // Types
-import type { IToken } from 'features/shared/user/user.model';
-import type { UserRole } from 'features/shared/user/user.types';
 import type { Request, Response, NextFunction } from 'express';
+import type { UserRole } from 'features/shared/user/user.types';
+import type { IToken } from 'features/shared/session/session.types';
 
 export default function auth(roles: UserRole[]) {
   return async function (req: Request, res: Response, next: NextFunction) {
     const mask = req.t('error.token_generic_error');
-    const token = req.header(jwtTokenName);
+    const token = req.header(jwtAccessTokenName);
 
     if (!token) {
       throw new UnauthorizedError(
