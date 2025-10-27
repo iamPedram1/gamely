@@ -71,7 +71,7 @@ export default class SessionService extends BaseService<
     mongooseSession?: mongoose.ClientSession
   ) {
     const { userId, sessionId } = this.verifyRefreshJwt(refreshToken);
-    const session = await this.getOneById(sessionId, { lean: true });
+    const session = await this.getOneById(sessionId);
 
     // Validation
     if (session.userId.toHexString() !== userId)
@@ -87,7 +87,7 @@ export default class SessionService extends BaseService<
     // Generating Token & Updating Session
     const newAuth = this.generateAuthToken(userId, sessionId);
     session.set('refreshToken', newAuth.refreshToken);
-    session.set('generatedAt', new Date());
+    session.set('refreshedAt', new Date());
     session.set('lastActivity', new Date());
     session.set(
       'expiresAt',

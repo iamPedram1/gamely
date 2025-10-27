@@ -43,6 +43,10 @@ export class CreateSessionDto {
   @IsDate()
   generatedAt: Date;
 
+  @IsOptional()
+  @IsDate()
+  refreshedAt: Date;
+
   @IsNotEmpty()
   @IsDate()
   lastActivity: Date;
@@ -70,7 +74,7 @@ export class UpdateSessionDto {
 
   @IsOptional()
   @IsDate()
-  generatedAt: Date;
+  refreshedAt: Date;
 
   @IsOptional()
   @IsDate()

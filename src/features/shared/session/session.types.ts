@@ -13,5 +13,6 @@ export interface ISessionEntity {
   userId: Types.ObjectId;
   expiresAt: Date;
   generatedAt: Date;
+  refreshedAt: Date | null;
   lastActivity: Date;
 }

@@ -6,7 +6,7 @@ import type { RequestHandler } from 'express';
 import AuthService from 'features/shared/auth/auth.service';
 
 // DTO
-import { UpdateSessionDto } from 'features/shared/session/session.dto';
+import { CreateSessionDto } from 'features/shared/session/session.dto';
 import {
   LoginDto,
   RegisterDto,
@@ -63,7 +63,7 @@ export default class AuthController {
   login: RequestHandler = async (req, res) => {
     const loginDto = req.body as LoginDto;
 
-    const sessionDto = new UpdateSessionDto();
+    const sessionDto = new CreateSessionDto();
     sessionDto.generatedAt = new Date();
     sessionDto.lastActivity = new Date();
     sessionDto.ip = req.clientIp || '';

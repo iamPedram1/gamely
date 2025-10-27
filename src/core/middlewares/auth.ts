@@ -33,7 +33,7 @@ export default function auth(roles: UserRole[]) {
     }
 
     // Check JWT
-    const { userId } = tokenUtils.verify<IToken>(
+    const { userId, sessionId } = tokenUtils.verify<IToken>(
       token,
       jwtAccessTokenKey,
       t('common.token')
@@ -64,6 +64,7 @@ export default function auth(roles: UserRole[]) {
       email: user.email,
       role: user.role,
       status: user.status,
+      sessionId,
     };
 
     const ctx = requestContext.getStore();

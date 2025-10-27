@@ -23,6 +23,10 @@ const sessionSchema = new Schema<ISessionEntity, Model<ISessionEntity>>({
     required: true,
     default: Date.now(),
   },
+  refreshedAt: {
+    type: Date,
+    default: null,
+  },
   expiresAt: {
     type: Date,
     required: true,

@@ -34,4 +34,4 @@ export type IUser = InstanceType<typeof UserManagementResponseDto>;
 export type IUserContext = Pick<
   IUser,
   'id' | 'role' | 'name' | 'email' | 'status'
->;
+> & { sessionId: string };

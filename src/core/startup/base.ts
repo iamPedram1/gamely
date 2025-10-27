@@ -7,6 +7,7 @@ import express from 'express';
 import requestIp from 'request-ip';
 import mongoSanitize from 'express-mongo-sanitize';
 import type { Express } from 'express';
+import { updateSessionActivity } from 'features/shared/session/session.middleware';
 
 export default function baseStartup(app: Express) {
   app.disable('etag');
@@ -41,6 +42,7 @@ export default function baseStartup(app: Express) {
 
   app.use(mongoSanitize());
   app.use(requestIp.mw());
+  app.use(updateSessionActivity);
 
   // Paramater Polution
   app.use(
