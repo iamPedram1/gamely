@@ -590,4 +590,23 @@ export default abstract class BaseService<
   async assertOwnership(document: string | Record<'creator', Types.ObjectId>) {
     return this.validations.assertOwnership(document);
   }
+
+  /**
+   * Sets a field on a Mongoose document if the value is defined (not undefined or null).
+   *
+   * @template TDoc - The Mongoose document type.
+   * @template TKey - The keys of the schema that can be updated.
+   * @param {TDoc} doc - The Mongoose document to update.
+   * @param {TKey} key - The key of the field to update.
+   * @param {TDoc[TKey] | undefined | null} value - The value to set. Will only set if value is not undefined or null.
+   */
+  async setIfDefined<TDoc extends Record<string, any>, TKey extends keyof TDoc>(
+    doc: TDoc,
+    key: TKey,
+    value: TDoc[TKey] | string | undefined | null
+  ) {
+    if (value !== undefined && value !== null) {
+      doc.set(key, value);
+    }
+  }
 }

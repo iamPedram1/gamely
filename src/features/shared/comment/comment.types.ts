@@ -15,6 +15,7 @@ export interface ICommentEntity {
   status: CommentStatusType;
   message: string;
   postId: Types.ObjectId;
+  parentIds: Types.ObjectId[];
   creator: Types.ObjectId;
   threadId?: Types.ObjectId | null;
   replyToCommentId?: Types.ObjectId | null;

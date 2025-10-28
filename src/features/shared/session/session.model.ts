@@ -17,6 +17,7 @@ const sessionSchema = new Schema<ISessionEntity, Model<ISessionEntity>>({
     ref: 'User',
     required: true,
     index: true,
+    immutable: true,
   },
   generatedAt: {
     type: Date,

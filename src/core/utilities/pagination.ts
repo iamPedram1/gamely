@@ -65,6 +65,7 @@ export default async function paginate<TResult, TDoc>(
   ]);
 
   const totalPages = calculateTotalPages(totalDocs, limit);
+  console.log({ configs, currentPage, limit, skip, totalDocs, totalPages });
 
   return {
     docs,

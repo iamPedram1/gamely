@@ -12,10 +12,11 @@ import BaseService from 'core/services/base/base.service';
 import PostService from 'features/shared/post/post.service';
 
 // Utilities
-import { ForbiddenError, ValidationError } from 'core/utilities/errors';
+import { ValidationError } from 'core/utilities/errors';
 
 // Types
-import type { Document, Types } from 'mongoose';
+import type { IPostEntity } from 'features/shared/post/post.types';
+import type { Types } from 'mongoose';
 import type { WithPagination } from 'core/types/paginate';
 import type { IRequestQueryBase } from 'core/types/query';
 import type {
@@ -32,12 +33,10 @@ import type {
   CommentLeanDocument,
 } from 'features/shared/comment/comment.types';
 import NotificationService from 'features/shared/notification/notification.service';
-import { CreateNotificationDto } from 'features/shared/notification/notification.dto';
-import { IPostEntity } from 'features/shared/post/post.types';
-import { HydratedDocument } from 'mongoose';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;
+  parentIds: Types.ObjectId[];
   type?: CommentType;
   threadId?: Types.ObjectId | null;
 };
@@ -74,15 +73,22 @@ class CommentService extends BaseService<
     id: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
-    if (this.currentUser.is('author')) {
-      const post = await this.getCommentPost(id);
-      await this.postService.assertOwnership(post);
-    }
+    this.withTransaction(async (session) => {
+      if (this.currentUser.is('author')) {
+        const post = await this.getCommentPost(id);
+        await this.postService.assertOwnership(post);
+      }
 
-    await this.deleteManyWithConditions(
-      { $or: [{ _id: id }, { threadId: id }] },
-      options
-    );
+      await this.notificationService.deleteManyWithConditions(
+        { 'metadata.refId': id, 'metadata.modelKey': 'Comment' },
+        { ...options, session }
+      );
+
+      await this.deleteManyWithConditions(
+        { $or: [{ _id: id }, { parentIds: { $in: id } }] },
+        { ...options, session }
+      );
+    });
 
     return true;
   }
@@ -157,6 +163,7 @@ class CommentService extends BaseService<
       const cm = await this.getOneById(data.replyToCommentId, { lean: true });
       data.type = 'reply';
       data.threadId = cm.threadId || cm._id;
+      data.parentIds = [...(cm?.parentIds || []), cm._id];
     } else data.type = 'main';
 
     return super.create(data, options);
@@ -175,18 +182,15 @@ class CommentService extends BaseService<
         await this.postService.assertOwnership(post);
       }
 
+      this.setIfDefined(comment, 'status', payload.status);
+      this.setIfDefined(comment, 'message', payload.message);
+
       // Check if is trying to update approved comment status
-      if (
-        isCommentApproved &&
-        'status' in payload &&
-        payload.status !== 'approved'
-      ) {
+      if (isCommentApproved && comment.isModified('status')) {
         throw new ValidationError(
           this.t('error.comment.approved_cannot_change')
         );
       }
-
-      comment.set(payload);
 
       // Send notification if its replying
       if (

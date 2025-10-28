@@ -81,10 +81,9 @@ class CategoryService extends BaseService<
     if (payload.parentId === id)
       throw new BadRequestError(this.t('error.category.self_parent'));
 
-    if (payload.slug) category.set('slug', payload.slug);
-    if (payload.parentId) category.set('parentId', payload.parentId);
-    if (payload.translations)
-      category.set('translations', payload.translations);
+    this.setIfDefined(category, 'slug', payload.slug);
+    this.setIfDefined(category, 'parentId', payload.parentId);
+    this.setIfDefined(category, 'translations', payload.translations);
 
     return await category.save({ session: options?.session });
   }

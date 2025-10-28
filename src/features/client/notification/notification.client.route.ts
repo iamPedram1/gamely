@@ -8,9 +8,11 @@ import NotificationClientController from 'features/client/notification/notificat
 // Middlewares
 import auth from 'core/middlewares/auth';
 import { validateParam } from 'core/middlewares/validateParams';
+import { validateQuery } from 'core/middlewares/validateQuery';
 import validateDocumentOwnership from 'core/middlewares/validateOwnership';
 
 // DTO
+import { BaseQueryDto } from 'core/dto/query';
 
 const notificationClientRouter = express.Router();
 const notificationClientController = container.resolve(
@@ -19,12 +21,36 @@ const notificationClientController = container.resolve(
 
 notificationClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 
-notificationClientRouter.get('/', notificationClientController.getAll);
+// <----------------   GET   ---------------->
+notificationClientRouter.get(
+  '/',
+  validateQuery(BaseQueryDto),
+  notificationClientController.getAll
+);
 
-notificationClientRouter.post('/:id/seen', [
+// <----------------   POST   ---------------->
+notificationClientRouter.post(
+  '/seen/all',
+  notificationClientController.seenAllNotification
+);
+
+notificationClientRouter.post(
+  '/:id/seen',
   validateParam(Notification, 'id', '_id', { type: 'id' }),
   validateDocumentOwnership(Notification, 'id', 'receiverId', 'params'),
-  notificationClientController.seenNotification,
-]);
+  notificationClientController.seenNotification
+);
+
+// <----------------   DELETE   ---------------->
+notificationClientRouter.delete(
+  '/delete/all',
+  notificationClientController.deleteAllNotifications
+);
+notificationClientRouter.delete(
+  '/:id',
+  validateParam(Notification, 'id', '_id', { type: 'id' }),
+  validateDocumentOwnership(Notification, 'id', 'receiverId', 'params'),
+  notificationClientController.deleteNotification
+);
 
 export default notificationClientRouter;

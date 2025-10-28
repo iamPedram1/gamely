@@ -44,6 +44,11 @@ const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
         return this.type === 'reply';
       },
     },
+    parentIds: {
+      type: [Schema.Types.ObjectId],
+      ref: 'Comment',
+      default: [],
+    },
     postId: {
       type: Schema.Types.ObjectId,
       ref: 'Post',

@@ -10,21 +10,16 @@ import type {
   NotificationMetadata,
 } from 'features/shared/notification/notification.types';
 
-const metadataSchema = new Schema<NotificationMetadata>({
-  modelKey: {
-    type: String,
-    enum: modelKeyName,
-    required: true,
+const metadataSchema = new Schema<NotificationMetadata>(
+  {
+    sourceType: { type: String, enum: modelKeyName, required: true },
+    sourceId: { type: Schema.Types.ObjectId, required: true },
+    parentType: { type: String, enum: modelKeyName, required: false },
+    parentId: { type: Schema.Types.ObjectId, required: false },
+    context: { type: String, trim: true },
   },
-  refId: {
-    type: Schema.Types.ObjectId,
-    required: true,
-  },
-  context: {
-    type: String,
-    trim: true,
-  },
-});
+  { _id: false }
+);
 
 const notificationSchema = new Schema<
   INotificationEntity,

@@ -25,6 +25,7 @@ import type { IPostEntity } from 'features/shared/post/post.types';
 import type { PostDocument } from 'features/shared/post/post.types';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { IApiBatchResponse } from 'core/utilities/response';
+import NotificationService from 'features/shared/notification/notification.service';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()
@@ -37,7 +38,9 @@ class PostService extends BaseService<
   constructor(
     @inject(delay(() => FileService)) private fileService: FileService,
     @inject(delay(() => CommentService)) private commentService: CommentService,
-    @inject(delay(() => PostValidation)) private postValidation: PostValidation
+    @inject(delay(() => PostValidation)) private postValidation: PostValidation,
+    @inject(delay(() => NotificationService))
+    private notificationService: NotificationService
   ) {
     super(Post);
   }
@@ -73,6 +76,7 @@ class PostService extends BaseService<
       // Prepare cleanup operations
       const cleanupTasks: Promise<any>[] = [
         this.commentService.deleteManyByKey('postId', id, { session }),
+        this.notificationService.deletePostAllNotification(id),
       ];
 
       if (post.coverImage) {

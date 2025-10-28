@@ -10,8 +10,8 @@ import sendResponse from 'core/utilities/response';
 import { NotificationMapper } from 'features/shared/notification/notification.mapper';
 
 // Types
+import { BaseQueryDto } from 'core/dto/query';
 import type { RequestHandler } from 'express';
-import type { IRequestQueryBase } from 'core/types/query';
 
 @injectable()
 export default class NotificationClientController {
@@ -23,10 +23,10 @@ export default class NotificationClientController {
   ) {}
 
   getAll: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as IRequestQueryBase;
+    const query = req.query as unknown as BaseQueryDto;
 
     const { docs, pagination } =
-      await this.notificationService.getNotifications();
+      await this.notificationService.getNotifications(query);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -42,6 +42,21 @@ export default class NotificationClientController {
 
   seenNotification: RequestHandler = async (req, res) => {
     await this.notificationService.seenNotification(req.params.id);
+
+    sendResponse(res, 204);
+  };
+  seenAllNotification: RequestHandler = async (req, res) => {
+    await this.notificationService.seenAllNotifications();
+
+    sendResponse(res, 204);
+  };
+  deleteNotification: RequestHandler = async (req, res) => {
+    await this.notificationService.deleteNotification(req.params.id);
+
+    sendResponse(res, 204);
+  };
+  deleteAllNotifications: RequestHandler = async (req, res) => {
+    await this.notificationService.deleteAllNotifications();
 
     sendResponse(res, 204);
   };

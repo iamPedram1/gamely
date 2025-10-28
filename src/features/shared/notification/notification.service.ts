@@ -22,6 +22,7 @@ import type {
   NotificationLeanDocument,
   NotificationType,
 } from 'features/shared/notification/notification.types';
+import { BaseQueryDto } from 'core/dto/query';
 
 @injectable()
 export default class NotificationService extends BaseService<
@@ -36,13 +37,13 @@ export default class NotificationService extends BaseService<
     super(Notification);
   }
 
-  /**
-   * Fetch notifications for current user
-   */
-  async getNotifications(): Promise<WithPagination<NotificationLeanDocument>> {
+  async getNotifications(
+    query: BaseQueryDto
+  ): Promise<WithPagination<NotificationLeanDocument>> {
     const notifications = await this.find({
-      filter: { receiverId: this.currentUser.id },
+      query,
       lean: true,
+      filter: { receiverId: this.currentUser.id },
     });
 
     const cache = new Map<string, ICommentPopulated>();
@@ -59,21 +60,18 @@ export default class NotificationService extends BaseService<
     return notifications;
   }
 
-  /**
-   * Mark notification as seen
-   */
+  async deletePostAllNotification(postId: string) {
+    this.deleteManyWithConditions({
+      'metadata.parentType': 'Post',
+      'metadata.parentId': postId,
+    });
+  }
+
   async seenNotification(
     id: string,
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
-    const notification = await this.getOneById(id);
-    notification.set('seen', true);
-
-    if (this.currentUser.id !== String(notification.receiverId)) {
-      throw new ForbiddenError();
-    }
-
-    await notification.save({ session: options?.session });
+    await this.updateOneById(id, { seen: true }, { ...options, lean: true });
   }
 
   async seenAllNotifications(
@@ -81,7 +79,7 @@ export default class NotificationService extends BaseService<
   ): Promise<void> {
     await this.updateManyByKey(
       'receiverId',
-      this.currentUser,
+      this.currentUser.id,
       { seen: true },
       options
     );
@@ -97,12 +95,9 @@ export default class NotificationService extends BaseService<
   async deleteAllNotifications(
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
-    await this.deleteManyByKey('receiverId', this.currentUser, options);
+    await this.deleteManyByKey('receiverId', this.currentUser.id, options);
   }
 
-  /**
-   * Create notification when someone replies to a comment
-   */
   async createCommentReplyNotification<TThrowError extends boolean = true>(
     comment: ICommentPopulated,
     options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
@@ -117,16 +112,15 @@ export default class NotificationService extends BaseService<
     notify.receiverId = String(comment.replyToCommentId.creator._id);
     notify.messageKey = 'messages.notification.comment_reply';
     notify.metadata = {
-      modelKey: 'Comment',
-      refId: comment.replyToCommentId._id,
+      parentType: 'Post',
+      parentId: comment.postId._id,
+      sourceType: 'Comment',
+      sourceId: comment.replyToCommentId._id,
     };
 
     await this.create(notify, options);
   }
 
-  /**
-   * Centralized message resolver by notification type
-   */
   private resolveMessage(
     comment: ICommentPopulated,
     notification: INotificationEntity
@@ -143,7 +137,7 @@ export default class NotificationService extends BaseService<
     notification: INotificationEntity,
     cache: Map<string, ICommentPopulated>
   ) {
-    const commentId = String(notification.metadata.refId);
+    const commentId = String(notification.metadata.sourceId);
     if (!commentId)
       throw new AnonymousError('Something went wrong in notification metadata');
 
@@ -163,9 +157,6 @@ export default class NotificationService extends BaseService<
     return comment;
   }
 
-  /**
-   * Message builder for reply notification
-   */
   private resolveReplyMessage(
     comment: ICommentPopulated,
     notification: INotificationEntity

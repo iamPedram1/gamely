@@ -1,3 +1,4 @@
+import { ValidateIf } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
 import { modelKeyName } from 'core/utilities/common';
 import { notificationType } from 'features/shared/notification/notification.constants';
@@ -24,11 +25,21 @@ class NotificationMetadataDto {
   @IsNotEmpty()
   @IsString()
   @IsIn(modelKeyName)
-  modelKey: ModelKeys;
+  sourceType: ModelKeys;
 
   @IsNotEmpty()
   @IsMongoId()
-  refId: Types.ObjectId;
+  sourceId: Types.ObjectId;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(modelKeyName)
+  parentType?: ModelKeys;
+
+  @ValidateIf(({ obj }) => Boolean(obj.parentType))
+  @IsOptional()
+  @IsMongoId()
+  parentId?: Types.ObjectId;
 
   @IsOptional()
   @IsString()

@@ -8,8 +8,10 @@ export type NotificationLeanDocument = FlattenMaps<INotificationEntity>;
 export type NotificationType = 'reply' | 'follow-request';
 
 export interface NotificationMetadata {
-  modelKey: ModelKeys;
-  refId: Types.ObjectId;
+  sourceType: ModelKeys;
+  sourceId: Types.ObjectId;
+  parentType?: ModelKeys;
+  parentId?: Types.ObjectId;
   context?: string; // STORE JSON as String and Parse back
 }
 
