@@ -2,7 +2,7 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import validateObjectId from 'core/middlewares/validateObjectId';
+import validateDocumentExistById from 'core/middlewares/validateObjectId';
 import { validateQuery } from 'core/middlewares/validateQuery';
 
 // Model

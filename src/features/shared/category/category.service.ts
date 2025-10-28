@@ -46,7 +46,6 @@ class CategoryService extends BaseService<
 
   async create(
     data: CreateCategoryDto,
-    userId?: string,
     options?: BaseMutateOptions
   ): Promise<CategoryDocument> {
     if (data.parentId) {
@@ -56,7 +55,7 @@ class CategoryService extends BaseService<
           this.t('error.not_exists_by_id', { id: data.parentId })
         );
     }
-    return await super.create(data, userId, options);
+    return await super.create(data, options);
   }
 
   async updateOneById(

@@ -6,7 +6,7 @@ import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import { validateParam } from 'core/middlewares/validateParams';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
-import validateObjectId from 'core/middlewares/validateObjectId';
+import validateDocumentExistById from 'core/middlewares/validateObjectId';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
@@ -40,36 +40,29 @@ postManagementRouter.get('/summaries', [
   postController.getAllSummaries,
 ]);
 postManagementRouter.get('/:id', [
-  validateObjectId(Post),
+  validateDocumentExistById(Post),
   postController.getOne,
 ]);
 
 // <----------------   DELETE   ---------------->
 postManagementRouter.delete('/batch/delete', [postController.batchDelete]);
 postManagementRouter.delete('/:id', [
-  validateObjectId(Post),
+  validateDocumentExistById(Post),
   postController.delete,
 ]);
 
 // <----------------   POST   ---------------->
-const mutateValidation = [
-  validateParam(Game, 'game', '_id', { type: 'id' }),
-  validateParam(Tag, 'tags', '_id', { type: 'idArray' }),
-  validateParam(Category, 'category', '_id', { type: 'id' }),
-];
 postManagementRouter.post('/', [
   validateBody(CreatePostDto),
   validateUniqueConflict(Post, 'slug'),
-  ...mutateValidation,
   postController.create,
 ]);
 
 // <----------------   PATCH  ---------------->
 postManagementRouter.patch('/:id', [
-  validateObjectId(Post),
+  validateDocumentExistById(Post),
   validateBody(UpdatePostDto),
   validateUniqueConflict(Post, 'slug'),
-  ...mutateValidation,
   postController.update,
 ]);
 

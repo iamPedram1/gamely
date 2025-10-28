@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import validateObjectId from 'core/middlewares/validateObjectId';
+import validateDocumentExistById from 'core/middlewares/validateObjectId';
 import { validateQuery } from 'core/middlewares/validateQuery';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
@@ -39,7 +39,7 @@ categoryManagementRouter.get(
 );
 categoryManagementRouter.get(
   '/:id',
-  validateObjectId(Category),
+  validateDocumentExistById(Category),
   categoryController.getOne
 );
 
@@ -54,7 +54,7 @@ categoryManagementRouter.post(
 // <----------------   PATCH   ---------------->
 categoryManagementRouter.patch(
   '/:id',
-  validateObjectId(Category),
+  validateDocumentExistById(Category),
   validateBody(UpdateCategoryDto),
   validateUniqueConflict(Category, 'slug'),
   categoryController.update
@@ -63,7 +63,7 @@ categoryManagementRouter.patch(
 // <----------------   DELETE   ---------------->
 categoryManagementRouter.delete(
   '/:id',
-  validateObjectId(Category),
+  validateDocumentExistById(Category),
   categoryController.delete
 );
 

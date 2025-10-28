@@ -1,1 +1,4 @@
-export const gamePopulate = [{ path: 'creator', populate: 'avatar' }];
+export const gamePopulate = [
+  { path: 'coverImage' },
+  { path: 'creator', populate: 'avatar' },
+];

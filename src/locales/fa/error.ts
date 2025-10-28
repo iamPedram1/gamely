@@ -15,6 +15,10 @@ const errosTranslations = {
     is_blocked: 'حساب شما توسط ادمین مسدود شده',
     update_role: 'شما دسترسی لازم برای "تغییر نقش کاربر" ندارید',
   },
+  comment: {
+    approved_cannot_change:
+      'این نظر از قبل تایید شده و وضعیت آن قابل تغییر نیست',
+  },
   validation_failed: 'اعتبار سنجی با خطا مواجه شد',
   id_required: 'وارد کردن شناسه اجباریست',
   id_invalid: 'شناسه نامعتبر است',

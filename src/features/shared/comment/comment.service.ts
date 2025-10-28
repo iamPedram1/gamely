@@ -12,7 +12,7 @@ import BaseService from 'core/services/base/base.service';
 import PostService from 'features/shared/post/post.service';
 
 // Utilities
-import { ForbiddenError } from 'core/utilities/errors';
+import { ForbiddenError, ValidationError } from 'core/utilities/errors';
 
 // Types
 import type { Document, Types } from 'mongoose';
@@ -21,6 +21,7 @@ import type { IRequestQueryBase } from 'core/types/query';
 import type {
   CommentType,
   ICommentEntity,
+  ICommentPopulated,
 } from 'features/shared/comment/comment.types';
 import type {
   BaseMutateOptions,
@@ -30,6 +31,10 @@ import type {
   CommentDocument,
   CommentLeanDocument,
 } from 'features/shared/comment/comment.types';
+import NotificationService from 'features/shared/notification/notification.service';
+import { CreateNotificationDto } from 'features/shared/notification/notification.dto';
+import { IPostEntity } from 'features/shared/post/post.types';
+import { HydratedDocument } from 'mongoose';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;
@@ -58,7 +63,9 @@ class CommentService extends BaseService<
   CommentDocument
 > {
   constructor(
-    @inject(delay(() => PostService)) private postService: PostService
+    @inject(delay(() => PostService)) private postService: PostService,
+    @inject(delay(() => NotificationService))
+    private notificationService: NotificationService
   ) {
     super(Comment);
   }
@@ -67,8 +74,6 @@ class CommentService extends BaseService<
     id: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
-    if (this.currentUser.isNot(['admin', 'author'])) throw new ForbiddenError();
-
     if (this.currentUser.is('author')) {
       const post = await this.getCommentPost(id);
       await this.postService.assertOwnership(post);
@@ -146,7 +151,6 @@ class CommentService extends BaseService<
 
   async create(
     data: CreateCommentInput,
-    userId?: string,
     options?: BaseMutateOptions
   ): Promise<CommentDocument> {
     if (data.replyToCommentId) {
@@ -155,18 +159,49 @@ class CommentService extends BaseService<
       data.threadId = cm.threadId || cm._id;
     } else data.type = 'main';
 
-    return super.create(data, userId, options);
+    return super.create(data, options);
   }
 
   async updateOneById(commentId: string, payload: UpdateCommentDto) {
-    if (this.currentUser.isNot(['admin', 'author'])) throw new ForbiddenError();
+    return this.withTransaction(async (session) => {
+      const comment = await this.getOneById(commentId, {
+        populate: 'replyToCommentId postId',
+      });
+      const post = comment.postId as unknown as IPostEntity;
+      const isCommentApproved = comment.status === 'approved';
 
-    if (this.currentUser.is('author')) {
-      const post = await this.getCommentPost(commentId);
-      await this.postService.assertOwnership(post);
-    }
+      // Ownership check for authors
+      if (this.currentUser.is('author')) {
+        await this.postService.assertOwnership(post);
+      }
 
-    return await super.updateOneById(commentId, payload);
+      // Check if is trying to update approved comment status
+      if (
+        isCommentApproved &&
+        'status' in payload &&
+        payload.status !== 'approved'
+      ) {
+        throw new ValidationError(
+          this.t('error.comment.approved_cannot_change')
+        );
+      }
+
+      comment.set(payload);
+
+      // Send notification if its replying
+      if (
+        comment.isModified('status') &&
+        comment.status === 'approved' &&
+        comment.replyToCommentId
+      ) {
+        await this.notificationService.createCommentReplyNotification(
+          comment as unknown as ICommentPopulated,
+          { session }
+        );
+      }
+
+      return await comment.save({ session });
+    });
   }
 
   private async getCommentPost(commentId: string) {

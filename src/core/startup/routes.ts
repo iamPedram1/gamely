@@ -11,6 +11,7 @@ import postClientRouter from 'features/client/post/post.client.route';
 import userClientRouter from 'features/client/user/user.client.route';
 import commentClientRouter from 'features/client/comment/comment.client.route';
 import categoryClientRouter from 'features/client/category/category.client.route';
+import notificationClientRouter from 'features/client/notification/notification.client.route';
 
 // Management Routes
 import gameManagementRouter from 'features/management/game/game.management.route';
@@ -30,6 +31,7 @@ import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);
   app.use(prefixBaseUrl('/user'), userClientRouter);
+  app.use(prefixBaseUrl('/user/notifications'), notificationClientRouter);
   app.use(prefixBaseUrl('/auth'), authClientRouter);
   app.use(prefixBaseUrl('/tags'), tagClientRouter);
   app.use(prefixBaseUrl('/games'), gameClientRouter);

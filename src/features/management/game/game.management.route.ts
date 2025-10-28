@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import validateObjectId from 'core/middlewares/validateObjectId';
+import validateDocumentExistById from 'core/middlewares/validateObjectId';
 import { validateQuery } from 'core/middlewares/validateQuery';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
@@ -36,14 +36,14 @@ gameManagementRouter.get('/summaries', [
   gameController.getAllSummaries,
 ]);
 gameManagementRouter.get('/:id', [
-  validateObjectId(Game),
+  validateDocumentExistById(Game),
   gameController.getOne,
 ]);
 
 // <----------------   DELETE   ---------------->
 gameManagementRouter.delete('/batch/delete', gameController.batchDelete);
 gameManagementRouter.delete('/:id', [
-  validateObjectId(Game),
+  validateDocumentExistById(Game),
   gameController.delete,
 ]);
 
@@ -56,7 +56,7 @@ gameManagementRouter.post('/', [
 
 // <----------------   PATCH   ---------------->
 gameManagementRouter.patch('/:id', [
-  validateObjectId(Game),
+  validateDocumentExistById(Game),
   validateBody(UpdateGameDto),
   validateUniqueConflict(Game, 'slug'),
   gameController.update,

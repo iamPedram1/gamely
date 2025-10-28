@@ -1,19 +1,15 @@
 import { AsyncLocalStorage } from 'async_hooks';
+import { TransformFnParams } from 'class-transformer';
 import { AnonymousError, InternalServerError } from 'core/utilities/errors';
 
 // Types
 import type { i18n as I18nType } from 'i18next';
-import type {
-  IUser,
-  IUserContext,
-  UserRole,
-} from 'features/shared/user/user.types';
+import type { IUserContext, UserRole } from 'features/shared/user/user.types';
 import type {
   TranslationKeys,
   TranslationVariables,
   TypedTFunction,
 } from 'core/types/i18n';
-import { TransformFnParams } from 'class-transformer';
 
 /**
  * Represents the contextual data stored per request.
@@ -80,7 +76,6 @@ export const t = <T extends TranslationKeys>(
   const ctx = getContext();
 
   if (!ctx?.t) return key;
-
   return ctx.t(key, options);
 };
 

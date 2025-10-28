@@ -4,6 +4,8 @@ import modelsJSON from '../../locales/en/models';
 import errorJSON from '../../locales/en/error';
 import messagesJSON from '../../locales/en/messages';
 
+export type AppLanguages = 'en' | 'fa';
+
 export const dictionaries = {
   errorJSON,
   modelsJSON,

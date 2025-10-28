@@ -1,4 +1,6 @@
 // Types
+import { IPostEntity } from 'features/shared/post/post.types';
+import { IUserEntity } from 'features/shared/user/user.types';
 import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 
 export type CommentDocument = HydratedDocument<ICommentEntity>;
@@ -18,4 +20,11 @@ export interface ICommentEntity {
   replyToCommentId?: Types.ObjectId | null;
   updatedAt: Date;
   createdAt: Date;
+}
+
+export interface ICommentPopulated
+  extends Omit<ICommentEntity, 'creator' | 'postId' | 'replyToCommentId'> {
+  postId: IPostEntity;
+  replyToCommentId?: ICommentEntity & { creator: IUserEntity };
+  creator: IUserEntity;
 }

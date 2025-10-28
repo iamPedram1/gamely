@@ -71,7 +71,7 @@ export default class TagManagementController {
 
   create: RequestHandler = async (req, res) => {
     const dto = req.body as CreateTagDto;
-    const tag = await this.tagService.create(dto, req.user.id);
+    const tag = await this.tagService.create(dto);
 
     sendResponse(res, 201, {
       httpMethod: 'POST',

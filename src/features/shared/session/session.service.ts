@@ -46,7 +46,6 @@ export default class SessionService extends BaseService<
 
   async createSession<TThrowError extends boolean = true>(
     data: CreateDto,
-    userId?: string,
     options?:
       | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
       | undefined
@@ -57,11 +56,7 @@ export default class SessionService extends BaseService<
     );
 
     // Create a Session
-    await super.create(
-      { ...data, _id: sessionId, refreshToken },
-      userId,
-      options
-    );
+    await super.create({ ...data, _id: sessionId, refreshToken }, options);
 
     return { accessToken, refreshToken };
   }

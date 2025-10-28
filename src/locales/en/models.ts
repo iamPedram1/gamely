@@ -7,6 +7,10 @@ export const modelsTranslations = {
     singular: 'Category',
     plural: 'Categories',
   },
+  Notification: {
+    singular: 'Notification',
+    plural: 'Notifications',
+  },
   Post: {
     singular: 'Post',
     plural: 'Posts',

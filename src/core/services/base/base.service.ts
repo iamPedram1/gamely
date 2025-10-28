@@ -7,6 +7,7 @@ import BaseValidationService from 'core/services/base/base.validation.service';
 
 // Utilities
 import { AnonymousError } from 'core/utilities/errors';
+import { QueryFilterBuilder } from 'core/utilities/filter';
 import { IApiBatchResponse } from 'core/utilities/response';
 import {
   i18nInstance,
@@ -47,8 +48,6 @@ import type {
   OrAndFilter,
   RelatedLookup,
 } from 'core/types/base.service.type';
-import { UserRole } from 'features/shared/user/user.types';
-import { QueryFilterBuilder } from 'core/utilities/filter';
 
 type Q<
   TSchema,
@@ -140,7 +139,7 @@ export default abstract class BaseService<
   /**
    * i18n Instance
    **/
-  protected i18n(): i18n {
+  protected get i18n(): i18n {
     return i18nInstance();
   }
   /**
@@ -369,17 +368,15 @@ export default abstract class BaseService<
   /**
    * Creates a new document.
    * @param data - Data to create the document with.
-   * @param userId - Optional creator ID to attach.
    * @param options - Mongoose session or populate options.
    * @returns Created document.
    * @throws {AnonymousError} If creation fails.
    */
   async create<TThrowError extends boolean = true>(
     data: TCreateDto,
-    userId?: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
-    return this.mutations.create(data, userId, options);
+    return this.mutations.create(data, options);
   }
 
   // =====================

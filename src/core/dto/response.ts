@@ -9,11 +9,11 @@ export class BaseResponseDto {
 
   @Expose()
   @Transform(({ obj }) => obj.createdAt)
-  createdDate!: string;
+  createDate!: string;
 
   @Expose()
   @Transform(({ obj }) => obj.updatedAt)
-  updatedDate!: string;
+  updateDate!: string;
 }
 
 export class BaseSummaryResponseDto {

@@ -38,7 +38,6 @@ export default class PostManagementController {
         },
       ],
     });
-    console.log(filter);
 
     const { pagination, docs } = await this.postService.find({
       query: dto,
@@ -92,7 +91,7 @@ export default class PostManagementController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const post = await this.postService.create(req.body, req.user.id, {
+    const post = await this.postService.create(req.body, {
       lean: true,
     });
 

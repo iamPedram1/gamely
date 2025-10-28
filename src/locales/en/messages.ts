@@ -1,4 +1,8 @@
 const messageTranslations = {
+  notification: {
+    follow_request: '{{username}} sended a follow request to you',
+    comment_reply: '{{username}} has replied to your message in {{postTitle}}',
+  },
   file: {
     upload_some_failed: 'Some files upload failed ',
     upload_success_singular: 'File uploaded successfully',

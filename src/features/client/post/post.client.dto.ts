@@ -69,6 +69,10 @@ export class ClientPostSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(pickLocaleField('title'))
   title: string;
+
+  @Expose()
+  @Transform(pickLocaleField('abstract'))
+  abstract: string;
 }
 
 // <----------------   QUERY   ---------------->

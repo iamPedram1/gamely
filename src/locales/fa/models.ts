@@ -7,6 +7,10 @@ const modelsTranslations = {
     singular: 'دسته‌بندی',
     plural: 'دسته‌بندی‌ها',
   },
+  Notification: {
+    singular: 'اعلان',
+    plural: 'اعلان‌ها',
+  },
   Post: {
     singular: 'پست',
     plural: 'پست‌ها',

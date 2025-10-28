@@ -1,4 +1,8 @@
 const messageTranslations = {
+  notification: {
+    follow_request: 'درخواست دنبال کردن شما توسط {{username}}',
+    comment_reply: 'در پست "{{postTitle}}" به نظر شما پاسخ داد {{username}}',
+  },
   auth: {
     password_recovery_emailSubject: 'گیم‌لی - بازیابی کلمه عبور',
     password_changed: 'کلمه عبور با موفقیت تغییر کرد',

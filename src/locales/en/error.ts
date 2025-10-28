@@ -15,6 +15,10 @@ const errosTranslations = {
     is_blocked: 'Your account has been suspended by admin',
     update_role: "You don't have access to change user roles",
   },
+  comment: {
+    approved_cannot_change:
+      'This comment is already approved and status cannot change',
+  },
   validation_failed: 'Validation failed',
   id_required: 'The id paramater is required',
   id_invalid: 'The id paramater is invalid',

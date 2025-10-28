@@ -88,7 +88,7 @@ export default class GameManagementController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const game = await this.gameService.create(req.body, req.user.id, {
+    const game = await this.gameService.create(req.body, {
       populate: gamePopulate,
     });
 

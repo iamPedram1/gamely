@@ -44,10 +44,10 @@ export default class CommentClientController {
   create: RequestHandler = async (req, res) => {
     const dto = req.body as CreateCommentDto;
 
-    const comment = await this.commentService.create(
-      { ...dto, postId: req.params.id },
-      req.user.id
-    );
+    const comment = await this.commentService.create({
+      ...dto,
+      postId: req.params.id,
+    });
 
     sendResponse(res, 201, {
       httpMethod: 'POST',

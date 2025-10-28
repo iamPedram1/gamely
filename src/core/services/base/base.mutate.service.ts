@@ -26,6 +26,7 @@ import type {
   NestedValueOf,
   OrAndFilter,
 } from 'core/types/base.service.type';
+import { userContext } from 'core/utilities/request-context';
 
 /**
  * Base service for CRUD and mutation operations on Mongoose models.
@@ -45,9 +46,9 @@ class BaseMutateService<
 
   async create<TThrowError extends boolean = true>(
     data: TCreateDto,
-    userId?: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
+    const userId = this.currentUser?.id || '';
     const doc = await new this.model({
       ...data,
       ...(userId && { creator: userId }),
@@ -298,6 +299,14 @@ class BaseMutateService<
     if (options.lean && 'lean' in q) q = q.lean();
 
     return q;
+  }
+
+  protected get currentUser() {
+    try {
+      return userContext();
+    } catch (error) {
+      return null;
+    }
   }
 }
 
