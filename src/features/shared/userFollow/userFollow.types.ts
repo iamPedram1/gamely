@@ -7,5 +7,5 @@ export type UserFollowLeanDocument = FlattenMaps<IUserFollowEntity>;
 export interface IUserFollowEntity {
   _id: Types.ObjectId;
   user: Types.ObjectId;
-  follows: Types.ObjectId;
+  followed: Types.ObjectId;
 }

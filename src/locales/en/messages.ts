@@ -53,6 +53,11 @@ const messageTranslations = {
     followers: 'Followers',
     followings: 'Followings',
   },
+  userBlock: {
+    block: 'Block',
+    unblock: 'Unblock',
+    blocklist: 'Block List',
+  },
 } as const;
 
 export default messageTranslations;

@@ -14,7 +14,7 @@ const userFollowSchema = new Schema<
       required: true,
       immutable: true,
     },
-    follows: {
+    followed: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -24,7 +24,7 @@ const userFollowSchema = new Schema<
   { timestamps: true }
 );
 
-userFollowSchema.index({ user: 1, follows: 1 }, { unique: true });
+userFollowSchema.index({ user: 1, followed: 1 }, { unique: true });
 
 export const UserFollow = model<IUserFollowEntity>(
   'UserFollow',

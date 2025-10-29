@@ -64,7 +64,7 @@ export default class UserFollowController {
         ).map(async (follower) => {
           follower.isFollowing = await this.userFollowService.checkIsFollowing(
             req.user.id,
-            follower.follows._id
+            follower.followed._id
           );
         })
       );
@@ -113,7 +113,7 @@ export default class UserFollowController {
         ).map(async (follower) => {
           follower.isFollowing = await this.userFollowService.checkIsFollowing(
             req.user.id,
-            follower.follows._id
+            follower.followed._id
           );
         })
       );

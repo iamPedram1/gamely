@@ -51,7 +51,7 @@ class UserFollowService extends BaseService<
 
       const follow = new CreateUserFollowDto();
       follow.user = this.currentUser.id;
-      follow.follows = userIdToFollow;
+      follow.followed = userIdToFollow;
 
       await Promise.all([
         this.create(follow, { session }),
@@ -70,7 +70,7 @@ class UserFollowService extends BaseService<
 
       const follow = new CreateUserFollowDto();
       follow.user = this.currentUser.id;
-      follow.follows = userIdToUnfollow;
+      follow.followed = userIdToUnfollow;
 
       const record = await this.getOneByCondition(follow, {
         throwError: false,
@@ -118,7 +118,7 @@ class UserFollowService extends BaseService<
     FindResult<IUserFollowEntity, UserFollowDocument, TLean, TPaginate>
   > {
     const followers = await this.find({
-      filter: { follows: userId },
+      filter: this.getQueryFilterOf(userId, 'followers'),
       lean: true,
       select: 'createdAt user',
       populate: 'user',
@@ -143,9 +143,9 @@ class UserFollowService extends BaseService<
     FindResult<IUserFollowEntity, UserFollowDocument, TLean, TPaginate>
   > {
     return await this.find({
-      filter: { user: { $eq: userId } },
+      filter: this.getQueryFilterOf(userId, 'followings'),
       lean: true,
-      populate: 'follows',
+      populate: 'followed',
       ...options,
     });
   }
@@ -153,7 +153,7 @@ class UserFollowService extends BaseService<
   async checkIsFollowing(followerId: DocumentId, followingId: DocumentId) {
     return await this.existsByCondition({
       user: { $eq: followerId },
-      follows: { $eq: followingId },
+      followed: { $eq: followingId },
     });
   }
 
@@ -162,7 +162,7 @@ class UserFollowService extends BaseService<
     type: 'followers' | 'followings'
   ): FilterQuery<IUserFollowEntity> {
     return {
-      [type === 'followers' ? 'user' : 'follows']: {
+      [type === 'followers' ? 'followed' : 'user']: {
         $eq: new mongoose.Types.ObjectId(userId),
       },
     };

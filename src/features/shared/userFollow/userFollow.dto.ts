@@ -10,7 +10,7 @@ export class CreateUserFollowDto {
   user: string;
   @IsNotEmpty()
   @IsMongoId()
-  follows: string;
+  followed: string;
 }
 
 export class UserFollowerResponseDto extends BaseSummaryResponseDto {
@@ -41,20 +41,20 @@ export class UserFollowerResponseDto extends BaseSummaryResponseDto {
 
 export class UserFollowingResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  @Transform(({ obj }) => obj.follows?.role)
+  @Transform(({ obj }) => obj.followed?.role)
   role: UserRole;
 
   @Expose()
-  @Transform(({ obj }) => obj.follows?.avatar)
+  @Transform(({ obj }) => obj.followed?.avatar)
   @Type(() => FileResponseDto)
   avatar: FileResponseDto;
 
   @Expose()
-  @Transform(({ obj }) => obj.follows?.username)
+  @Transform(({ obj }) => obj.followed?.username)
   username: string;
 
   @Expose()
-  @Transform(({ obj }) => obj.follows?._id)
+  @Transform(({ obj }) => obj.followed?._id)
   userId: string;
 
   @Expose()
