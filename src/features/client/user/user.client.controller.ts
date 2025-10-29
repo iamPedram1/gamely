@@ -20,9 +20,18 @@ export default class UserClientController {
   ) {}
 
   getProfile: RequestHandler = async (req, res) => {
-    const user = await this.userService.getOneById(req.user.id, {
-      populate: 'avatar',
+    const user = await this.userService.getSelfProfile();
+
+    sendResponse(res, 200, {
+      httpMethod: 'GET',
+      customName: req.t('common.profile'),
+      body: { data: this.userMapper.toProfileDto(user) },
     });
+  };
+
+  getUser: RequestHandler = async (req, res) => {
+    const username = req.params.username;
+    const user = await this.userService.getUserProfile(username);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

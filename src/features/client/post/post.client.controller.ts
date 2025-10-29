@@ -46,6 +46,7 @@ export default class PostClientController {
           modelKey: 'category',
           transform: mapSlugToId(Category),
         },
+        { queryKey: 'creator', modelKey: 'creator' },
       ],
       searchBy: [
         {

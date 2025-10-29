@@ -10,9 +10,11 @@ import {
 } from 'features/management/post/post.management.dto';
 
 // Services
+import UserService from 'features/shared/user/user.service';
 import BaseService from 'core/services/base/base.service';
 import FileService from 'features/shared/file/file.service';
 import CommentService from 'features/shared/comment/comment.service';
+import NotificationService from 'features/shared/notification/notification.service';
 
 // Validations
 import { PostValidation } from 'features/shared/post/post.validation';
@@ -21,11 +23,11 @@ import { PostValidation } from 'features/shared/post/post.validation';
 import logger from 'core/utilities/logger';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { IPostEntity } from 'features/shared/post/post.types';
 import type { PostDocument } from 'features/shared/post/post.types';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { IApiBatchResponse } from 'core/utilities/response';
-import NotificationService from 'features/shared/notification/notification.service';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()
@@ -37,6 +39,7 @@ class PostService extends BaseService<
 > {
   constructor(
     @inject(delay(() => FileService)) private fileService: FileService,
+    @inject(delay(() => UserService)) private userService: UserService,
     @inject(delay(() => CommentService)) private commentService: CommentService,
     @inject(delay(() => PostValidation)) private postValidation: PostValidation,
     @inject(delay(() => NotificationService))
@@ -46,10 +49,54 @@ class PostService extends BaseService<
   }
 
   async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
-    return await super.batchDelete(ids, {
-      ...(this.currentUser.isNot('admin') && {
-        additionalFilter: { creator: this.currentUser.id },
-      }),
+    return this.withTransaction(async (session) => {
+      const posts = await this.find({
+        filter: { _id: { $in: ids } },
+        lean: true,
+        paginate: false,
+      });
+
+      if (posts.length > 0) {
+        let userCountMap = new Map<string, number>();
+
+        for (let post of posts) {
+          const userId = String(post.creator._id);
+          const count = userCountMap.get(userId) || 0;
+          userCountMap.set(userId, count + 1);
+        }
+
+        if (userCountMap.size > 0) {
+          await Promise.all(
+            Array.from(userCountMap).map(([userId, decrementCount]) =>
+              this.userService.adjustPostCount(userId, decrementCount, {
+                session,
+              })
+            )
+          );
+        }
+      }
+
+      return await super.batchDelete(ids, {
+        ...(this.currentUser.isNot(['admin', 'superAdmin']) && {
+          additionalFilter: { creator: this.currentUser.id },
+        }),
+      });
+    });
+  }
+
+  async create<TThrowError extends boolean = true>(
+    data: CreatePostDto,
+    options?:
+      | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
+      | undefined
+  ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
+    return this.withTransaction(async (session) => {
+      await this.userService.adjustPostCount(this.currentUser.id, 1, {
+        ...options,
+        session,
+      });
+
+      return super.create(data, { ...options, session });
     });
   }
 
@@ -65,9 +112,11 @@ class PostService extends BaseService<
     return await super.updateOneById(id, payload, options);
   }
 
-  async deleteOneById(id: string): Promise<true> {
+  async deleteOneById(id: DocumentId): Promise<true> {
     return this.withTransaction(async (session) => {
       const post = await super.getOneById(id, { lean: true });
+      const creatorId = String(post.creator._id);
+
       await this.assertOwnership(post);
 
       // Delete the post itself first
@@ -76,12 +125,13 @@ class PostService extends BaseService<
       // Prepare cleanup operations
       const cleanupTasks: Promise<any>[] = [
         this.commentService.deleteManyByKey('postId', id, { session }),
-        this.notificationService.deletePostAllNotification(id),
+        this.notificationService.deletePostAllNotification(id, { session }),
+        this.userService.adjustPostCount(creatorId, -1, { session }),
       ];
 
       if (post.coverImage) {
         cleanupTasks.push(
-          this.fileService.deleteOneById(post.coverImage.toHexString(), {
+          this.fileService.deleteOneById(post.coverImage._id, {
             session,
           })
         );

@@ -33,7 +33,7 @@ export class NotFoundError extends Error {
 
     this.name = 'NotFoundError';
     this.cause = options?.cause || [];
-    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+    if (Error.captureStackTrace) Error.captureStackTrace(this, NotFoundError);
   }
 }
 
@@ -45,7 +45,7 @@ export class AnonymousError extends Error {
   constructor(
     message: string,
     mask: string = 'Internal server error',
-    status: number = 400,
+    status: number = 500,
     options?: CustomErrorOptions
   ) {
     super(message);
@@ -54,7 +54,7 @@ export class AnonymousError extends Error {
     this.mask = mask;
     this.status = status;
     this.cause = options?.cause || [];
-    if (Error.captureStackTrace) Error.captureStackTrace(this, ValidationError);
+    if (Error.captureStackTrace) Error.captureStackTrace(this, AnonymousError);
   }
 }
 

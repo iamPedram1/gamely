@@ -160,8 +160,8 @@ export default class AuthService {
       subject: t('messages.auth.password_recovery_emailSubject'),
       html:
         i18nInstance().resolvedLanguage === 'fa'
-          ? recoveryPersianHtml(user.name, key)
-          : recoveryEnglishHtml(user.name, key),
+          ? recoveryPersianHtml(user.username, key)
+          : recoveryEnglishHtml(user.username, key),
     });
   }
 }

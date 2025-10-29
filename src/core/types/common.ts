@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export type ModelKeys =
   | 'Post'
   | 'Tag'
@@ -7,3 +9,5 @@ export type ModelKeys =
   | 'File'
   | 'Notification'
   | 'Comment';
+
+export type DocumentId = string | Types.ObjectId;

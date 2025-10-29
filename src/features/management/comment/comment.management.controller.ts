@@ -41,7 +41,7 @@ export default class CommentManagementController {
       filter,
       populate: [
         { path: 'postId', select: '_id translations' },
-        { path: 'creator', select: 'name status type' },
+        { path: 'creator', select: 'username status type' },
       ],
     });
 

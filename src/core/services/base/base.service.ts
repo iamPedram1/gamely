@@ -17,6 +17,7 @@ import {
 
 // Types
 import type { i18n } from 'i18next';
+import type { DocumentId } from 'core/types/common';
 import type { TranslationKeys, TranslationVariables } from 'core/types/i18n';
 import type {
   Model,
@@ -93,6 +94,8 @@ export default abstract class BaseService<
   protected readonly queries: Q<TSchema, TDoc>;
   protected readonly mutations: M<TSchema, TCreateDto, TUpdateDto, TDoc>;
   protected readonly validations: V<TSchema, TDoc>;
+  private _currentUser?: ReturnType<typeof userContext>;
+  private _softCurrentUser?: ReturnType<typeof userContext> | null;
 
   constructor(private model: Model<TSchema>) {
     this.mutations = new BaseMutateService(model, this.t);
@@ -105,6 +108,14 @@ export default abstract class BaseService<
       return userContext();
     } catch (error) {
       throw new AnonymousError('Something wrong with user context');
+    }
+  }
+
+  protected get softCurrentUser() {
+    try {
+      return userContext();
+    } catch {
+      return null;
     }
   }
 
@@ -184,6 +195,15 @@ export default abstract class BaseService<
   }
 
   /**
+   * Checks if a document exists by complex condition.
+   * @param slug - Slug to match.
+   * @returns True if a document exists, false otherwise.
+   */
+  async existsByCondition(filter: FilterQuery<TSchema>): Promise<boolean> {
+    return this.queries.existsByCondition(filter);
+  }
+
+  /**
    * Checks if a document exists by a specific key-value pair.
    * @param key - Field name to match.
    * @param match - Value to compare.
@@ -197,7 +217,7 @@ export default abstract class BaseService<
   }
 
   async isMadeBySelf(documentId: string, userId: string): Promise<boolean> {
-    return this.isMadeBySelf(documentId, userId);
+    return this.queries.isMadeBySelf(documentId, userId);
   }
 
   // =====================
@@ -231,7 +251,7 @@ export default abstract class BaseService<
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<FindResult<TDoc, TLean, TPaginate>> {
+  ): Promise<FindResult<TSchema, TDoc, TLean, TPaginate>> {
     return await this.queries.find(options);
   }
 
@@ -302,13 +322,37 @@ export default abstract class BaseService<
     TLean extends boolean = false,
     TThrowError extends boolean = true,
   >(
-    id: string,
+    id: DocumentId,
     options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
       lean?: TLean;
       throwError?: TThrowError;
     }
-  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
     return this.queries.getOneById(id, options);
+  }
+
+  /**
+   * Retrieves a single document by filter object.
+   * @param filter - Filter Object.
+   * @param options - Query customization options:
+   *  - `select`: fields to include/exclude
+   *  - `populate`: relations to populate
+   *  - `lean`: if true, returns a plain JS object instead of a hydrated doc
+   *  - `throwError`: if true (default), throws NotFoundError when not found
+   * @returns The found document or null (if throwError=false).
+   * @throws {NotFoundError} If document not found and throwError is true.
+   */
+  async getOneByCondition<
+    TLean extends boolean = false,
+    TThrowError extends boolean = true,
+  >(
+    filter: FilterQuery<TSchema>,
+    options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
+      lean?: TLean;
+      throwError?: TThrowError;
+    }
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
+    return this.queries.getOneByCondition(filter, options);
   }
 
   /**
@@ -329,10 +373,10 @@ export default abstract class BaseService<
   ): Promise<
     TThrowError extends true
       ? TLean extends true
-        ? FlattenMaps<TDoc>
+        ? FlattenMaps<TSchema>
         : TDoc
       : TLean extends true
-        ? FlattenMaps<TDoc> | null
+        ? FlattenMaps<TSchema> | null
         : TDoc | null
   > {
     return this.queries.getOneBySlug(slug, options);
@@ -357,7 +401,7 @@ export default abstract class BaseService<
       lean?: TLean;
       throwError?: TThrowError;
     }
-  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
     return this.queries.getOneByKey(key, value, options);
   }
 
@@ -392,8 +436,8 @@ export default abstract class BaseService<
    * @throws {NotFoundError} If document is not found and throwError is true.
    */
   async updateOneById<TThrowError extends boolean = true>(
-    id: string,
-    payload: Partial<TUpdateDto>,
+    id: DocumentId,
+    payload: UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
     return this.mutations.updateOneById(id, payload, options);
@@ -494,10 +538,24 @@ export default abstract class BaseService<
    * @throws {NotFoundError} If document not found and throwError is true.
    */
   async deleteOneById<TThrowError extends boolean = true>(
-    id: string,
+    id: DocumentId,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
     return this.mutations.deleteOneById(id, options);
+  }
+
+  /**
+   * Deletes a document by complex filter object.
+   * @param filter - filter object.
+   * @param options - Options including session or throwError flag.
+   * @returns True if deleted, otherwise false.
+   * @throws {NotFoundError} If document not found and throwError is true.
+   */
+  async deleteOneByCondition<TThrowError extends boolean = true>(
+    filter: FilterQuery<TSchema>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? true : boolean> {
+    return this.mutations.deleteOneByCondition(filter, options);
   }
 
   /**
@@ -562,7 +620,7 @@ export default abstract class BaseService<
    */
   async removeIdFromArrayField(
     keyName: NestedKeyOf<TSchema>,
-    id: string,
+    id: DocumentId,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     return this.mutations.removeIdFromArrayField(keyName, id, options);

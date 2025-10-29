@@ -18,6 +18,7 @@ export function validateParam<T>(
 ) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const raw = req.params[paramKey];
+
     if (!raw)
       throw new ValidationError(
         req.t('error.param.required', { param: paramKey })

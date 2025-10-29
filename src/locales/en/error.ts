@@ -61,6 +61,13 @@ const errosTranslations = {
     invalid: '{{param}} is invalid',
     not_found: 'No {{model}} found with {{param}} = {{value}}',
   },
+  userFollow: {
+    already_following: 'You are already following this user',
+    not_following: 'You are not following this user',
+    follow_self: 'You cannot follow yourself',
+    unfollow_self: 'You cannot unfollow yourself',
+    unfollow: 'Unfollow',
+  },
   validation: {
     isString: '{{property}} must be a string',
     isNotEmpty: '{{property}} should not be empty',

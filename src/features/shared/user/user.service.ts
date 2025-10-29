@@ -1,5 +1,5 @@
-import { injectable } from 'tsyringe';
-import type { ClientSession } from 'mongoose';
+import { delay, inject, injectable } from 'tsyringe';
+import type { ClientSession, Types } from 'mongoose';
 
 // Model
 import User from 'features/shared/user/user.model';
@@ -9,6 +9,9 @@ import BaseService from 'core/services/base/base.service';
 
 // DTO
 import { RegisterDto } from 'features/shared/auth/auth.dto';
+import PostService from 'features/shared/post/post.service';
+import SessionService from 'features/shared/session/session.service';
+import UserFollowService from 'features/shared/userFollow/userFollow.service';
 import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 import { UpdateUserDto } from 'features/management/user/user.management.dto';
 
@@ -24,6 +27,9 @@ import {
   ValidationError,
 } from 'core/utilities/errors';
 
+import type { BaseMutateOptions } from 'core/types/base.service.type';
+import type { DocumentId } from 'core/types/common';
+
 export type IUserService = InstanceType<typeof UserService>;
 
 @injectable()
@@ -33,7 +39,14 @@ export default class UserService extends BaseService<
   UpdateUserDto | UpdateProfileDto,
   UserDocument
 > {
-  constructor() {
+  constructor(
+    @inject(delay(() => UserFollowService))
+    private userFollowService: UserFollowService,
+    @inject(delay(() => PostService))
+    private postService: PostService,
+    @inject(delay(() => SessionService))
+    private sessionService: SessionService
+  ) {
     super(User);
   }
 
@@ -41,8 +54,40 @@ export default class UserService extends BaseService<
     return this.withTransaction(fn);
   }
 
+  async getSelfProfile() {
+    const user = await this.getOneById(this.currentUser.id, {
+      populate: 'avatar',
+      lean: true,
+    });
+
+    return { ...user, lastSeen: new Date().toISOString() };
+  }
+
+  async getUserProfile(username: string) {
+    const user = await this.getOneByKey('username', username, {
+      populate: 'avatar',
+      select: '-email',
+      lean: true,
+    });
+
+    const viewerId = this.softCurrentUser?.id;
+    const userId = user._id;
+
+    const promises: [Promise<string | null>, Promise<boolean>?] = [
+      this.getUserLastSeen(userId),
+    ];
+
+    if (viewerId) {
+      promises.push(this.userFollowService.checkIsFollowing(viewerId, userId));
+    }
+
+    const [lastSeen, isFollowing] = await Promise.all(promises);
+
+    return { ...user, lastSeen, isFollowing: isFollowing ?? false };
+  }
+
   async update(
-    userId: string,
+    userId: DocumentId,
     data: UpdateUserDto | UpdateProfileDto
   ): Promise<IUserEntity> {
     const user = await this.getOneById(userId, { lean: true });
@@ -60,6 +105,67 @@ export default class UserService extends BaseService<
       throw new ForbiddenError();
 
     return await this.updateOneById(userId, data, { lean: true });
+  }
+
+  async adjustMetadata(
+    userId: DocumentId,
+    key: keyof UserDocument,
+    value: number,
+    options?: BaseMutateOptions
+  ) {
+    return await this.updateOneById(
+      userId,
+      { $inc: { [key]: value } },
+      options
+    );
+  }
+
+  async adjustPostCount(
+    userId: DocumentId,
+    value: number,
+    options?: BaseMutateOptions
+  ) {
+    return this.adjustMetadata(userId, 'postsCount', value, options);
+  }
+
+  async adjustFollowersCount(
+    userId: DocumentId,
+    value: number,
+    options?: BaseMutateOptions
+  ) {
+    return this.adjustMetadata(userId, 'followersCount', value, options);
+  }
+
+  async adjustFollowingsCount(
+    userId: DocumentId,
+    value: number,
+    options?: BaseMutateOptions
+  ) {
+    return this.adjustMetadata(userId, 'followingsCount', value, options);
+  }
+
+  private async getUserLastSeen(userId: DocumentId) {
+    return (
+      (
+        await this.sessionService.find({
+          lean: true,
+          filter: { userId },
+          select: 'lastActivity',
+          sort: { lastActivity: -1 },
+          paginate: false,
+          limit: 1,
+        })
+      )?.[0]?.lastActivity.toISOString() || null
+    );
+  }
+
+  async getIdByUsername(username: string) {
+    const user = await this.getOneByKey('username', username, {
+      lean: true,
+      select: '_id',
+    });
+
+    return user._id.toHexString();
   }
 
   private validateBlocking(

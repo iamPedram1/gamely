@@ -3,7 +3,11 @@ import { Model, Schema, model } from 'mongoose';
 
 // Utils
 import crypto from 'core/utilities/crypto';
-import { userRoles, userStatus } from 'features/shared/user/user.constants';
+import {
+  usernameRegex,
+  userRoles,
+  userStatus,
+} from 'features/shared/user/user.constants';
 
 // Types
 import type {
@@ -36,18 +40,22 @@ const userSchema = new Schema<
       default: 'active',
       index: true,
     },
-    name: {
+    username: {
       type: String,
       trim: true,
+      unique: true,
+      index: true,
+      lowercase: true,
       minlength: 3,
       maxlength: 255,
+      match: usernameRegex,
       required: true,
     },
     bio: {
       type: String,
       trim: true,
       minlength: 1,
-      maxlength: 255,
+      maxlength: 500,
     },
     email: {
       index: true,
@@ -74,6 +82,9 @@ const userSchema = new Schema<
       required: true,
       select: false,
     },
+    followersCount: { type: Number, default: 0 },
+    followingsCount: { type: Number, default: 0 },
+    postsCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

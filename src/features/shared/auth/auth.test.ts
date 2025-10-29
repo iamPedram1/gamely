@@ -31,7 +31,7 @@ describe('auth routes', () => {
       token = '';
 
       payload = {
-        name: 'Pedram',
+        username: 'Pedram',
         email: 'email@gmail.com',
         password: '123456789',
       };
@@ -71,7 +71,7 @@ describe('auth routes', () => {
       expect(response.status).toBe(400);
     });
     it('should return 400 if name is not valid', async () => {
-      payload.name = 'ab';
+      payload.username = 'ab';
 
       const response = await exec();
 

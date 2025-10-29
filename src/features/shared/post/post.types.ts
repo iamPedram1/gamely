@@ -7,7 +7,7 @@ import type {
 } from 'features/client/post/post.client.dto';
 
 export type PostDocument = HydratedDocument<IPostEntity>;
-export type PostLeanDocument = FlattenMaps<PostDocument>;
+export type PostLeanDocument = FlattenMaps<IPostEntity>;
 
 export interface PostTranslation {
   title: string;

@@ -3,6 +3,10 @@ const messageTranslations = {
     follow_request: '{{username}} sended a follow request to you',
     comment_reply: '{{username}} has replied to your message in {{postTitle}}',
   },
+  comment: {
+    create_success:
+      'Comment created successfully and will be visible after admin review',
+  },
   file: {
     upload_some_failed: 'Some files upload failed ',
     upload_success_singular: 'File uploaded successfully',
@@ -16,10 +20,6 @@ const messageTranslations = {
     not_provided: 'File not provided',
     location_not_provided: 'File location not provided',
     location_invalid: 'File location is not valid',
-  },
-  comment: {
-    create_success:
-      'Comment created successfully and will be visible after admin review',
   },
   batch: {
     completed: 'Batch operation completed successfuly',
@@ -46,6 +46,12 @@ const messageTranslations = {
   },
   user: {
     profile_updated: 'Profile updated successfully',
+  },
+  userFollow: {
+    follow: 'Follow',
+    unfollow: 'Unfollow',
+    followers: 'Followers',
+    followings: 'Followings',
   },
 } as const;
 

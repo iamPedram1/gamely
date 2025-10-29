@@ -44,7 +44,7 @@ export default class UserManagementController {
     const query = req.query as unknown as UserManagementQueryDto;
     const filter = await this.userService.buildFilterFromQuery(query, {
       searchBy: [
-        { queryKey: 'search', modelKeys: ['name', 'email'], options: 'i' },
+        { queryKey: 'search', modelKeys: ['username', 'email'], options: 'i' },
       ],
       filterBy: [
         { queryKey: 'role', modelKey: 'role', logic: 'and' },

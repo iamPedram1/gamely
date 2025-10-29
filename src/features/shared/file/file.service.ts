@@ -14,6 +14,7 @@ import { t } from 'core/utilities/request-context';
 import { AnonymousError, BadRequestError } from 'core/utilities/errors';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type {
   IFileEntity,
@@ -34,7 +35,10 @@ class FileService extends BaseService<
     super(File);
   }
 
-  async deleteOneById(id: string, options?: BaseMutateOptions): Promise<true> {
+  async deleteOneById(
+    id: DocumentId,
+    options?: BaseMutateOptions
+  ): Promise<true> {
     const file = await super.getOneById(id, { lean: true });
     const result = await super.deleteOneById(id, options);
 

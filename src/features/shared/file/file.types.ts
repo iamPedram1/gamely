@@ -7,7 +7,7 @@ import type {
 } from 'features/shared/file/file.dto';
 
 export type FileDocument = HydratedDocument<IFileEntity>;
-export type FileLeanDocument = FlattenMaps<FileDocument>;
+export type FileLeanDocument = FlattenMaps<IFileEntity>;
 
 export type IFileLocation = 'game' | 'post' | 'user';
 

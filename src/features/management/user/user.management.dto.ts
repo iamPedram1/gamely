@@ -18,7 +18,7 @@ import type { UserRole, UserStatus } from 'features/shared/user/user.types';
 export class UpdateUserDto extends BaseUserUpdate {
   avatar: Types.ObjectId;
   bio: string;
-  name: string;
+  username: string;
   password: string;
 
   @IsOptional()
@@ -51,12 +51,12 @@ export class UserManagementResponseDto extends BaseResponseDto {
   avatar: FileResponseDto;
 
   @Expose()
-  name: string;
+  username: string;
 }
 
 export class UserManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  name: string;
+  username: string;
 
   @Expose()
   bio: string;

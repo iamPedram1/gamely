@@ -27,11 +27,13 @@ import notFound from 'core/middlewares/notFound';
 
 // Utilities
 import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
+import userFollowRouter from 'features/shared/userFollow/userFollow.route';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);
-  app.use(prefixBaseUrl('/user'), userClientRouter);
   app.use(prefixBaseUrl('/user/notifications'), notificationClientRouter);
+  app.use(prefixBaseUrl('/user'), userClientRouter);
+  app.use(prefixBaseUrl('/user'), userFollowRouter);
   app.use(prefixBaseUrl('/auth'), authClientRouter);
   app.use(prefixBaseUrl('/tags'), tagClientRouter);
   app.use(prefixBaseUrl('/games'), gameClientRouter);

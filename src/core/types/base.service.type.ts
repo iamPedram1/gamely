@@ -8,14 +8,14 @@ import type {
 } from 'mongoose';
 
 // Services
+import BaseService from 'core/services/base/base.service';
 import BaseQueryService from 'core/services/base/base.query.service';
 import BaseMutateService from 'core/services/base/base.mutate.service';
+import BaseValidationService from 'core/services/base/base.validation.service';
 
 // Types
-import BaseService from 'core/services/base/base.service';
 import type { IRequestQueryBase } from 'core/types/query';
 import type { WithPagination } from 'core/types/paginate';
-import BaseValidationService from 'core/services/base/base.validation.service';
 
 /** Options for Mongoose session (transactions) */
 export interface BaseSessionOptions {
@@ -29,24 +29,22 @@ export interface BasePopulateOptions {
   populate?: PopulateOptions | PopulateOptions[] | string;
 }
 
-/** Result of getting a single document */
-export type GetOneResult<TLean, TDoc> =
-  | (TLean extends true ? FlattenMaps<TDoc> : TDoc)
-  | null;
-
 /** Generic query result type */
-export type QueryResult<TDoc, TLean extends boolean> = TLean extends true
-  ? FlattenMaps<TDoc>
-  : TDoc;
+export type QueryResult<
+  TSchema,
+  TDoc,
+  TLean extends boolean,
+> = TLean extends true ? FlattenMaps<TSchema> : TDoc;
 
 /** Nullable query result type with optional throw behavior */
 export type NullableQueryResult<
+  TSchema,
   TDoc,
   TLean extends boolean,
   TThrowError extends boolean,
 > = TThrowError extends true
-  ? QueryResult<TDoc, TLean>
-  : QueryResult<TDoc, TLean> | null;
+  ? QueryResult<TSchema, TDoc, TLean>
+  : QueryResult<TSchema, TDoc, TLean> | null;
 
 /** Return type of aggregation queries */
 export type AggregateReturn<
@@ -55,18 +53,21 @@ export type AggregateReturn<
 > = TPaginate extends true ? WithPagination<TResult> : TResult[];
 
 /** Result of array queries */
-export type ArrayQueryResult<TDoc, TLean extends boolean> = TLean extends true
-  ? FlattenMaps<TDoc>[]
-  : TDoc[];
+export type ArrayQueryResult<
+  TSchema,
+  TDoc,
+  TLean extends boolean,
+> = TLean extends true ? FlattenMaps<TSchema>[] : TDoc[];
 
 /** Result of find queries with optional pagination */
 export type FindResult<
+  TSchema,
   TDoc,
   TLean extends boolean,
   TPaginate extends boolean,
 > = TPaginate extends false
-  ? ArrayQueryResult<TDoc, TLean>
-  : WithPagination<QueryResult<TDoc, TLean>>;
+  ? ArrayQueryResult<TSchema, TDoc, TLean>
+  : WithPagination<QueryResult<TSchema, TDoc, TLean>>;
 
 /** Common options for query/mutation services */
 interface BaseCommonOptions<TLean extends boolean = boolean> {
@@ -102,16 +103,18 @@ export interface BaseMutateOptions<TLean extends boolean = boolean>
   session?: mongo.ClientSession;
 }
 
+type BaseDoc<T> = HydratedDocument<T>;
+
 /** BaseQueryService type alias */
 export type IBaseQueryService<
   TSchema,
-  TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
+  TDoc extends BaseDoc<TSchema> = BaseDoc<TSchema>,
 > = BaseQueryService<TSchema, TDoc>;
 
 /** BaseValidationService type alias */
 export type IBaseValidationService<
   TSchema,
-  TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
+  TDoc extends BaseDoc<TSchema> = BaseDoc<TSchema>,
 > = BaseValidationService<TSchema, TDoc>;
 
 /** BaseMutateService type alias */
@@ -119,7 +122,7 @@ export type IBaseMutateService<
   TSchema,
   TCreateDto,
   TUpdateDto,
-  TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
+  TDoc extends BaseDoc<TSchema> = BaseDoc<TSchema>,
 > = BaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>;
 
 /** Combined BaseService type alias */
@@ -127,7 +130,7 @@ export type IBaseService<
   TSchema,
   TCreateDto,
   TUpdateDto,
-  TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
+  TDoc extends BaseDoc<TSchema> = BaseDoc<TSchema>,
 > = BaseService<TSchema, TCreateDto, TUpdateDto, TDoc>;
 
 /** Logical OR/AND filter object */

@@ -8,9 +8,11 @@ import type {
   AnyKeys,
   UpdateWithAggregationPipeline,
   UpdateQuery,
+  Types,
 } from 'mongoose';
 
 // Utilities
+import { userContext } from 'core/utilities/request-context';
 import {
   AnonymousError,
   NotFoundError,
@@ -18,6 +20,7 @@ import {
 } from 'core/utilities/errors';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { IApiBatchResponse } from 'core/utilities/response';
 import type { BaseTFunction } from 'core/services/base/base.service';
 import type {
@@ -26,7 +29,6 @@ import type {
   NestedValueOf,
   OrAndFilter,
 } from 'core/types/base.service.type';
-import { userContext } from 'core/utilities/request-context';
 
 /**
  * Base service for CRUD and mutation operations on Mongoose models.
@@ -68,20 +70,18 @@ class BaseMutateService<
   // <----------------   UPDATE   ---------------->
 
   async updateOneById<TThrowError extends boolean = true>(
-    id: string,
-    payload: Partial<TUpdateDto>,
+    id: DocumentId,
+    payload: UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
-    const query = this.model.findByIdAndUpdate(
-      id,
-      payload as unknown as UpdateQuery<TSchema>,
-      { new: true }
-    );
+    const query = this.model.findByIdAndUpdate(id, payload, { new: true });
 
     const doc = await this.applyMutateOptions(query, options).exec();
 
     if (!doc && (options?.throwError ?? true)) {
-      throw new NotFoundError(this.t('error.not_found_by_id', { id }));
+      throw new NotFoundError(
+        this.t('error.not_found_by_id', { id: String(id) })
+      );
     }
 
     return doc as TThrowError extends true ? TDoc : TDoc | null;
@@ -116,7 +116,7 @@ class BaseMutateService<
   }
 
   async updateManyByReference<K extends NestedKeyOf<TSchema>>(
-    id: string,
+    id: DocumentId,
     referenceKey: K,
     value: NestedValueOf<TSchema, K>,
     options?: BaseMutateOptions
@@ -125,7 +125,7 @@ class BaseMutateService<
   }
 
   async updateManyByReferences<K extends NestedKeyOf<TSchema>>(
-    ids: string[],
+    ids: Array<DocumentId>,
     referenceKey: K,
     value: NestedValueOf<TSchema, K>,
     options?: BaseMutateOptions
@@ -163,7 +163,7 @@ class BaseMutateService<
   // <----------------   DELETE   ---------------->
 
   async deleteOneById<TThrowError extends boolean = true>(
-    id: string,
+    id: DocumentId,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
     const query = this.model.deleteOne({ _id: id } as FilterQuery<TSchema>);
@@ -172,7 +172,26 @@ class BaseMutateService<
     const deleted = result.deletedCount > 0;
 
     if ((options?.throwError ?? true) && !deleted) {
-      throw new NotFoundError(this.t('error.not_found_by_id', { id }));
+      throw new NotFoundError(
+        this.t('error.not_found_by_id', { id: String(id) })
+      );
+    }
+
+    return ((options?.throwError ?? true) ? true : deleted) as any;
+  }
+
+  async deleteOneByCondition<TThrowError extends boolean = true>(
+    filter: FilterQuery<TSchema>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? true : boolean> {
+    const query = this.model.deleteOne(filter);
+    const result = await this.applyMutateOptions(query, options).exec();
+
+    const deleted = result.deletedCount > 0;
+
+    if ((options?.throwError ?? true) && !deleted) {
+      // TODO: Hey
+      throw new NotFoundError(this.t('error.not_found_by_id'));
     }
 
     return ((options?.throwError ?? true) ? true : deleted) as any;
@@ -223,7 +242,8 @@ class BaseMutateService<
     if (!ids?.length) {
       throw new ValidationError(this.t('error.ids_array_empty'));
     }
-
+    if (ids.length > 100)
+      throw new ValidationError('Too many id, the max is 100 ');
     const query = this.model.deleteMany({
       _id: { $in: ids },
       ...options?.additionalFilter,
@@ -245,7 +265,7 @@ class BaseMutateService<
         success: successIds.includes(id),
         message: successIds.includes(id)
           ? this.t('common.deleted_successfully')
-          : this.t('error.not_found_by_id', { id }),
+          : this.t('error.not_found_by_id', { id: String(id) }),
       })),
       errors:
         failedIds.length > 0 ? [this.t('common.some_documents_not_found')] : [],
@@ -260,7 +280,7 @@ class BaseMutateService<
   // <----------------   ARRAY FIELD   ---------------->
   async removeIdFromArrayField(
     keyName: NestedKeyOf<TSchema>,
-    id: string,
+    id: DocumentId,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     return this.removeIdsFromArrayField(keyName, [id], options);
@@ -268,7 +288,7 @@ class BaseMutateService<
 
   async removeIdsFromArrayField(
     keyName: NestedKeyOf<TSchema>,
-    ids: string[],
+    ids: Array<DocumentId>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
     const query = this.model.updateMany(

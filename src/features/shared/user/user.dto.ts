@@ -8,7 +8,7 @@ import type { Types } from 'mongoose';
 export abstract class BaseUserUpdate {
   @IsOptional()
   @Length(3, 255)
-  abstract name: string;
+  abstract username: string;
 
   @IsOptional()
   @Length(1, 255)

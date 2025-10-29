@@ -1,4 +1,5 @@
 import { singleton } from 'tsyringe';
+import { plainToInstance } from 'class-transformer';
 
 // DTO
 import {
@@ -19,7 +20,6 @@ import type {
   UserDocument,
   UserLeanDocument,
 } from 'features/shared/user/user.types';
-import { plainToInstance } from 'class-transformer';
 
 export type IUserMapper = InstanceType<typeof UserMapper>;
 

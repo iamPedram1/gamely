@@ -11,6 +11,10 @@ const modelsTranslations = {
     singular: 'اعلان',
     plural: 'اعلان‌ها',
   },
+  UserFollow: {
+    singular: 'دنبال کننده',
+    plural: 'دنبال کننده‌ها',
+  },
   Post: {
     singular: 'پست',
     plural: 'پست‌ها',

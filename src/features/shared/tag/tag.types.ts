@@ -3,7 +3,7 @@ import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 import type { WithTranslations } from 'core/types/translations';
 
 export type TagDocument = HydratedDocument<ITagEntity>;
-export type TagLeanDocument = FlattenMaps<TagDocument>;
+export type TagLeanDocument = FlattenMaps<ITagEntity>;
 
 export interface TagTranslation {
   title: string;

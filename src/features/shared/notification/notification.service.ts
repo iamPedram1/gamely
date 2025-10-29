@@ -10,9 +10,11 @@ import {
 } from 'features/shared/notification/notification.dto';
 
 // Utilities
-import { AnonymousError, ForbiddenError } from 'core/utilities/errors';
+import { AnonymousError } from 'core/utilities/errors';
 
 // Types
+import type { BaseQueryDto } from 'core/dto/query';
+import type { DocumentId } from 'core/types/common';
 import type { AppLanguages } from 'core/types/i18n';
 import type { WithPagination } from 'core/types/paginate';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
@@ -22,7 +24,6 @@ import type {
   NotificationLeanDocument,
   NotificationType,
 } from 'features/shared/notification/notification.types';
-import { BaseQueryDto } from 'core/dto/query';
 
 @injectable()
 export default class NotificationService extends BaseService<
@@ -60,15 +61,21 @@ export default class NotificationService extends BaseService<
     return notifications;
   }
 
-  async deletePostAllNotification(postId: string) {
-    this.deleteManyWithConditions({
-      'metadata.parentType': 'Post',
-      'metadata.parentId': postId,
-    });
+  async deletePostAllNotification(
+    postId: DocumentId,
+    options?: Pick<BaseMutateOptions<true>, 'session'>
+  ) {
+    await this.deleteManyWithConditions(
+      {
+        'metadata.parentType': 'Post',
+        'metadata.parentId': postId,
+      },
+      options
+    );
   }
 
   async seenNotification(
-    id: string,
+    id: DocumentId,
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
     await this.updateOneById(id, { seen: true }, { ...options, lean: true });
@@ -86,7 +93,7 @@ export default class NotificationService extends BaseService<
   }
 
   async deleteNotification(
-    id: string,
+    id: DocumentId,
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
     await this.deleteOneById(id, options);
@@ -145,11 +152,11 @@ export default class NotificationService extends BaseService<
 
     if (!comment) {
       comment = (await this.commentService.getOneById(commentId, {
+        lean: true,
         populate: [
           { path: 'postId', select: '_id translations slug' },
           { path: 'creator' },
         ],
-        lean: true,
       })) as unknown as ICommentPopulated;
 
       cache.set(commentId, comment);
@@ -162,7 +169,7 @@ export default class NotificationService extends BaseService<
     notification: INotificationEntity
   ) {
     return this.t(notification.messageKey, {
-      username: comment.creator.name,
+      username: comment.creator.username,
       postTitle:
         comment.postId.translations[this.i18n.language as AppLanguages].title,
     });

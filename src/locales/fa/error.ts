@@ -60,6 +60,13 @@ const errosTranslations = {
     invalid: '{{param}} نامعتبر است',
     not_found: '{{model}} مورد نظر یافت نشد',
   },
+  userFollow: {
+    already_following: 'شما قبلاً این کاربر را دنبال کرده‌اید',
+    not_following: 'شما این کاربر را دنبال نمی‌کنید',
+    follow_self: 'نمی‌توانید خودتان را دنبال کنید',
+    unfollow_self: 'نمی‌توانید خودتان را از دنبال‌شده‌ها حذف کنید',
+    unfollow: 'لغو دنبال',
+  },
   validation: {
     isString: '{{property}} باید رشته متنی باشد',
     isNotEmpty: '{{property}} نباید خالی باشد',

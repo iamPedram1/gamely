@@ -46,6 +46,7 @@ export default class CommentClientController {
 
     const comment = await this.commentService.create({
       ...dto,
+      parentIds: [],
       postId: req.params.id,
     });
 

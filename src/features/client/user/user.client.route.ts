@@ -10,18 +10,29 @@ import UserClientController from 'features/client/user/user.client.controller';
 
 // DTO
 import { UpdateProfileDto } from 'features/client/user/user.client.dto';
+import { initializeContext } from 'core/middlewares/context';
 
 const userClientRouter = express.Router();
 const userClientController = container.resolve(UserClientController);
 
-userClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
+const accessMiddleware = auth(['user', 'author', 'admin', 'superAdmin']);
 
 // <----------------   GET   ---------------->
-userClientRouter.get('/profile', userClientController.getProfile);
+userClientRouter.get(
+  '/profile',
+  accessMiddleware,
+  userClientController.getProfile
+);
+userClientRouter.get(
+  '/:username',
+  initializeContext,
+  userClientController.getUser
+);
 
 // <----------------   PATCH  ---------------->
 userClientRouter.patch(
   '/profile',
+  accessMiddleware,
   validateBody(UpdateProfileDto),
   userClientController.update
 );

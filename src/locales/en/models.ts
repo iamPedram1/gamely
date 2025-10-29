@@ -11,9 +11,17 @@ export const modelsTranslations = {
     singular: 'Notification',
     plural: 'Notifications',
   },
+  UserFollow: {
+    singular: 'User Follow',
+    plural: 'User Follows',
+  },
   Post: {
     singular: 'Post',
     plural: 'Posts',
+  },
+  Comment: {
+    singular: 'Comment',
+    plural: 'Comments',
   },
   Game: {
     singular: 'Game',
@@ -22,10 +30,6 @@ export const modelsTranslations = {
   Tag: {
     singular: 'Tag',
     plural: 'Tags',
-  },
-  Comment: {
-    singular: 'Comment',
-    plural: 'Comments',
   },
 };
 

@@ -9,6 +9,7 @@ import type {
   HydratedDocument,
   FilterQuery,
   PipelineStage,
+  Types,
 } from 'mongoose';
 import {
   AggregateReturn,
@@ -19,6 +20,7 @@ import {
   NullableQueryResult,
   RelatedLookup,
 } from 'core/types/base.service.type';
+import { DocumentId } from 'core/types/common';
 
 /**
  * Generic base service for query operations (read-only) on Mongoose models.
@@ -56,8 +58,12 @@ class BaseQueryService<
     return this.exists({ _id: documentId, creator: userId });
   }
 
-  async existsById(id: string): Promise<boolean> {
+  async existsById(id: DocumentId): Promise<boolean> {
     return this.exists({ _id: id } as FilterQuery<TSchema>);
+  }
+
+  async existsByCondition(filter: FilterQuery<TSchema>): Promise<boolean> {
+    return this.exists(filter);
   }
 
   async existsBySlug(slug: string): Promise<boolean> {
@@ -77,20 +83,43 @@ class BaseQueryService<
     TLean extends boolean = false,
     TThrowError extends boolean = true,
   >(
-    id: string,
+    id: DocumentId,
     options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
       lean?: TLean;
       throwError?: TThrowError;
     }
-  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
     const query = this.model.findById(id);
     const result = await this.applyQueryOptions(query, options).exec();
 
     if (!result && (options?.throwError ?? true)) {
-      throw new NotFoundError(this.t('error.not_found_by_id', { id }));
+      throw new NotFoundError(
+        this.t('error.not_found_by_id', { id: String(id) })
+      );
     }
 
-    return result as NullableQueryResult<TDoc, TLean, TThrowError>;
+    return result as NullableQueryResult<TSchema, TDoc, TLean, TThrowError>;
+  }
+
+  async getOneByCondition<
+    TLean extends boolean = false,
+    TThrowError extends boolean = true,
+  >(
+    filter: FilterQuery<TSchema>,
+    options?: Omit<BaseQueryOptions<TSchema>, 'filter'> & {
+      lean?: TLean;
+      throwError?: TThrowError;
+    }
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
+    const query = this.model.findOne(filter);
+    const result = await this.applyQueryOptions(query, options).exec();
+
+    if (!result && (options?.throwError ?? true)) {
+      // TODO: Add better translate {id? in t second arg}
+      throw new NotFoundError(this.t('error.not_found_by_id'));
+    }
+
+    return result as NullableQueryResult<TSchema, TDoc, TLean, TThrowError>;
   }
 
   async getOneBySlug<
@@ -102,7 +131,7 @@ class BaseQueryService<
       lean?: TLean;
       throwError?: TThrowError;
     }
-  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
     const query = this.model.findOne({ slug } as FilterQuery<TSchema>);
     const result = await this.applyQueryOptions(query, options).exec();
 
@@ -112,7 +141,7 @@ class BaseQueryService<
       );
     }
 
-    return result as NullableQueryResult<TDoc, TLean, TThrowError>;
+    return result as NullableQueryResult<TSchema, TDoc, TLean, TThrowError>;
   }
 
   async getOneByKey<
@@ -126,7 +155,7 @@ class BaseQueryService<
       lean?: TLean;
       throwError?: TThrowError;
     }
-  ): Promise<NullableQueryResult<TDoc, TLean, TThrowError>> {
+  ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
     const query = this.model.findOne({ [key]: value } as FilterQuery<TSchema>);
     const result = await this.applyQueryOptions(query, options).exec();
 
@@ -139,7 +168,7 @@ class BaseQueryService<
       );
     }
 
-    return result as NullableQueryResult<TDoc, TLean, TThrowError>;
+    return result as NullableQueryResult<TSchema, TDoc, TLean, TThrowError>;
   }
 
   // <----------------   MULTIPLE DOCUMENTS   ---------------->
@@ -149,7 +178,7 @@ class BaseQueryService<
       lean?: TLean;
       paginate?: TPaginate;
     }
-  ): Promise<FindResult<TDoc, TLean, TPaginate>> {
+  ): Promise<FindResult<TSchema, TDoc, TLean, TPaginate>> {
     const query = this.model.find(options?.filter || {});
     const enrichedQuery = this.applyQueryOptions(query, options);
 

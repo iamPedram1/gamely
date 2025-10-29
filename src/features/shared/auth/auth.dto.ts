@@ -27,7 +27,7 @@ export class RegisterDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 255)
-  name: string;
+  username: string;
 
   @IsNotEmpty()
   @IsEmail()

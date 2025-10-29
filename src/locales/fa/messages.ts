@@ -3,21 +3,6 @@ const messageTranslations = {
     follow_request: 'درخواست دنبال کردن شما توسط {{username}}',
     comment_reply: '"{{username}}" در پست "{{postTitle}}" به نظر شما پاسخ داد',
   },
-  auth: {
-    password_recovery_emailSubject: 'گیم‌لی - بازیابی کلمه عبور',
-    password_changed: 'کلمه عبور با موفقیت تغییر کرد',
-    recover_password:
-      'در صورت صحت اطلاعات، ایمیل تأیید به آدرس شما ارسال خواهد شد',
-    email_or_recoveryKey_invalid: 'ایمیل یا شناسه بازیابی نامعتبر است',
-    email_exists: 'این ایمیل توسط کاربر دیگری استفاده شده است',
-    token_refresh_success: 'توکن با موفقیت تازه‌سازی شد',
-    login_success: 'با موفقیت وارد حساب خود شدید',
-    logout_success: 'با موفقیت از حساب خارج شدید',
-    register_success: 'ثبت نام با موفقیت انجام شد',
-  },
-  user: {
-    profile_updated: 'پروفایل با موفقیت بروزرسانی شد',
-  },
   comment: {
     create_success:
       'کامنت شما با موفقیت ایجاد شد و پس از تایید ادمین نمایش داده خواهد شد',
@@ -49,6 +34,27 @@ const messageTranslations = {
     put: '{{name}} با موفقیت بروزرسانی شد',
     delete: '{{name}} با موفقیت حذف شد',
     else: 'درخواست با موفقیت انجام شد',
+  },
+  auth: {
+    password_recovery_emailSubject: 'گیم‌لی - بازیابی کلمه عبور',
+    password_changed: 'کلمه عبور با موفقیت تغییر کرد',
+    recover_password:
+      'در صورت صحت اطلاعات، ایمیل تأیید به آدرس شما ارسال خواهد شد',
+    email_or_recoveryKey_invalid: 'ایمیل یا شناسه بازیابی نامعتبر است',
+    email_exists: 'این ایمیل توسط کاربر دیگری استفاده شده است',
+    token_refresh_success: 'توکن با موفقیت تازه‌سازی شد',
+    login_success: 'با موفقیت وارد حساب خود شدید',
+    logout_success: 'با موفقیت از حساب خارج شدید',
+    register_success: 'ثبت نام با موفقیت انجام شد',
+  },
+  user: {
+    profile_updated: 'پروفایل با موفقیت بروزرسانی شد',
+  },
+  userFollow: {
+    follow: 'دنبال کردن',
+    unfollow: 'لغو دنبال کردن',
+    followers: 'دنبال‌کننده‌ها',
+    followings: 'دنبال‌شده‌ها',
   },
 } as const;
 

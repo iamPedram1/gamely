@@ -2,7 +2,7 @@ import { HydratedDocument, FlattenMaps, Types } from 'mongoose';
 import { WithTranslations } from 'core/types/translations';
 
 export type GameDocument = HydratedDocument<IGameEntity>;
-export type GameLeanDocument = FlattenMaps<GameDocument>;
+export type GameLeanDocument = FlattenMaps<IGameEntity>;
 
 export interface GameTranslation {
   title: string;
