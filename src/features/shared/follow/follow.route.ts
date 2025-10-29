@@ -9,59 +9,59 @@ import { softValidateQuery } from 'core/middlewares/validateQuery';
 import User from 'features/shared/user/user.model';
 
 // Controller
-import UserFollowController from 'features/shared/userFollow/userFollow.controller';
+import FollowController from 'features/shared/follow/follow.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
 import { validateParam } from 'core/middlewares/validateParams';
 import { initializeContext } from 'core/middlewares/context';
 
-const userFollowRouter = express.Router();
-const userFollowController = container.resolve(UserFollowController);
+const followRouter = express.Router();
+const followController = container.resolve(FollowController);
 
 // <----------------   GET   ---------------->
 
 const accessMiddleware = auth(['user', 'author', 'admin', 'superAdmin']);
 
-userFollowRouter.get(
-  '/profile/followers',
+followRouter.get(
+  '/followers',
   accessMiddleware,
-  userFollowController.getProfileFollowers
+  followController.getProfileFollowers
 );
-userFollowRouter.get(
-  '/profile/followings',
+followRouter.get(
+  '/followings',
   accessMiddleware,
-  userFollowController.getProfileFollowings
+  followController.getProfileFollowings
 );
-userFollowRouter.get(
+followRouter.get(
   '/:username/followers',
   softValidateQuery(BaseQueryDto),
   validateParam(User, 'username', 'username'),
-  userFollowController.getUserFollowers
+  followController.getFollowers
 );
-userFollowRouter.get(
+followRouter.get(
   '/:username/followings',
   softValidateQuery(BaseQueryDto),
   validateParam(User, 'username', 'username'),
   initializeContext,
-  userFollowController.getUserFollowings
+  followController.getFollowings
 );
 
 // <----------------   POST   ---------------->
 
-userFollowRouter.post(
+followRouter.post(
   '/:userId/follow',
   accessMiddleware,
   softValidateQuery(BaseQueryDto),
-  userFollowController.follow
+  followController.follow
 );
 
 // <----------------   DELETE   ---------------->
-userFollowRouter.delete(
+followRouter.delete(
   '/:userId/unfollow',
   accessMiddleware,
   validateParam(User, 'userId', '_id', { type: 'id' }),
-  userFollowController.unfollow
+  followController.unfollow
 );
 
-export default userFollowRouter;
+export default followRouter;

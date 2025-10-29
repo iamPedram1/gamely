@@ -47,7 +47,7 @@ const messageTranslations = {
   user: {
     profile_updated: 'Profile updated successfully',
   },
-  userFollow: {
+  follow: {
     follow: 'Follow',
     unfollow: 'Unfollow',
     followers: 'Followers',

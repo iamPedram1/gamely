@@ -3,66 +3,66 @@ import type { RequestHandler } from 'express';
 
 // Service
 import UserService from 'features/shared/user/user.service';
-import UserFollowService from 'features/shared/userFollow/userFollow.service';
+import FollowService from 'features/shared/follow/follow.service';
 
 // Utilities
 import sendResponse from 'core/utilities/response';
-import { UserFollowMapper } from 'features/shared/userFollow/userFollow.mapper';
-import { UserFollowLeanDocument } from 'features/shared/userFollow/userFollow.types';
+import { FollowMapper } from 'features/shared/follow/follow.mapper';
+import { FollowLeanDocument } from 'features/shared/follow/follow.types';
 
 @injectable()
-export default class UserFollowController {
+export default class FollowController {
   constructor(
     @inject(delay(() => UserService))
     private userService: UserService,
-    @inject(delay(() => UserFollowMapper))
-    private userFollowMapper: UserFollowMapper,
-    @inject(delay(() => UserFollowService))
-    private userFollowService: UserFollowService
+    @inject(delay(() => FollowMapper))
+    private followMapper: FollowMapper,
+    @inject(delay(() => FollowService))
+    private followService: FollowService
   ) {}
 
   follow: RequestHandler = async (req, res) => {
-    await this.userFollowService.follow(req.params.userId);
+    await this.followService.follow(req.params.userId);
 
     sendResponse(res, 204);
   };
 
   unfollow: RequestHandler = async (req, res) => {
-    await this.userFollowService.unfollow(req.params.userId);
+    await this.followService.unfollow(req.params.userId);
 
     sendResponse(res, 204);
   };
 
-  getUserFollowers: RequestHandler = async (req, res) => {
+  getFollowers: RequestHandler = async (req, res) => {
     const userId = await this.userService.getIdByUsername(req.params.username);
-    const followers = await this.userFollowService.getFollowers(userId);
+    const followers = await this.followService.getFollowers(userId);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      customName: req.t('messages.userFollow.followers'),
+      customName: req.t('messages.follow.followers'),
       body: {
         data: {
           pagination: followers.pagination,
           docs: followers.docs.map((doc) =>
-            this.userFollowMapper.toFollowerDto(doc)
+            this.followMapper.toFollowerDto(doc)
           ),
         },
       },
     });
   };
 
-  getUserFollowings: RequestHandler = async (req, res) => {
+  getFollowings: RequestHandler = async (req, res) => {
     const userId = await this.userService.getIdByUsername(req.params.username);
-    const followings = await this.userFollowService.getFollowings(userId);
+    const followings = await this.followService.getFollowings(userId);
 
     if (req.user?.id) {
       await Promise.all(
         (
           followings.docs as Array<
-            UserFollowLeanDocument & { isFollowing: boolean }
+            FollowLeanDocument & { isFollowing: boolean }
           >
         ).map(async (follower) => {
-          follower.isFollowing = await this.userFollowService.checkIsFollowing(
+          follower.isFollowing = await this.followService.checkIsFollowing(
             req.user.id,
             follower.followed._id
           );
@@ -72,12 +72,12 @@ export default class UserFollowController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      customName: req.t('messages.userFollow.followings'),
+      customName: req.t('messages.follow.followings'),
       body: {
         data: {
           pagination: followings.pagination,
           docs: followings.docs.map((doc) =>
-            this.userFollowMapper.toFollowingDto(doc)
+            this.followMapper.toFollowingDto(doc)
           ),
         },
       },
@@ -85,16 +85,16 @@ export default class UserFollowController {
   };
 
   getProfileFollowers: RequestHandler = async (req, res) => {
-    const followers = await this.userFollowService.getFollowers(req.user.id);
+    const followers = await this.followService.getFollowers(req.user.id);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      customName: req.t('messages.userFollow.followers'),
+      customName: req.t('messages.follow.followers'),
       body: {
         data: {
           pagination: followers.pagination,
           docs: followers.docs.map((doc) =>
-            this.userFollowMapper.toFollowerDto(doc)
+            this.followMapper.toFollowerDto(doc)
           ),
         },
       },
@@ -102,16 +102,16 @@ export default class UserFollowController {
   };
 
   getProfileFollowings: RequestHandler = async (req, res) => {
-    const followings = await this.userFollowService.getFollowings(req.user.id);
+    const followings = await this.followService.getFollowings(req.user.id);
 
     if (req.user?.id) {
       await Promise.all(
         (
           followings.docs as Array<
-            UserFollowLeanDocument & { isFollowing: boolean }
+            FollowLeanDocument & { isFollowing: boolean }
           >
         ).map(async (follower) => {
-          follower.isFollowing = await this.userFollowService.checkIsFollowing(
+          follower.isFollowing = await this.followService.checkIsFollowing(
             req.user.id,
             follower.followed._id
           );
@@ -121,12 +121,12 @@ export default class UserFollowController {
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
-      customName: req.t('messages.userFollow.followings'),
+      customName: req.t('messages.follow.followings'),
       body: {
         data: {
           pagination: followings.pagination,
           docs: followings.docs.map((doc) =>
-            this.userFollowMapper.toFollowingDto(doc)
+            this.followMapper.toFollowingDto(doc)
           ),
         },
       },

@@ -50,7 +50,7 @@ const messageTranslations = {
   user: {
     profile_updated: 'پروفایل با موفقیت بروزرسانی شد',
   },
-  userFollow: {
+  follow: {
     follow: 'دنبال کردن',
     unfollow: 'لغو دنبال کردن',
     followers: 'دنبال‌کننده‌ها',

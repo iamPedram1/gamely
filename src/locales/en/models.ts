@@ -11,7 +11,7 @@ export const modelsTranslations = {
     singular: 'Notification',
     plural: 'Notifications',
   },
-  UserFollow: {
+  Follow: {
     singular: 'User Follow',
     plural: 'User Follows',
   },

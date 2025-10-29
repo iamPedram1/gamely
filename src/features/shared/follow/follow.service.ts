@@ -2,10 +2,10 @@ import mongoose, { FilterQuery, mongo } from 'mongoose';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import UserFollow from 'features/shared/userFollow/userFollow.model';
+import Follow from 'features/shared/follow/follow.model';
 
 // DTO
-import { CreateUserFollowDto } from 'features/shared/userFollow/userFollow.dto';
+import { CreateFollowDto } from 'features/shared/follow/follow.dto';
 
 // Services
 import BaseService from 'core/services/base/base.service';
@@ -21,35 +21,35 @@ import type {
   FindResult,
 } from 'core/types/base.service.type';
 import type {
-  IUserFollowEntity,
-  UserFollowDocument,
-} from 'features/shared/userFollow/userFollow.types';
+  IFollowEntity,
+  FollowDocument,
+} from 'features/shared/follow/follow.types';
 
-export type IUserFollowService = InstanceType<typeof UserFollowService>;
+export type IFollowService = InstanceType<typeof FollowService>;
 
 @injectable()
-class UserFollowService extends BaseService<
-  IUserFollowEntity,
-  CreateUserFollowDto,
+class FollowService extends BaseService<
+  IFollowEntity,
+  CreateFollowDto,
   null,
-  UserFollowDocument
+  FollowDocument
 > {
   constructor(
     @inject(delay(() => UserService))
     private userService: UserService
   ) {
-    super(UserFollow);
+    super(Follow);
   }
 
   async follow(userIdToFollow: string): Promise<void> {
     return this.withTransaction(async (session) => {
       if (this.currentUser.id === userIdToFollow)
-        throw new ValidationError(this.t('error.userFollow.follow_self'));
+        throw new ValidationError(this.t('error.follow.follow_self'));
 
       if (await this.checkIsFollowing(this.currentUser.id, userIdToFollow))
-        throw new ValidationError(this.t('error.userFollow.already_following'));
+        throw new ValidationError(this.t('error.follow.already_following'));
 
-      const follow = new CreateUserFollowDto();
+      const follow = new CreateFollowDto();
       follow.user = this.currentUser.id;
       follow.followed = userIdToFollow;
 
@@ -66,9 +66,9 @@ class UserFollowService extends BaseService<
   async unfollow(userIdToUnfollow: string): Promise<void> {
     return this.withTransaction(async (session) => {
       if (this.currentUser.id === userIdToUnfollow)
-        throw new ValidationError(this.t('error.userFollow.unfollow_self'));
+        throw new ValidationError(this.t('error.follow.unfollow_self'));
 
-      const follow = new CreateUserFollowDto();
+      const follow = new CreateFollowDto();
       follow.user = this.currentUser.id;
       follow.followed = userIdToUnfollow;
 
@@ -77,7 +77,7 @@ class UserFollowService extends BaseService<
       });
 
       if (!record)
-        throw new ValidationError(this.t('error.userFollow.not_following'));
+        throw new ValidationError(this.t('error.follow.not_following'));
 
       await Promise.all([
         record.deleteOne({ session }),
@@ -109,14 +109,12 @@ class UserFollowService extends BaseService<
   >(
     userId: DocumentId,
     options?:
-      | (BaseQueryOptions<IUserFollowEntity, boolean> & {
+      | (BaseQueryOptions<IFollowEntity, boolean> & {
           lean?: TLean | undefined;
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<
-    FindResult<IUserFollowEntity, UserFollowDocument, TLean, TPaginate>
-  > {
+  ): Promise<FindResult<IFollowEntity, FollowDocument, TLean, TPaginate>> {
     const followers = await this.find({
       filter: this.getQueryFilterOf(userId, 'followers'),
       lean: true,
@@ -134,14 +132,12 @@ class UserFollowService extends BaseService<
   >(
     userId: DocumentId,
     options?:
-      | (BaseQueryOptions<IUserFollowEntity, boolean> & {
+      | (BaseQueryOptions<IFollowEntity, boolean> & {
           lean?: TLean | undefined;
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<
-    FindResult<IUserFollowEntity, UserFollowDocument, TLean, TPaginate>
-  > {
+  ): Promise<FindResult<IFollowEntity, FollowDocument, TLean, TPaginate>> {
     return await this.find({
       filter: this.getQueryFilterOf(userId, 'followings'),
       lean: true,
@@ -160,7 +156,7 @@ class UserFollowService extends BaseService<
   private getQueryFilterOf(
     userId: DocumentId,
     type: 'followers' | 'followings'
-  ): FilterQuery<IUserFollowEntity> {
+  ): FilterQuery<IFollowEntity> {
     return {
       [type === 'followers' ? 'followed' : 'user']: {
         $eq: new mongoose.Types.ObjectId(userId),
@@ -169,4 +165,4 @@ class UserFollowService extends BaseService<
   }
 }
 
-export default UserFollowService;
+export default FollowService;

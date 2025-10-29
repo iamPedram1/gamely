@@ -4,7 +4,7 @@ import { IsMongoId, IsNotEmpty } from 'core/utilities/validation';
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { UserRole } from 'features/shared/user/user.types';
 
-export class CreateUserFollowDto {
+export class CreateFollowDto {
   @IsNotEmpty()
   @IsMongoId()
   user: string;
@@ -13,7 +13,7 @@ export class CreateUserFollowDto {
   followed: string;
 }
 
-export class UserFollowerResponseDto extends BaseSummaryResponseDto {
+export class FollowerResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(({ obj }) => obj.user?.role)
   role: UserRole;
@@ -39,7 +39,7 @@ export class UserFollowerResponseDto extends BaseSummaryResponseDto {
   since: Date;
 }
 
-export class UserFollowingResponseDto extends BaseSummaryResponseDto {
+export class FollowingResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(({ obj }) => obj.followed?.role)
   role: UserRole;

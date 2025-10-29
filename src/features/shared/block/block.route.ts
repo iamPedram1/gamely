@@ -8,13 +8,13 @@ import auth from 'core/middlewares/auth';
 import User from 'features/shared/user/user.model';
 
 // Controller
-import UserFollowController from 'features/shared/block/block.controller';
+import FollowController from 'features/shared/block/block.controller';
 
 // DTO
 import { validateParam } from 'core/middlewares/validateParams';
 
 const blockRouter = express.Router();
-const blockController = container.resolve(UserFollowController);
+const blockController = container.resolve(FollowController);
 
 // <----------------   GET   ---------------->
 

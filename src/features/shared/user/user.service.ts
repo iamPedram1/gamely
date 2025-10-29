@@ -11,7 +11,7 @@ import BaseService from 'core/services/base/base.service';
 import { RegisterDto } from 'features/shared/auth/auth.dto';
 import PostService from 'features/shared/post/post.service';
 import SessionService from 'features/shared/session/session.service';
-import UserFollowService from 'features/shared/userFollow/userFollow.service';
+import FollowService from 'features/shared/follow/follow.service';
 import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 import { UpdateUserDto } from 'features/management/user/user.management.dto';
 
@@ -40,8 +40,8 @@ export default class UserService extends BaseService<
   UserDocument
 > {
   constructor(
-    @inject(delay(() => UserFollowService))
-    private userFollowService: UserFollowService,
+    @inject(delay(() => FollowService))
+    private followService: FollowService,
     @inject(delay(() => PostService))
     private postService: PostService,
     @inject(delay(() => SessionService))
@@ -78,7 +78,7 @@ export default class UserService extends BaseService<
     ];
 
     if (viewerId) {
-      promises.push(this.userFollowService.checkIsFollowing(viewerId, userId));
+      promises.push(this.followService.checkIsFollowing(viewerId, userId));
     }
 
     const [lastSeen, isFollowing] = await Promise.all(promises);
