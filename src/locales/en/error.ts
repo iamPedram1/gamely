@@ -68,12 +68,14 @@ const errosTranslations = {
     unfollow_self: 'You cannot unfollow yourself',
     unfollow: 'Unfollow',
   },
-  userBlock: {
+  block: {
     already_blocked: 'This user is already blocked',
     not_blocked: "You haven't blocked this user",
     block_self: 'You cannot block yourself',
     unblock_self: 'You cannot unblock yourself',
     unblock: 'Unfollow',
+    have_been_blocked_by_author: 'You have been blocked by author',
+    have_been_blocked_by_user: 'You have been blocked by this user',
   },
   validation: {
     isString: '{{property}} must be a string',

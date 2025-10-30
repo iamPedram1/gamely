@@ -30,7 +30,7 @@ export default class UserClientController {
   };
 
   getUser: RequestHandler = async (req, res) => {
-    const username = req.params.username;
+    const username = req.params.username.toLowerCase();
     const user = await this.userService.getUserProfile(username);
 
     sendResponse(res, 200, {

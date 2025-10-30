@@ -11,7 +11,7 @@ import User from 'features/shared/user/user.model';
 import FollowController from 'features/shared/block/block.controller';
 
 // DTO
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 
 const blockRouter = express.Router();
 const blockController = container.resolve(FollowController);

@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateRequestField } from 'core/middlewares/validations';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
 import validateDocumentExistById from 'core/middlewares/validateObjectId';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
@@ -55,6 +55,18 @@ postManagementRouter.delete('/:id', [
 postManagementRouter.post('/', [
   validateBody(CreatePostDto),
   validateUniqueConflict(Post, 'slug'),
+  validateRequestField(Game, 'body', 'game', '_id', {
+    type: 'id',
+    required: true,
+  }),
+  validateRequestField(Tag, 'body', 'tags', '_id', {
+    type: 'idArray',
+    required: true,
+  }),
+  validateRequestField(Category, 'body', 'category', '_id', {
+    type: 'id',
+    required: true,
+  }),
   postController.create,
 ]);
 
@@ -63,6 +75,18 @@ postManagementRouter.patch('/:id', [
   validateDocumentExistById(Post),
   validateBody(UpdatePostDto),
   validateUniqueConflict(Post, 'slug'),
+  validateRequestField(Game, 'body', 'game', '_id', {
+    type: 'id',
+    required: false,
+  }),
+  validateRequestField(Tag, 'body', 'tags', '_id', {
+    type: 'idArray',
+    required: false,
+  }),
+  validateRequestField(Category, 'body', 'category', '_id', {
+    type: 'id',
+    required: false,
+  }),
   postController.update,
 ]);
 

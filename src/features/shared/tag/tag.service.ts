@@ -34,14 +34,14 @@ class TagService extends BaseService<
     super(Tag);
   }
 
-  async deleteOneById(tagId: string): Promise<true> {
+  async deleteOneById(id: string, options?: BaseMutateOptions): Promise<true> {
     return this.withTransaction(async (session) => {
-      await this.assertOwnership(tagId);
+      await this.assertOwnership(id);
 
-      const result = await super.deleteOneById(tagId, { session });
-      await this.postService.removeIdFromArrayField('tags', tagId, { session });
+      const result = await super.deleteOneById(id, { session, ...options });
+      await this.postService.removeIdFromArrayField('tags', id, { session });
       return result;
-    });
+    }, options?.session);
   }
 
   async updateOneById<TThrowError extends boolean = true>(
@@ -54,16 +54,23 @@ class TagService extends BaseService<
     return super.updateOneById(id, payload, options);
   }
 
-  async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
+  async batchDelete(
+    ids: string[],
+    options?: BaseMutateOptions
+  ): Promise<IApiBatchResponse> {
     return this.withTransaction(async (session) => {
-      await this.postService.removeIdsFromArrayField('tags', ids, { session });
+      await this.postService.removeIdsFromArrayField('tags', ids, {
+        session,
+        ...options,
+      });
       return await super.batchDelete(ids, {
         session,
         ...(this.currentUser.isNot('admin') && {
           additionalFilter: { creator: this.currentUser.id },
         }),
+        ...options,
       });
-    });
+    }, options?.session);
   }
 }
 

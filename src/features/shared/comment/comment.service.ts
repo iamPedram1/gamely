@@ -10,6 +10,8 @@ import { UpdateCommentDto } from 'features/management/comment/comment.management
 // Services
 import BaseService from 'core/services/base/base.service';
 import PostService from 'features/shared/post/post.service';
+import BlockService from 'features/shared/block/block.service';
+import NotificationService from 'features/shared/notification/notification.service';
 
 // Utilities
 import { ValidationError } from 'core/utilities/errors';
@@ -32,7 +34,6 @@ import type {
   CommentDocument,
   CommentLeanDocument,
 } from 'features/shared/comment/comment.types';
-import NotificationService from 'features/shared/notification/notification.service';
 
 type CreateCommentInput = CreateCommentDto & {
   postId: string;
@@ -63,6 +64,7 @@ class CommentService extends BaseService<
 > {
   constructor(
     @inject(delay(() => PostService)) private postService: PostService,
+    @inject(delay(() => BlockService)) private blockService: BlockService,
     @inject(delay(() => NotificationService))
     private notificationService: NotificationService
   ) {
@@ -81,14 +83,14 @@ class CommentService extends BaseService<
 
       await this.notificationService.deleteManyWithConditions(
         { 'metadata.refId': id, 'metadata.modelKey': 'Comment' },
-        { ...options, session }
+        { session, ...options }
       );
 
       await this.deleteManyWithConditions(
         { $or: [{ _id: id }, { parentIds: { $in: id } }] },
-        { ...options, session }
+        { session, ...options }
       );
-    });
+    }, options?.session);
 
     return true;
   }
@@ -159,17 +161,53 @@ class CommentService extends BaseService<
     data: CreateCommentInput,
     options?: BaseMutateOptions
   ): Promise<CommentDocument> {
-    if (data.replyToCommentId) {
-      const cm = await this.getOneById(data.replyToCommentId, { lean: true });
+    const [post, comment] = await Promise.all([
+      this.postService.getOneById(data.postId, {
+        lean: true,
+        select: 'creator',
+      }),
+      ...(data.replyToCommentId
+        ? [this.getOneById(data.replyToCommentId, { lean: true })]
+        : []),
+    ]);
+
+    const blockChecks: Promise<boolean>[] = [
+      this.blockService.checkIsBlock(this.currentUser.id, post.creator._id),
+    ];
+
+    if (comment) {
+      blockChecks.push(
+        this.blockService.checkIsBlock(this.currentUser.id, comment.creator._id)
+      );
+    }
+
+    const [isBlockedByAuthor, isBlockedByUser = false] =
+      await Promise.all(blockChecks);
+
+    if (isBlockedByAuthor)
+      throw new ValidationError(
+        this.t('error.block.have_been_blocked_by_author')
+      );
+
+    if (comment) {
+      if (isBlockedByUser)
+        throw new ValidationError(
+          this.t('error.block.have_been_blocked_by_user')
+        );
+
       data.type = 'reply';
-      data.threadId = cm.threadId || cm._id;
-      data.parentIds = [...(cm?.parentIds || []), cm._id];
+      data.threadId = comment.threadId || comment._id;
+      data.parentIds = [...(comment?.parentIds || []), comment._id];
     } else data.type = 'main';
 
     return super.create(data, options);
   }
 
-  async updateOneById(commentId: string, payload: UpdateCommentDto) {
+  async updateOneById(
+    commentId: string,
+    payload: UpdateCommentDto,
+    options?: BaseMutateOptions
+  ) {
     return this.withTransaction(async (session) => {
       const comment = await this.getOneById(commentId, {
         populate: 'replyToCommentId postId',
@@ -204,8 +242,8 @@ class CommentService extends BaseService<
         );
       }
 
-      return await comment.save({ session });
-    });
+      return await comment.save({ session, ...options });
+    }, options?.session);
   }
 
   private async getCommentPost(commentId: string) {

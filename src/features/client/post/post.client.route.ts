@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 
 // Middlewares
 import { softValidateQuery } from 'core/middlewares/validateQuery';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 
 // Model
 import Post from 'features/shared/post/post.model';

@@ -2,7 +2,6 @@ import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import UserService from 'features/shared/user/user.service';
 import UserBlockService from 'features/shared/block/block.service';
 
 // Utilities
@@ -12,9 +11,7 @@ import { BlockMapper } from 'features/shared/block/block.mapper';
 @injectable()
 export default class BlockController {
   constructor(
-    @inject(delay(() => UserService))
-    private userService: UserService,
-    @inject(delay(() => UserService))
+    @inject(delay(() => BlockMapper))
     private userBlockMapper: BlockMapper,
     @inject(delay(() => UserBlockService))
     private userBlockService: UserBlockService
@@ -33,8 +30,7 @@ export default class BlockController {
   };
 
   getUserBlockList: RequestHandler = async (req, res) => {
-    const userId = await this.userService.getIdByUsername(req.params.username);
-    const followers = await this.userBlockService.getBlockList(userId);
+    const followers = await this.userBlockService.getBlockList(req.user.id);
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

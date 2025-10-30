@@ -24,11 +24,13 @@ import type {
 import {
   BadRequestError,
   ForbiddenError,
+  NotFoundError,
   ValidationError,
 } from 'core/utilities/errors';
 
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { DocumentId } from 'core/types/common';
+import BlockService from 'features/shared/block/block.service';
 
 export type IUserService = InstanceType<typeof UserService>;
 
@@ -42,16 +44,19 @@ export default class UserService extends BaseService<
   constructor(
     @inject(delay(() => FollowService))
     private followService: FollowService,
-    @inject(delay(() => PostService))
-    private postService: PostService,
     @inject(delay(() => SessionService))
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    @inject(delay(() => BlockService))
+    private blockService: BlockService
   ) {
     super(User);
   }
 
-  async mutateWithTransaction<T>(fn: (session: ClientSession) => Promise<T>) {
-    return this.withTransaction(fn);
+  async mutateWithTransaction<T>(
+    fn: (session: ClientSession) => Promise<T>,
+    exisitingSession?: ClientSession
+  ) {
+    return this.withTransaction(fn, exisitingSession);
   }
 
   async getSelfProfile() {
@@ -64,24 +69,37 @@ export default class UserService extends BaseService<
   }
 
   async getUserProfile(username: string) {
-    const user = await this.getOneByKey('username', username, {
-      populate: 'avatar',
-      select: '-email',
-      lean: true,
-    });
+    const user = await this.getOneByKey(
+      'username',
+      username.trim().toLowerCase(),
+      {
+        populate: 'avatar',
+        select: '-email',
+        lean: true,
+      }
+    );
 
-    const viewerId = this.softCurrentUser?.id;
     const userId = user._id;
+    const viewerId = this.softCurrentUser?.id;
 
-    const promises: [Promise<string | null>, Promise<boolean>?] = [
-      this.getUserLastSeen(userId),
-    ];
+    const promises: [
+      Promise<string | null>,
+      Promise<boolean>?,
+      Promise<boolean>?,
+    ] = [this.getUserLastSeen(userId)];
 
     if (viewerId) {
       promises.push(this.followService.checkIsFollowing(viewerId, userId));
+      promises.push(this.blockService.checkIsBlock(user._id, viewerId));
     }
 
-    const [lastSeen, isFollowing] = await Promise.all(promises);
+    const [lastSeen, isFollowing, viewerBlockedByUser] =
+      await Promise.all(promises);
+
+    if (viewerBlockedByUser)
+      throw new ValidationError(
+        this.t('error.block.have_been_blocked_by_user')
+      );
 
     return { ...user, lastSeen, isFollowing: isFollowing ?? false };
   }
@@ -136,6 +154,14 @@ export default class UserService extends BaseService<
     return this.adjustMetadata(userId, 'followersCount', value, options);
   }
 
+  async adjustBlocksCount(
+    userId: DocumentId,
+    value: number,
+    options?: BaseMutateOptions
+  ) {
+    return this.adjustMetadata(userId, 'blocksCount', value, options);
+  }
+
   async adjustFollowingsCount(
     userId: DocumentId,
     value: number,
@@ -160,10 +186,14 @@ export default class UserService extends BaseService<
   }
 
   async getIdByUsername(username: string) {
-    const user = await this.getOneByKey('username', username, {
-      lean: true,
-      select: '_id',
-    });
+    const user = await this.getOneByKey(
+      'username',
+      username.trim().toLowerCase(),
+      {
+        lean: true,
+        select: '_id',
+      }
+    );
 
     return user._id.toHexString();
   }

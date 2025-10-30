@@ -37,6 +37,7 @@ import {
 // Types
 import { CreateSessionDto } from 'features/shared/session/session.dto';
 import { IRecoveryKey, IUserEntity } from 'features/shared/user/user.types';
+import type { BaseMutateOptions } from 'core/types/base.service.type';
 
 @injectable()
 export default class AuthService {
@@ -45,15 +46,21 @@ export default class AuthService {
     @inject(delay(() => SessionService)) private sessionService: SessionService
   ) {}
 
-  async register(data: RegisterDto): Promise<IUserEntity> {
+  async register(
+    data: RegisterDto,
+    options?: BaseMutateOptions
+  ): Promise<IUserEntity> {
     const user = await this.userService.existsByKey('email', data.email);
 
     if (user) throw new ValidationError(t('messages.auth.email_exists'));
 
-    return await this.userService.create({ ...data });
+    return await this.userService.create({ ...data }, options);
   }
 
-  async recoverPassword(data: RecoverPasswordDto): Promise<void> {
+  async recoverPassword(
+    data: RecoverPasswordDto,
+    options?: BaseMutateOptions
+  ): Promise<void> {
     const email = data.email.toLowerCase();
     const user = await this.userService.getOneByKey('email', email, {
       select: '+recoveryKey',
@@ -75,13 +82,16 @@ export default class AuthService {
 
     await this.userService.mutateWithTransaction(async (session) => {
       const key = this.generatePasswordRecoveryKey(user._id.toHexString());
-      await user.set('recoveryKey', key).save({ session });
+      await user.set('recoveryKey', key).save({ session, ...options });
       const result = await this.sendRecoveryEmail(user, key);
       if (!result.success) throw new InternalServerError();
-    });
+    }, options?.session);
   }
 
-  async changePassword(data: ChangePasswordDto): Promise<void> {
+  async changePassword(
+    data: ChangePasswordDto,
+    options?: BaseMutateOptions
+  ): Promise<void> {
     const key = this.verifyRecoveryJwt(data.recoveryKey);
     const user = await this.userService.getOneById(key.userId, {
       select: '+recoveryKey',
@@ -105,7 +115,7 @@ export default class AuthService {
           lean: true,
         }),
       ]);
-    });
+    }, options?.session);
   }
 
   async login(data: LoginDto, sessionData: CreateSessionDto) {

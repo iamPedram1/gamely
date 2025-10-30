@@ -37,6 +37,9 @@ export class FollowerResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(({ obj }) => obj.createdAt)
   since: Date;
+
+  @Expose()
+  isBlocked: boolean;
 }
 
 export class FollowingResponseDto extends BaseSummaryResponseDto {
@@ -63,4 +66,7 @@ export class FollowingResponseDto extends BaseSummaryResponseDto {
   @Expose()
   @Transform(({ obj }) => obj.createdAt)
   since: Date;
+
+  @Expose()
+  isBlocked: boolean;
 }

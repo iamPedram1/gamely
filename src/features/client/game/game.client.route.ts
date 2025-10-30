@@ -13,7 +13,7 @@ import GameClientController from 'features/client/game/game.client.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 
 const gameClientRouter = express.Router();
 const gameController = container.resolve(GameClientController);

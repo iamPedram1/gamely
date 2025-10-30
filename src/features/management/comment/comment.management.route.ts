@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 
 // Model
 import Comment from 'features/shared/comment/comment.model';

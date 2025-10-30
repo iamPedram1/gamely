@@ -7,7 +7,7 @@ import NotificationClientController from 'features/client/notification/notificat
 
 // Middlewares
 import auth from 'core/middlewares/auth';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 import { validateQuery } from 'core/middlewares/validateQuery';
 import validateDocumentOwnership from 'core/middlewares/validateOwnership';
 

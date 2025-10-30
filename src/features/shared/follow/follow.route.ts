@@ -13,7 +13,7 @@ import FollowController from 'features/shared/follow/follow.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 import { initializeContext } from 'core/middlewares/context';
 
 const followRouter = express.Router();

@@ -114,7 +114,7 @@ class CategoryService extends BaseService<
       ]);
 
       return deleted;
-    });
+    }, options?.session);
   }
 
   async getAllNested() {

@@ -153,15 +153,24 @@ export default abstract class BaseService<
   protected get i18n(): i18n {
     return i18nInstance();
   }
+
   /**
-   * Run a callback inside a MongoDB transaction
+   * Executes a callback function within a MongoDB transaction.
    *
-   * @param fn - Async callback receiving the session
-   * @returns Result of the callback
+   * If an existing session is provided, the callback runs inside that session
+   * (useful for nested service calls that share one transaction).
+   * Otherwise, this method starts a new session and manages the transaction lifecycle.
+   *
+   * @param {function(ClientSession): Promise<T>} fn - Async callback that receives the active MongoDB session.
+   * @param {ClientSession} [existingSession] - Optional existing session to reuse for nested transactions.
+   * @returns {Promise<T>} The result returned by the callback function.
    */
   protected async withTransaction<T>(
-    fn: (session: ClientSession) => Promise<T>
+    fn: (session: ClientSession) => Promise<T>,
+    existingSession?: ClientSession
   ): Promise<T> {
+    if (existingSession) return fn(existingSession);
+
     const session = await startSession();
     try {
       return await session.withTransaction(() => fn(session));

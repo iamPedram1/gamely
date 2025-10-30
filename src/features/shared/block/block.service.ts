@@ -1,4 +1,4 @@
-import { injectable } from 'tsyringe';
+import { delay, inject, injectable } from 'tsyringe';
 
 // Models
 import UserBlock from 'features/shared/block/block.model';
@@ -8,6 +8,8 @@ import { CreateBlockDto } from 'features/shared/block/block.dto';
 
 // Services
 import BaseService from 'core/services/base/base.service';
+import UserService from 'features/shared/user/user.service';
+import FollowService from 'features/shared/follow/follow.service';
 
 // Utilities
 import { ValidationError } from 'core/utilities/errors';
@@ -33,27 +35,40 @@ class BlockService extends BaseService<
   null,
   BlockDocument
 > {
-  constructor() {
+  constructor(
+    @inject(delay(() => FollowService))
+    private followService: FollowService,
+    @inject(delay(() => UserService))
+    private userService: UserService
+  ) {
     super(UserBlock);
   }
 
   async block(targetId: string, options?: BaseMutateOptions): Promise<void> {
     if (this.currentUser.id === targetId)
-      throw new ValidationError(this.t('error.userBlock.block_self'));
+      throw new ValidationError(this.t('error.block.block_self'));
 
     if (await this.checkIsBlock(this.currentUser.id, targetId))
-      throw new ValidationError(this.t('error.userBlock.already_blocked'));
+      throw new ValidationError(this.t('error.block.already_blocked'));
 
-    const follow = new CreateBlockDto();
-    follow.user = this.currentUser.id;
-    follow.blocked = targetId;
+    const block = new CreateBlockDto();
+    block.user = this.currentUser.id;
+    block.blocked = targetId;
 
-    await this.create(follow, options);
+    return await this.withTransaction(async (session) => {
+      await Promise.all([
+        this.create(block, { session }),
+        this.userService.adjustBlocksCount(block.user, 1, { session }),
+        // Unfollow both way
+        this.followService.unfollow(block.user, targetId, { session }),
+        this.followService.unfollow(targetId, block.user, { session }),
+      ]);
+    }, options?.session);
   }
 
   async unblock(targetId: string, options?: BaseMutateOptions): Promise<void> {
     if (this.currentUser.id === targetId)
-      throw new ValidationError(this.t('error.userBlock.unblock_self'));
+      throw new ValidationError(this.t('error.block.unblock_self'));
 
     const follow = new CreateBlockDto();
     follow.user = this.currentUser.id;
@@ -61,10 +76,14 @@ class BlockService extends BaseService<
 
     const record = await this.getOneByCondition(follow, { throwError: false });
 
-    if (!record)
-      throw new ValidationError(this.t('error.userBlock.not_blocked'));
+    if (!record) throw new ValidationError(this.t('error.block.not_blocked'));
 
-    await record.deleteOne({ session: options?.session });
+    return this.withTransaction(async (session) => {
+      await Promise.all([
+        record.deleteOne({ session }),
+        this.userService.adjustBlocksCount(record.user._id, 1, { session }),
+      ]);
+    }, options?.session);
   }
 
   async getBlockList<
@@ -90,9 +109,10 @@ class BlockService extends BaseService<
     return followers;
   }
 
-  async checkIsBlock(userId: DocumentId, blockedUserId: DocumentId) {
+  async checkIsBlock(actorId: DocumentId, blockedUserId: DocumentId) {
+    if (actorId === blockedUserId) return false;
     return await this.existsByCondition({
-      user: { $eq: userId },
+      user: { $eq: actorId },
       blocked: { $eq: blockedUserId },
     });
   }

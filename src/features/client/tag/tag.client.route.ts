@@ -12,7 +12,7 @@ import TagClientController from 'features/client/tag/tag.client.controller';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
-import { validateParam } from 'core/middlewares/validateParams';
+import { validateParam } from 'core/middlewares/validations';
 
 const tagClientRouter = express.Router();
 const tagController = container.resolve(TagClientController);

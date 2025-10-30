@@ -1,4 +1,4 @@
-import mongoose, { FilterQuery, mongo } from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
@@ -10,6 +10,7 @@ import { CreateFollowDto } from 'features/shared/follow/follow.dto';
 // Services
 import BaseService from 'core/services/base/base.service';
 import UserService from 'features/shared/user/user.service';
+import BlockService from 'features/shared/block/block.service';
 
 // Utilities
 import { ValidationError } from 'core/utilities/errors';
@@ -17,6 +18,7 @@ import { ValidationError } from 'core/utilities/errors';
 // Types
 import type { DocumentId } from 'core/types/common';
 import type {
+  BaseMutateOptions,
   BaseQueryOptions,
   FindResult,
 } from 'core/types/base.service.type';
@@ -36,41 +38,58 @@ class FollowService extends BaseService<
 > {
   constructor(
     @inject(delay(() => UserService))
-    private userService: UserService
+    private userService: UserService,
+    @inject(delay(() => BlockService))
+    private blockService: BlockService
   ) {
     super(Follow);
   }
 
-  async follow(userIdToFollow: string): Promise<void> {
+  async follow(
+    actorId: string,
+    targetId: string,
+    options?: BaseMutateOptions
+  ): Promise<void> {
     return this.withTransaction(async (session) => {
-      if (this.currentUser.id === userIdToFollow)
+      if (actorId === targetId)
         throw new ValidationError(this.t('error.follow.follow_self'));
 
-      if (await this.checkIsFollowing(this.currentUser.id, userIdToFollow))
+      const [isFollowing, isBlockedByUser] = await Promise.all([
+        this.checkIsFollowing(actorId, targetId),
+        this.blockService.checkIsBlock(targetId, actorId),
+      ]);
+
+      if (isFollowing)
         throw new ValidationError(this.t('error.follow.already_following'));
+      if (isBlockedByUser)
+        throw new ValidationError(
+          this.t('error.block.have_been_blocked_by_user')
+        );
 
       const follow = new CreateFollowDto();
-      follow.user = this.currentUser.id;
-      follow.followed = userIdToFollow;
+      follow.user = actorId;
+      follow.followed = targetId;
 
       await Promise.all([
-        this.create(follow, { session }),
-        this.userService.adjustFollowingsCount(this.currentUser.id, 1, {
-          session,
-        }),
-        this.userService.adjustFollowersCount(userIdToFollow, 1, { session }),
+        this.create(follow, { session, ...options }),
+        this.userService.adjustFollowersCount(targetId, 1, { session }),
+        this.userService.adjustFollowingsCount(actorId, 1, { session }),
       ]);
-    });
+    }, options?.session);
   }
 
-  async unfollow(userIdToUnfollow: string): Promise<void> {
+  async unfollow(
+    actorId: string,
+    targetId: string,
+    options?: BaseMutateOptions
+  ): Promise<void> {
     return this.withTransaction(async (session) => {
-      if (this.currentUser.id === userIdToUnfollow)
+      if (actorId === targetId)
         throw new ValidationError(this.t('error.follow.unfollow_self'));
 
       const follow = new CreateFollowDto();
-      follow.user = this.currentUser.id;
-      follow.followed = userIdToUnfollow;
+      follow.user = actorId;
+      follow.followed = targetId;
 
       const record = await this.getOneByCondition(follow, {
         throwError: false,
@@ -80,15 +99,11 @@ class FollowService extends BaseService<
         throw new ValidationError(this.t('error.follow.not_following'));
 
       await Promise.all([
-        record.deleteOne({ session }),
-        this.userService.adjustFollowingsCount(this.currentUser.id, -1, {
-          session,
-        }),
-        this.userService.adjustFollowersCount(userIdToUnfollow, -1, {
-          session,
-        }),
+        record.deleteOne({ session, ...options }),
+        this.userService.adjustFollowersCount(targetId, -1, { session }),
+        this.userService.adjustFollowingsCount(actorId, -1, { session }),
       ]);
-    });
+    }, options?.session);
   }
 
   async getFollowersCount(userId: DocumentId): Promise<number> {
@@ -147,6 +162,7 @@ class FollowService extends BaseService<
   }
 
   async checkIsFollowing(followerId: DocumentId, followingId: DocumentId) {
+    if (followerId === followingId) return false;
     return await this.existsByCondition({
       user: { $eq: followerId },
       followed: { $eq: followingId },

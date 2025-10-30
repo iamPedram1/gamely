@@ -28,9 +28,10 @@ export interface IUserEntity extends PrivateKeys {
   avatar: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  postsCount: number;
+  blocksCount: number;
   followersCount: number;
   followingsCount: number;
-  postsCount: number;
 }
 
 export type IUser = InstanceType<typeof UserManagementResponseDto>;

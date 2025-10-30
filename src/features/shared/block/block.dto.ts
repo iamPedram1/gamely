@@ -33,9 +33,6 @@ export class BlockResponseDto extends BaseSummaryResponseDto {
   userId: string;
 
   @Expose()
-  isFollowing: boolean;
-
-  @Expose()
   @Transform(({ obj }) => obj.createdAt)
-  since: Date;
+  blockedAt: Date;
 }

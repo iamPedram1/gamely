@@ -82,6 +82,7 @@ const userSchema = new Schema<
       required: true,
       select: false,
     },
+    blocksCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },
     followingsCount: { type: Number, default: 0 },
     postsCount: { type: Number, default: 0 },

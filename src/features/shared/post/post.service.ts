@@ -48,7 +48,10 @@ class PostService extends BaseService<
     super(Post);
   }
 
-  async batchDelete(ids: string[]): Promise<IApiBatchResponse> {
+  async batchDelete(
+    ids: string[],
+    options?: BaseMutateOptions
+  ): Promise<IApiBatchResponse> {
     return this.withTransaction(async (session) => {
       const posts = await this.find({
         filter: { _id: { $in: ids } },
@@ -80,8 +83,9 @@ class PostService extends BaseService<
         ...(this.currentUser.isNot(['admin', 'superAdmin']) && {
           additionalFilter: { creator: this.currentUser.id },
         }),
+        session,
       });
-    });
+    }, options?.session);
   }
 
   async create<TThrowError extends boolean = true>(
@@ -92,12 +96,11 @@ class PostService extends BaseService<
   ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
     return this.withTransaction(async (session) => {
       await this.userService.adjustPostCount(this.currentUser.id, 1, {
-        ...options,
         session,
       });
 
       return super.create(data, { ...options, session });
-    });
+    }, options?.session);
   }
 
   async updateOneById<TThrowError extends boolean = true>(
@@ -112,7 +115,10 @@ class PostService extends BaseService<
     return await super.updateOneById(id, payload, options);
   }
 
-  async deleteOneById(id: DocumentId): Promise<true> {
+  async deleteOneById(
+    id: DocumentId,
+    options?: BaseMutateOptions
+  ): Promise<true> {
     return this.withTransaction(async (session) => {
       const post = await super.getOneById(id, { lean: true });
       const creatorId = String(post.creator._id);
@@ -120,7 +126,7 @@ class PostService extends BaseService<
       await this.assertOwnership(post);
 
       // Delete the post itself first
-      const result = await super.deleteOneById(id, { session });
+      const result = await super.deleteOneById(id, { session, ...options });
 
       // Prepare cleanup operations
       const cleanupTasks: Promise<any>[] = [
@@ -131,9 +137,7 @@ class PostService extends BaseService<
 
       if (post.coverImage) {
         cleanupTasks.push(
-          this.fileService.deleteOneById(post.coverImage._id, {
-            session,
-          })
+          this.fileService.deleteOneById(post.coverImage._id, { session })
         );
       }
 
@@ -143,7 +147,7 @@ class PostService extends BaseService<
         if (r.status === 'rejected') logger.error('Cleanup failed:', r.reason);
 
       return result;
-    });
+    }, options?.session);
   }
 }
 

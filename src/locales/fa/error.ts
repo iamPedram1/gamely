@@ -11,8 +11,8 @@ const errosTranslations = {
   },
   user: {
     self_block: 'نمیتوانید خودتان را مسدود کنید',
-    forbidden_block: 'شما دسترسی لازم برای مسدوسازی این کاربر را ندارید',
     is_blocked: 'حساب شما توسط ادمین مسدود شده',
+    forbidden_block: 'شما دسترسی لازم برای مسدوسازی این کاربر را ندارید',
     update_role: 'شما دسترسی لازم برای "تغییر نقش کاربر" ندارید',
   },
   comment: {
@@ -66,6 +66,15 @@ const errosTranslations = {
     follow_self: 'نمی‌توانید خودتان را دنبال کنید',
     unfollow_self: 'نمی‌توانید خودتان را از دنبال‌شده‌ها حذف کنید',
     unfollow: 'لغو دنبال',
+  },
+  block: {
+    already_blocked: 'شما قبلا این کاربر را مسدود کرده اید',
+    not_blocked: 'شما این کاربر را مسدود نکرده اید',
+    block_self: 'نمی‌توانید خودتان را مسدود کنید',
+    unblock_self: 'نمیتوانید خودتان را لغو مسدود کنید',
+    unblock: 'لغو مسدود',
+    have_been_blocked_by_user: 'شما توسط این کاربر مسدود شده اید',
+    have_been_blocked_by_author: 'شما توسط نویسنده مسدود شده اید',
   },
   validation: {
     isString: '{{property}} باید رشته متنی باشد',

@@ -81,6 +81,9 @@ export class UserBaseResponseDto extends BaseResponseDto {
 export class UserProfileResponseDto extends UserBaseResponseDto {
   @Expose()
   role: UserRole;
+
+  @Expose()
+  blocksCount: number;
 }
 
 export class UserClientResponseDto extends UserBaseResponseDto {}
