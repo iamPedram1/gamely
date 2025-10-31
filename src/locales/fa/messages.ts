@@ -2,6 +2,8 @@ const messageTranslations = {
   notification: {
     follow_request: 'درخواست دنبال کردن شما توسط {{username}}',
     comment_reply: '"{{username}}" در پست "{{postTitle}}" به نظر شما پاسخ داد',
+    post_created: '{{username}} یک پست جدید منتشر کرد - {{postTitle}}',
+    post_reply: '{{username}} در پست شما({{postTitle}}) نظری ارسال کرد',
   },
   comment: {
     create_success:
@@ -55,6 +57,11 @@ const messageTranslations = {
     unfollow: 'لغو دنبال کردن',
     followers: 'دنبال‌کننده‌ها',
     followings: 'دنبال‌شده‌ها',
+  },
+  block: {
+    block: 'مسدود کردن',
+    unblock: 'لغو مسدودیت',
+    blocklist: 'لیست مسدودیت',
   },
 } as const;
 

@@ -1,5 +1,5 @@
 import type { WithPagination } from 'core/types/paginate';
-import type { Query, Document, FlattenMaps, Aggregate, Model } from 'mongoose';
+import type { Query, FlattenMaps, Model } from 'mongoose';
 
 interface IPaginationConfig {
   page: number;

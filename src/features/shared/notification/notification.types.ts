@@ -5,7 +5,7 @@ import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 export type NotificationDocument = HydratedDocument<INotificationEntity>;
 export type NotificationLeanDocument = FlattenMaps<INotificationEntity>;
 
-export type NotificationType = 'reply' | 'follow-request';
+export type NotificationType = 'comment-reply' | 'new-post' | 'post-reply';
 
 export interface NotificationMetadata {
   sourceType: ModelKeys;

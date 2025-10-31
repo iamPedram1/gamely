@@ -16,9 +16,6 @@ import FileService from 'features/shared/file/file.service';
 import CommentService from 'features/shared/comment/comment.service';
 import NotificationService from 'features/shared/notification/notification.service';
 
-// Validations
-import { PostValidation } from 'features/shared/post/post.validation';
-
 // Utilities
 import logger from 'core/utilities/logger';
 
@@ -41,7 +38,6 @@ class PostService extends BaseService<
     @inject(delay(() => FileService)) private fileService: FileService,
     @inject(delay(() => UserService)) private userService: UserService,
     @inject(delay(() => CommentService)) private commentService: CommentService,
-    @inject(delay(() => PostValidation)) private postValidation: PostValidation,
     @inject(delay(() => NotificationService))
     private notificationService: NotificationService
   ) {
@@ -95,11 +91,22 @@ class PostService extends BaseService<
       | undefined
   ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
     return this.withTransaction(async (session) => {
-      await this.userService.adjustPostCount(this.currentUser.id, 1, {
+      const post = await super.create(data, {
+        ...options,
         session,
+        throwError: true,
       });
 
-      return super.create(data, { ...options, session });
+      await Promise.all([
+        this.userService.adjustPostCount(this.currentUser.id, 1, { session }),
+        this.notificationService.sendPostNotifyToFollowers(
+          post._id,
+          this.currentUser.id,
+          { session }
+        ),
+      ]);
+
+      return post;
     }, options?.session);
   }
 

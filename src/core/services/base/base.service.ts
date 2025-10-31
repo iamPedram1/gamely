@@ -48,6 +48,7 @@ import type {
   NullableQueryResult,
   OrAndFilter,
   RelatedLookup,
+  WithId,
 } from 'core/types/base.service.type';
 
 type Q<
@@ -426,7 +427,7 @@ export default abstract class BaseService<
    * @throws {AnonymousError} If creation fails.
    */
   async create<TThrowError extends boolean = true>(
-    data: TCreateDto,
+    data: WithId<TCreateDto>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
     return this.mutations.create(data, options);

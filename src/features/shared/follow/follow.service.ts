@@ -95,11 +95,10 @@ class FollowService extends BaseService<
         throwError: false,
       });
 
-      if (!record)
-        throw new ValidationError(this.t('error.follow.not_following'));
+      if (!record) return;
 
       await Promise.all([
-        record.deleteOne({ session, ...options }),
+        record?.deleteOne({ session, ...options }),
         this.userService.adjustFollowersCount(targetId, -1, { session }),
         this.userService.adjustFollowingsCount(actorId, -1, { session }),
       ]);

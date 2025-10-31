@@ -1,5 +1,10 @@
 import { delay, inject, injectable } from 'tsyringe';
+
+// Services
 import BaseService from 'core/services/base/base.service';
+import PostService from 'features/shared/post/post.service';
+import UserService from 'features/shared/user/user.service';
+import FollowService from 'features/shared/follow/follow.service';
 import CommentService from 'features/shared/comment/comment.service';
 import Notification from 'features/shared/notification/notification.model';
 
@@ -18,12 +23,21 @@ import type { DocumentId } from 'core/types/common';
 import type { AppLanguages } from 'core/types/i18n';
 import type { WithPagination } from 'core/types/paginate';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
+import type { UserLeanDocument } from 'features/shared/user/user.types';
 import type { ICommentPopulated } from 'features/shared/comment/comment.types';
+import type {
+  PostLeanDocument,
+  PostPopulatedDocument,
+} from 'features/shared/post/post.types';
 import type {
   INotificationEntity,
   NotificationLeanDocument,
   NotificationType,
 } from 'features/shared/notification/notification.types';
+
+type PostCacheMap = Map<string, PostLeanDocument>;
+type UserCacheMap = Map<string, UserLeanDocument>;
+type CommentCacheMap = Map<string, ICommentPopulated>;
 
 @injectable()
 export default class NotificationService extends BaseService<
@@ -33,32 +47,15 @@ export default class NotificationService extends BaseService<
 > {
   constructor(
     @inject(delay(() => CommentService))
-    private commentService: CommentService
+    private commentService: CommentService,
+    @inject(delay(() => PostService))
+    private postService: PostService,
+    @inject(delay(() => FollowService))
+    private followService: FollowService,
+    @inject(delay(() => UserService))
+    private userService: UserService
   ) {
     super(Notification);
-  }
-
-  async getNotifications(
-    query: BaseQueryDto
-  ): Promise<WithPagination<NotificationLeanDocument>> {
-    const notifications = await this.find({
-      query,
-      lean: true,
-      filter: { receiverId: this.currentUser.id },
-    });
-
-    const cache = new Map<string, ICommentPopulated>();
-
-    notifications.docs = await Promise.all(
-      notifications.docs.map(async (notification) => {
-        const comment = await this.getCommentById(notification, cache);
-        const message = this.resolveMessage(comment, notification);
-
-        return { ...notification, message, post: comment.postId };
-      })
-    );
-
-    return notifications;
   }
 
   async deletePostAllNotification(
@@ -105,7 +102,7 @@ export default class NotificationService extends BaseService<
     await this.deleteManyByKey('receiverId', this.currentUser.id, options);
   }
 
-  async createCommentReplyNotification<TThrowError extends boolean = true>(
+  async sendCommentReplyNotify<TThrowError extends boolean = true>(
     comment: ICommentPopulated,
     options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
   ): Promise<void> {
@@ -114,7 +111,7 @@ export default class NotificationService extends BaseService<
     const notify =
       new CreateNotificationDto<'messages.notification.comment_reply'>();
 
-    notify.type = 'reply';
+    notify.type = 'comment-reply';
     notify.senderId = String(comment.creator._id);
     notify.receiverId = String(comment.replyToCommentId.creator._id);
     notify.messageKey = 'messages.notification.comment_reply';
@@ -128,23 +125,107 @@ export default class NotificationService extends BaseService<
     await this.create(notify, options);
   }
 
-  private resolveMessage(
+  async sendPostReplyNotify<TThrowError extends boolean = true>(
     comment: ICommentPopulated,
-    notification: INotificationEntity
+    options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
+  ): Promise<void> {
+    if (!comment.replyToCommentId) return;
+
+    const notify =
+      new CreateNotificationDto<'messages.notification.post_reply'>();
+
+    notify.type = 'post-reply';
+    notify.senderId = String(comment.creator._id);
+    notify.receiverId = String(comment.postId.creator._id);
+    notify.messageKey = 'messages.notification.post_reply';
+    notify.metadata = {
+      sourceType: 'Comment',
+      sourceId: comment._id,
+    };
+
+    await this.create(notify, options);
+  }
+
+  async sendPostNotifyToFollowers<TThrowError extends boolean = true>(
+    postId: DocumentId,
+    userId: DocumentId,
+    options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
+  ): Promise<void> {
+    if (!postId || !userId) return;
+
+    const followers = await this.followService.getFollowers(
+      this.currentUser.id,
+      { paginate: false, lean: true, select: 'user' }
+    );
+
+    const batch = followers.map((flw) => ({
+      type: 'new-post',
+      senderId: this.currentUser.id,
+      receiverId: flw.user._id,
+      messageKey: 'messages.notification.post_created',
+      metadata: { sourceType: 'Post', sourceId: postId },
+    }));
+
+    return this.withTransaction(async (session) => {
+      await Notification.insertMany(batch, { session });
+    }, options?.session);
+  }
+
+  async getNotifications(
+    query: BaseQueryDto
+  ): Promise<WithPagination<NotificationLeanDocument>> {
+    const notifications = await this.find({
+      query,
+      lean: true,
+      filter: { receiverId: this.currentUser.id },
+    });
+
+    const userCache = new Map<string, UserLeanDocument>();
+    const postCache = new Map<string, PostLeanDocument>();
+    const commentCache = new Map<string, ICommentPopulated>();
+
+    notifications.docs = await Promise.all(
+      notifications.docs.map(async (notification) => {
+        return {
+          ...notification,
+          message: await this.resolveMessage(
+            notification,
+            userCache,
+            postCache,
+            commentCache
+          ),
+        };
+      })
+    );
+
+    return notifications;
+  }
+
+  private async resolveMessage(
+    notification: INotificationEntity,
+    userCache: UserCacheMap,
+    postCache: PostCacheMap,
+    commentCache: CommentCacheMap
   ) {
     switch (notification.type as NotificationType) {
-      case 'reply':
-        return this.resolveReplyMessage(comment, notification);
+      case 'post-reply':
+        return await this.resolvePostReplyMessage(notification, commentCache);
+      case 'new-post':
+        return await this.resolveNewPostMessage(notification, postCache);
+      case 'comment-reply':
+        return await this.resolveCommentReplyMessage(
+          notification,
+          commentCache
+        );
       default:
         return this.t(notification.messageKey);
     }
   }
 
   private async getCommentById(
-    notification: INotificationEntity,
+    commentId: string,
     cache: Map<string, ICommentPopulated>
   ) {
-    const commentId = String(notification.metadata.sourceId);
     if (!commentId)
       throw new AnonymousError('Something went wrong in notification metadata');
 
@@ -164,10 +245,78 @@ export default class NotificationService extends BaseService<
     return comment;
   }
 
-  private resolveReplyMessage(
-    comment: ICommentPopulated,
-    notification: INotificationEntity
+  private async getUserById(userId: string, userCache: UserCacheMap) {
+    if (!userId)
+      throw new AnonymousError('Something went wrong in notification metadata');
+
+    let user = userCache.get(userId);
+
+    if (!user) {
+      user = await this.userService.getOneById(userId, {
+        lean: true,
+        select: 'username',
+      });
+
+      userCache.set(userId, user);
+    }
+    return user;
+  }
+
+  private async getPostById(postId: string, postCache: PostCacheMap) {
+    if (!postId)
+      throw new AnonymousError('Something went wrong in notification metadata');
+
+    let post = postCache.get(postId);
+
+    if (!post) {
+      post = await this.postService.getOneById(postId, {
+        lean: true,
+        populate: [{ path: 'creator', select: 'username' }],
+      });
+      postCache.set(postId, post);
+    }
+
+    return post as PostPopulatedDocument;
+  }
+
+  private async resolveNewPostMessage(
+    notification: INotificationEntity,
+    postCacheMap: PostCacheMap
   ) {
+    const post = await this.getPostById(
+      notification.metadata.sourceId.toHexString(),
+      postCacheMap
+    );
+
+    return this.t(notification.messageKey, {
+      postTitle: post.translations[this.i18n.language as AppLanguages].title,
+      username: post.creator.username,
+    });
+  }
+
+  private async resolveCommentReplyMessage(
+    notification: INotificationEntity,
+    commentCache: CommentCacheMap
+  ) {
+    const comment = await this.getCommentById(
+      notification.metadata.sourceId.toHexString(),
+      commentCache
+    );
+    return this.t(notification.messageKey, {
+      username: comment.creator.username,
+      postTitle:
+        comment.postId.translations[this.i18n.language as AppLanguages].title,
+    });
+  }
+
+  private async resolvePostReplyMessage(
+    notification: INotificationEntity,
+    commentCache: CommentCacheMap
+  ) {
+    const comment = await this.getCommentById(
+      notification.metadata.sourceId.toHexString(),
+      commentCache
+    );
     return this.t(notification.messageKey, {
       username: comment.creator.username,
       postTitle:

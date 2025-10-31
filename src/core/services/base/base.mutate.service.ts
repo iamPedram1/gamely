@@ -28,6 +28,7 @@ import type {
   NestedKeyOf,
   NestedValueOf,
   OrAndFilter,
+  WithId,
 } from 'core/types/base.service.type';
 
 /**
@@ -47,7 +48,7 @@ class BaseMutateService<
   // <----------------   CREATE   ---------------->
 
   async create<TThrowError extends boolean = true>(
-    data: TCreateDto,
+    data: WithId<TCreateDto>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
     const userId = this.currentUser?.id || '';

@@ -1,7 +1,7 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
-import UserBlock from 'features/shared/block/block.model';
+import Block from 'features/shared/block/block.model';
 
 // DTO
 import { CreateBlockDto } from 'features/shared/block/block.dto';
@@ -41,9 +41,8 @@ class BlockService extends BaseService<
     @inject(delay(() => UserService))
     private userService: UserService
   ) {
-    super(UserBlock);
+    super(Block);
   }
-
   async block(targetId: string, options?: BaseMutateOptions): Promise<void> {
     if (this.currentUser.id === targetId)
       throw new ValidationError(this.t('error.block.block_self'));
@@ -81,7 +80,7 @@ class BlockService extends BaseService<
     return this.withTransaction(async (session) => {
       await Promise.all([
         record.deleteOne({ session }),
-        this.userService.adjustBlocksCount(record.user._id, 1, { session }),
+        this.userService.adjustBlocksCount(record.user._id, -1, { session }),
       ]);
     }, options?.session);
   }
@@ -98,15 +97,30 @@ class BlockService extends BaseService<
         })
       | undefined
   ): Promise<FindResult<IBlockEntity, BlockDocument, TLean, TPaginate>> {
-    const followers = await this.find({
+    const { search, ...otherQueries } = options?.query || {};
+    const blocks = await this.find({
       filter: { user: userId },
       lean: true,
       select: 'createdAt blocked',
-      populate: 'blocked',
+      populate: [
+        {
+          path: 'blocked',
+          select: 'username',
+          match: search ? { username: new RegExp(search, 'i') } : {},
+        },
+      ],
       ...options,
+      query: otherQueries,
     });
 
-    return followers;
+    return (
+      Array.isArray(blocks)
+        ? blocks.filter((doc) => doc.blocked)
+        : {
+            pagination: blocks.pagination,
+            docs: blocks.docs.filter((doc) => doc.blocked),
+          }
+    ) as any;
   }
 
   async checkIsBlock(actorId: DocumentId, blockedUserId: DocumentId) {

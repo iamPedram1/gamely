@@ -2,7 +2,7 @@ import { Model, Schema, model } from 'mongoose';
 
 // Utilities
 import { modelKeyName } from 'core/utilities/common';
-import { notificationType } from 'features/shared/notification/notification.constants';
+import { notificationTypeOptions } from 'features/shared/notification/notification.constants';
 
 // Types
 import type {
@@ -44,7 +44,7 @@ const notificationSchema = new Schema<
     },
     type: {
       type: String,
-      enum: notificationType,
+      enum: notificationTypeOptions,
       index: true,
       required: true,
     },

@@ -14,6 +14,7 @@ import BaseMutateService from 'core/services/base/base.mutate.service';
 import BaseValidationService from 'core/services/base/base.validation.service';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { IRequestQueryBase } from 'core/types/query';
 import type { WithPagination } from 'core/types/paginate';
 
@@ -276,3 +277,5 @@ export interface RelatedLookup<TSchema> {
   /** Optional additional $match stage for filtering related documents */
   matchStage?: Record<string, unknown>;
 }
+
+export type WithId<T> = T & { _id?: DocumentId };

@@ -172,12 +172,12 @@ class CommentService extends BaseService<
     ]);
 
     const blockChecks: Promise<boolean>[] = [
-      this.blockService.checkIsBlock(this.currentUser.id, post.creator._id),
+      this.blockService.checkIsBlock(post.creator._id, this.currentUser.id),
     ];
 
     if (comment) {
       blockChecks.push(
-        this.blockService.checkIsBlock(this.currentUser.id, comment.creator._id)
+        this.blockService.checkIsBlock(comment.creator._id, this.currentUser.id)
       );
     }
 
@@ -236,7 +236,7 @@ class CommentService extends BaseService<
         comment.status === 'approved' &&
         comment.replyToCommentId
       ) {
-        await this.notificationService.createCommentReplyNotification(
+        await this.notificationService.sendCommentReplyNotify(
           comment as unknown as ICommentPopulated,
           { session }
         );

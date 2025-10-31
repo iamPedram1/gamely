@@ -1,7 +1,7 @@
 import { ValidateIf } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
 import { modelKeyName } from 'core/utilities/common';
-import { notificationType } from 'features/shared/notification/notification.constants';
+import { notificationTypeOptions } from 'features/shared/notification/notification.constants';
 import {
   IsBoolean,
   IsIn,
@@ -25,11 +25,11 @@ class NotificationMetadataDto {
   @IsNotEmpty()
   @IsString()
   @IsIn(modelKeyName)
-  sourceType: ModelKeys;
+  sourceType?: ModelKeys;
 
   @IsNotEmpty()
   @IsMongoId()
-  sourceId: Types.ObjectId;
+  sourceId?: Types.ObjectId;
 
   @IsOptional()
   @IsString()
@@ -48,7 +48,7 @@ class NotificationMetadataDto {
 
 export class CreateNotificationDto<T extends TranslationKeys> {
   @IsNotEmpty()
-  @IsIn(notificationType)
+  @IsIn(notificationTypeOptions)
   type: NotificationType;
 
   @IsNotEmpty()
@@ -65,7 +65,7 @@ export class CreateNotificationDto<T extends TranslationKeys> {
 
   @IsOptional()
   @Type(() => NotificationMetadataDto)
-  metadata: NotificationMetadataDto;
+  metadata?: NotificationMetadataDto;
 
   @IsOptional()
   @IsString()

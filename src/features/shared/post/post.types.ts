@@ -1,5 +1,10 @@
 import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 import type { WithTranslations } from 'core/types/translations';
+import type { TagDocument } from 'features/shared/tag/tag.types';
+import type { FileDocument } from 'features/shared/file/file.types';
+import type { GameDocument } from 'features/shared/game/game.types';
+import type { UserDocument } from 'features/shared/user/user.types';
+import type { CategoryDocument } from 'features/shared/category/category.types';
 import type { PostManagementResponseDto } from 'features/management/post/post.management.dto';
 import type {
   ClientPostSummaryResponseDto,
@@ -8,6 +13,13 @@ import type {
 
 export type PostDocument = HydratedDocument<IPostEntity>;
 export type PostLeanDocument = FlattenMaps<IPostEntity>;
+export type PostPopulatedDocument = PostLeanDocument & {
+  game: GameDocument;
+  creator: UserDocument;
+  category: CategoryDocument;
+  coverImage: FileDocument;
+  tags: TagDocument[];
+};
 
 export interface PostTranslation {
   title: string;

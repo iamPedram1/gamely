@@ -1,7 +1,9 @@
 const messageTranslations = {
   notification: {
     follow_request: '{{username}} sended a follow request to you',
+    post_created: '{{username}} published a new post - {{postTitle}}',
     comment_reply: '{{username}} has replied to your message in {{postTitle}}',
+    post_reply: '{{username}} has replied to your post in {{postTitle}}',
   },
   comment: {
     create_success:
@@ -53,7 +55,7 @@ const messageTranslations = {
     followers: 'Followers',
     followings: 'Followings',
   },
-  userBlock: {
+  block: {
     block: 'Block',
     unblock: 'Unblock',
     blocklist: 'Block List',

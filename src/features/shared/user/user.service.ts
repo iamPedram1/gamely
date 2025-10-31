@@ -189,10 +189,7 @@ export default class UserService extends BaseService<
     const user = await this.getOneByKey(
       'username',
       username.trim().toLowerCase(),
-      {
-        lean: true,
-        select: '_id',
-      }
+      { lean: true, select: '_id' }
     );
 
     return user._id.toHexString();

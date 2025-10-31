@@ -143,7 +143,6 @@ export class QueryFilterBuilder<TSchema> {
   ): FilterQuery<TSchema>[] {
     const value = this.query[rule.queryKey];
     if (ValueHelper.isEmpty(value)) return [];
-
     const searchValue = String(value).trim();
     if (searchValue.length > 100) throw new Error('Search query too long');
     if (!searchValue) return [];
