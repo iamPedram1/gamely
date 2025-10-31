@@ -24,6 +24,9 @@ export class GameClientResponseDto extends BaseResponseDto {
   slug: string;
 
   @Expose()
+  isFavorite?: boolean;
+
+  @Expose()
   releaseDate: string;
 
   @Expose()

@@ -15,12 +15,12 @@ import CommentClientController from 'features/client/comment/comment.client.cont
 // DTO
 import { CreateCommentDto } from 'features/client/comment/comment.client.dto';
 
-const commentClientRouter = express.Router();
+const commentClientRouter = express.Router({ mergeParams: true });
 const commentController = container.resolve(CommentClientController);
 
 // <----------------   GET   ---------------->
 commentClientRouter.get(
-  '/:id/comments',
+  '/',
   validateDocumentExistById(Post),
   commentController.getComments
 );
@@ -28,7 +28,7 @@ commentClientRouter.get(
 // <----------------   POST   ---------------->
 commentClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 commentClientRouter.post(
-  '/:id/comments',
+  '/',
   validateDocumentExistById(Post),
   validateBody(CreateCommentDto),
   commentController.create

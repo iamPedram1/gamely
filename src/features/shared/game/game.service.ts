@@ -10,16 +10,20 @@ import {
 } from 'features/management/game/game.management.dto';
 
 // Services
-import PostService from 'features/shared/post/post.service';
 import BaseService from 'core/services/base/base.service';
+import PostService from 'features/shared/post/post.service';
+import FavoriteGameService from 'features/shared/favoriteGame/favoriteGame.service';
 
 // Types
 import type { IApiBatchResponse } from 'core/utilities/response';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type {
   GameDocument,
+  GameLeanDocument,
+  GameMetadata,
   IGameEntity,
 } from 'features/shared/game/game.types';
+import { DocumentId } from 'core/types/common';
 
 export type IGameService = InstanceType<typeof GameService>;
 
@@ -31,15 +35,43 @@ class GameService extends BaseService<
   GameDocument
 > {
   constructor(
-    @inject(delay(() => PostService)) private postService: PostService
+    @inject(delay(() => PostService)) private postService: PostService,
+    @inject(delay(() => FavoriteGameService))
+    private favoriteGameService: FavoriteGameService
   ) {
     super(Game);
   }
 
+  async getGameById(id: DocumentId) {
+    return await this.getOneById(id, { lean: true, populate: 'coverImage' });
+  }
+
+  async getGameBySlug(slug: string) {
+    const game = (await this.getOneByKey('slug', slug, {
+      lean: true,
+      populate: 'coverImage',
+    })) as GameLeanDocument & GameMetadata;
+
+    if (this.softCurrentUser?.id) {
+      game.isFavorite = await this.favoriteGameService.checkIsGameFavorited(
+        this.currentUser.id,
+        game._id
+      );
+    }
+
+    return game;
+  }
+
   async deleteOneById(id: string): Promise<true> {
     await this.assertOwnership(id);
-    await this.postService.updateManyByReference(id, 'game', null);
-    return await super.deleteOneById(id);
+
+    const [deleted] = await Promise.all([
+      super.deleteOneById(id),
+      this.postService.updateManyByReference(id, 'game', null),
+      this.favoriteGameService.deleteManyByKey('game', id),
+    ]);
+
+    return deleted;
   }
 
   async updateOneById<TThrowError extends boolean = true>(

@@ -8,9 +8,9 @@ export const fromEmail = env.FROM_Email as string;
 export const emailApiKey = env.EMAIL_Api_Key as string;
 
 // Configs
-export const appPort = config.get('PORT') as number;
+export const appPort = Number(config.get('PORT'));
 export const appDbUrl = config.get('DB') as string;
-export const apiVersion = config.get('VERSION') as number;
+export const apiVersion = Number(config.get('VERSION'));
 export const appUrl = `http://localhost:${appPort}`;
 export const prefixBaseUrl = (url: string) => `/api/v${apiVersion}${url}`;
 export const prefixManagementBaseUrl = (url: string) =>

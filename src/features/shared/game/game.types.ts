@@ -3,6 +3,9 @@ import { WithTranslations } from 'core/types/translations';
 
 export type GameDocument = HydratedDocument<IGameEntity>;
 export type GameLeanDocument = FlattenMaps<IGameEntity>;
+export interface GameMetadata {
+  isFavorite?: boolean;
+}
 
 export interface GameTranslation {
   title: string;

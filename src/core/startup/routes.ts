@@ -29,18 +29,25 @@ import notFound from 'core/middlewares/notFound';
 import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
 import followRouter from 'features/shared/follow/follow.route';
 import blockRouter from 'features/shared/block/block.route';
+import favoriteGamePublicRouter from 'features/shared/favoriteGame/favoriteGame.route';
+import favoriteGamePrivateRouter from 'features/client/favoriteGames/favoriteGame.private.route';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);
-  app.use(prefixBaseUrl('/blocks'), blockRouter);
+  app.use(prefixBaseUrl('/user/blocks'), blockRouter);
+  app.use(prefixBaseUrl('/user/follows'), followRouter);
+  app.use(prefixBaseUrl('/user/favorite-games'), favoriteGamePrivateRouter);
+  app.use(
+    prefixBaseUrl('/user/:username/favorite-games'),
+    favoriteGamePublicRouter
+  );
+  app.use(prefixBaseUrl('/user/notifications'), notificationClientRouter);
   app.use(prefixBaseUrl('/user'), userClientRouter);
-  app.use(prefixBaseUrl('/follows'), followRouter);
-  app.use(prefixBaseUrl('/notifications'), notificationClientRouter);
   app.use(prefixBaseUrl('/auth'), authClientRouter);
   app.use(prefixBaseUrl('/tags'), tagClientRouter);
   app.use(prefixBaseUrl('/games'), gameClientRouter);
+  app.use(prefixBaseUrl('/posts/:id/comments'), commentClientRouter);
   app.use(prefixBaseUrl('/posts'), postClientRouter);
-  app.use(prefixBaseUrl('/posts'), commentClientRouter);
   app.use(prefixBaseUrl('/categories'), categoryClientRouter);
 
   // Management

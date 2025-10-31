@@ -27,7 +27,7 @@ export class CommentClientResponseDto extends BaseResponseDto {
   message: string;
 
   @Expose()
-  @Transform(({ obj }) => obj.creator.name)
+  @Transform(({ obj }) => obj.creator.username)
   username: string;
 
   @Expose()
