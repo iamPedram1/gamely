@@ -85,6 +85,22 @@ class BaseMutateService<
     return doc as TThrowError extends true ? TDoc : TDoc | null;
   }
 
+  async updateOneByCondition<TThrowError extends boolean = true>(
+    filter: FilterQuery<TSchema>,
+    payload: UpdateQuery<TSchema>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
+    const query = this.model.findOneAndUpdate(filter, payload, { new: true });
+
+    const doc = await this.applyMutateOptions(query, options).exec();
+
+    if (!doc && (options?.throwError ?? true)) {
+      throw new NotFoundError(this.t('error.not_found_docs'));
+    }
+
+    return doc as TThrowError extends true ? TDoc : TDoc | null;
+  }
+
   async updateManyByKey(
     keyName: keyof AnyKeys<TSchema>,
     matchValue: any,

@@ -88,7 +88,7 @@ class CategoryService extends BaseService<ICategoryEntity> {
     id: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       await this.assertOwnership(id);
 
       if (this.currentUser.isNot('admin')) {

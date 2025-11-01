@@ -16,15 +16,12 @@ import { ValidationError } from 'core/utilities/errors';
 
 // Types
 import type { DocumentId } from 'core/types/common';
+import type { IBlockEntity } from 'features/shared/block/block.types';
 import type {
   BaseMutateOptions,
   BaseQueryOptions,
   FindResult,
 } from 'core/types/base.service.type';
-import type {
-  IBlockEntity,
-  BlockDocument,
-} from 'features/shared/block/block.types';
 
 export type IBlockService = InstanceType<typeof BlockService>;
 
@@ -72,7 +69,7 @@ class BlockService extends BaseService<IBlockEntity> {
 
     if (!record) throw new ValidationError(this.t('error.block.not_blocked'));
 
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       await Promise.all([
         record.deleteOne({ session }),
         this.userService.adjustBlocksCount(record.user._id, -1, { session }),
@@ -91,7 +88,7 @@ class BlockService extends BaseService<IBlockEntity> {
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<FindResult<IBlockEntity, BlockDocument, TLean, TPaginate>> {
+  ): Promise<FindResult<IBlockEntity, TLean, TPaginate>> {
     const { search, ...otherQueries } = options?.query || {};
     const blocks = await this.find({
       filter: { user: userId },

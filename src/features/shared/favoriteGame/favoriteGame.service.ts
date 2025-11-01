@@ -45,7 +45,7 @@ class FavoriteGameService extends BaseService<IFavoriteGameEntity> {
     favoriteGame.user = this.currentUser.id;
     favoriteGame.game = gameId;
 
-    this.create(favoriteGame, options);
+    await this.create(favoriteGame, options);
   }
 
   async unfavorite(gameId: string, options?: BaseMutateOptions): Promise<void> {
@@ -73,9 +73,7 @@ class FavoriteGameService extends BaseService<IFavoriteGameEntity> {
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<
-    FindResult<IFavoriteGameEntity, FavoriteGameDocument, TLean, TPaginate>
-  > {
+  ): Promise<FindResult<IFavoriteGameEntity, TLean, TPaginate>> {
     return await this.find({
       lean: true,
       populate: [{ path: 'game', populate: 'coverImage' }],

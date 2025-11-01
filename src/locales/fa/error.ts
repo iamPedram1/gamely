@@ -81,7 +81,9 @@ const errosTranslations = {
     already_reported: 'شما قبلا گزارش داده اید، گزارش شما بررسی خواهد شد',
     report_self: 'نمی‌توانید خودتان را گزارش دهید',
   },
-
+  gameReview: {
+    already_reviewed: 'شما قبلا یک نقد برای این بازی نوشته اید',
+  },
   validation: {
     isString: '{{property}} باید رشته متنی باشد',
     isNotEmpty: '{{property}} نباید خالی باشد',

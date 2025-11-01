@@ -26,6 +26,7 @@ import userManagementRouter from 'features/management/user/user.management.route
 import commentManagementRouter from 'features/management/comment/comment.management.route';
 import categoryManagementRouter from 'features/management/category/category.management.route';
 import reportManagementRouter from 'features/management/report/report.management.route';
+import gameReviewRouter from 'features/shared/gameReview/gameReview.route';
 
 // Middlewares
 import error from 'core/middlewares/error';
@@ -48,6 +49,7 @@ export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/auth'), authClientRouter);
   app.use(prefixBaseUrl('/tags'), tagClientRouter);
   app.use(prefixBaseUrl('/reports'), reportClientRouter);
+  app.use(prefixBaseUrl('/games/:id/reviews'), gameReviewRouter);
   app.use(prefixBaseUrl('/games'), gameClientRouter);
   app.use(prefixBaseUrl('/posts/:id/comments'), commentClientRouter);
   app.use(prefixBaseUrl('/posts'), postClientRouter);

@@ -159,7 +159,7 @@ export default class NotificationService extends BaseService<INotificationEntity
       metadata: { sourceType: 'Post', sourceId: postId },
     }));
 
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       await Notification.insertMany(batch, { session });
     }, options?.session);
   }

@@ -44,6 +44,15 @@ const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
       type: Date,
       required: true,
     },
+    averageRate: {
+      type: Number,
+      default: 0,
+      max: 5,
+    },
+    totalRates: {
+      type: Number,
+      default: 0,
+    },
     coverImage: {
       default: null,
       type: Schema.Types.ObjectId,

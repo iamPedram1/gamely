@@ -27,7 +27,7 @@ class TagService extends BaseService<ITagEntity, TagDocument> {
   }
 
   async deleteOneById(id: string, options?: BaseMutateOptions): Promise<true> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       await this.assertOwnership(id);
 
       const result = await super.deleteOneById(id, { session, ...options });
@@ -50,7 +50,7 @@ class TagService extends BaseService<ITagEntity, TagDocument> {
     ids: string[],
     options?: BaseMutateOptions
   ): Promise<IApiBatchResponse> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       await this.postService.removeIdsFromArrayField('tags', ids, {
         session,
         ...options,

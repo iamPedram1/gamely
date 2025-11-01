@@ -21,6 +21,7 @@ import type {
   GameMetadata,
   IGameEntity,
 } from 'features/shared/game/game.types';
+import { UpdateQuery, Document, Types } from 'mongoose';
 
 export type IGameService = InstanceType<typeof GameService>;
 
@@ -67,13 +68,15 @@ class GameService extends BaseService<IGameEntity, GameDocument> {
   }
 
   async updateOneById<TThrowError extends boolean = true>(
-    id: string,
-    payload: Partial<UpdateGameDto>,
-    options?:
-      | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
-      | undefined
+    id: DocumentId,
+    payload: UpdateQuery<IGameEntity>,
+    options?: BaseMutateOptions<boolean> & {
+      throwError?: TThrowError | undefined;
+      skipOwnershipCheck?: boolean;
+    }
   ): Promise<TThrowError extends true ? GameDocument : GameDocument | null> {
-    await this.assertOwnership(id);
+    if (!options?.skipOwnershipCheck) await this.assertOwnership(String(id));
+
     return super.updateOneById(id, payload, options);
   }
 

@@ -22,4 +22,6 @@ export interface IGameEntity extends WithTranslations<GameTranslation> {
   creator: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  averageRate: number;
+  totalRates: number;
 }

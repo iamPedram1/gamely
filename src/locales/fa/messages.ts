@@ -58,6 +58,10 @@ const messageTranslations = {
     followers: 'دنبال‌کننده‌ها',
     followings: 'دنبال‌شده‌ها',
   },
+  GameReview: {
+    singular: 'نقد بازی',
+    plural: 'نقد‌های بازی',
+  },
   block: {
     block: 'مسدود کردن',
     unblock: 'لغو مسدودیت',

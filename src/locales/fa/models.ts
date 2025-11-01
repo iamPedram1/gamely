@@ -35,6 +35,10 @@ const modelsTranslations = {
     singular: 'بازی مورد علاقه',
     plural: 'بازی‌های مورد علاقه',
   },
+  GameReview: {
+    singular: 'نقد‌ بازی',
+    plural: 'نقد‌های بازی',
+  },
   Report: {
     singular: 'گزارش',
     plural: 'گزارش‌ها',

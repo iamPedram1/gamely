@@ -82,6 +82,9 @@ const errosTranslations = {
     already_reported: "You've already reported",
     report_self: 'You cannot report yourself',
   },
+  gameReview: {
+    already_reviewed: "You've already wrote a review in the game",
+  },
   validation: {
     isString: '{{property}} must be a string',
     isNotEmpty: '{{property}} should not be empty',

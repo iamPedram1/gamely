@@ -48,7 +48,7 @@ export default class UserService extends BaseService<IUserEntity> {
     fn: (session: ClientSession) => Promise<T>,
     exisitingSession?: ClientSession
   ) {
-    return this.withTransaction(fn, exisitingSession);
+    return await this.withTransaction(fn, exisitingSession);
   }
 
   async getSelfProfile() {
@@ -113,8 +113,13 @@ export default class UserService extends BaseService<IUserEntity> {
 
     if (this.currentUser.isNot(['admin', 'superAdmin']) && !isUpdatingSelf)
       throw new ForbiddenError();
-
-    return await this.updateOneById(userId, data, { lean: true });
+    return await this.withTransaction(async (session) => {
+      if (isBlocking)
+        await this.sessionService.deleteManyByKey('userId', userId, {
+          session,
+        });
+      return await this.updateOneById(userId, data, { session, lean: true });
+    });
   }
 
   async adjustMetadata(

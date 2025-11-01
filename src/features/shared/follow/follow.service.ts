@@ -45,7 +45,7 @@ class FollowService extends BaseService<IFollowEntity> {
     targetId: string,
     options?: BaseMutateOptions
   ): Promise<void> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       if (actorId === targetId)
         throw new ValidationError(this.t('error.follow.follow_self'));
 
@@ -78,7 +78,7 @@ class FollowService extends BaseService<IFollowEntity> {
     targetId: string,
     options?: BaseMutateOptions
   ): Promise<void> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       if (actorId === targetId)
         throw new ValidationError(this.t('error.follow.unfollow_self'));
 
@@ -123,7 +123,7 @@ class FollowService extends BaseService<IFollowEntity> {
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<FindResult<IFollowEntity, FollowDocument, TLean, TPaginate>> {
+  ): Promise<FindResult<IFollowEntity, TLean, TPaginate>> {
     const followers = await this.find({
       filter: this.getQueryFilterOf(userId, 'followers'),
       lean: true,
@@ -146,7 +146,7 @@ class FollowService extends BaseService<IFollowEntity> {
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<FindResult<IFollowEntity, FollowDocument, TLean, TPaginate>> {
+  ): Promise<FindResult<IFollowEntity, TLean, TPaginate>> {
     return await this.find({
       filter: this.getQueryFilterOf(userId, 'followings'),
       lean: true,

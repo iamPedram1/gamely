@@ -202,7 +202,7 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     payload: UpdateCommentDto,
     options?: BaseMutateOptions
   ) {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       const comment = await this.getOneById(commentId, {
         populate: 'replyToCommentId postId',
       });

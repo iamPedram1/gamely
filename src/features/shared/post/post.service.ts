@@ -43,7 +43,7 @@ class PostService extends BaseService<IPostEntity> {
     ids: string[],
     options?: BaseMutateOptions
   ): Promise<IApiBatchResponse> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       const posts = await this.find({
         filter: { _id: { $in: ids } },
         lean: true,
@@ -85,7 +85,7 @@ class PostService extends BaseService<IPostEntity> {
       | (BaseMutateOptions<boolean> & { throwError?: TThrowError | undefined })
       | undefined
   ): Promise<TThrowError extends true ? PostDocument : PostDocument | null> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       const post = await super.create(data, {
         ...options,
         session,
@@ -121,7 +121,7 @@ class PostService extends BaseService<IPostEntity> {
     id: DocumentId,
     options?: BaseMutateOptions
   ): Promise<true> {
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       const post = await super.getOneById(id, { lean: true });
       const creatorId = String(post.creator._id);
 

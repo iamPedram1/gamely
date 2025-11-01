@@ -451,8 +451,23 @@ export default abstract class BaseService<
     payload: UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
-    this.model.create();
     return this.mutations.updateOneById(id, payload, options);
+  }
+
+  /**
+   * Updates a document by custom filter object.
+   * @param filter - mongoose filter object.
+   * @param payload - Fields to update.
+   * @param options - Options including session or throwError flag.
+   * @returns Updated document or null.
+   * @throws {NotFoundError} If document is not found and throwError is true.
+   */
+  async updateOneByCondition<TThrowError extends boolean = true>(
+    filter: FilterQuery<TSchema>,
+    payload: UpdateQuery<TSchema>,
+    options?: BaseMutateOptions & { throwError?: TThrowError }
+  ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
+    return this.mutations.updateOneByCondition(filter, payload, options);
   }
 
   /**
