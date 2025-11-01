@@ -30,12 +30,7 @@ import type {
 export type IFollowService = InstanceType<typeof FollowService>;
 
 @injectable()
-class FollowService extends BaseService<
-  IFollowEntity,
-  CreateFollowDto,
-  null,
-  FollowDocument
-> {
+class FollowService extends BaseService<IFollowEntity> {
   constructor(
     @inject(delay(() => UserService))
     private userService: UserService,

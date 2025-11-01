@@ -8,7 +8,6 @@ import type {
   AnyKeys,
   UpdateWithAggregationPipeline,
   UpdateQuery,
-  Types,
 } from 'mongoose';
 
 // Utilities
@@ -36,8 +35,6 @@ import type {
  */
 class BaseMutateService<
   TSchema,
-  TCreateDto = Partial<TSchema>,
-  TUpdateDto = Partial<TSchema>,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
 > {
   constructor(
@@ -48,7 +45,7 @@ class BaseMutateService<
   // <----------------   CREATE   ---------------->
 
   async create<TThrowError extends boolean = true>(
-    data: WithId<TCreateDto>,
+    data: WithId<TSchema | AnyKeys<TSchema>>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
     const userId = this.currentUser?.id || '';

@@ -63,10 +63,8 @@ type V<
 
 type M<
   TSchema,
-  TCreateDto,
-  TUpdateDto,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
-> = IBaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>;
+> = IBaseMutateService<TSchema, TDoc>;
 
 export type BaseTFunction = <T extends TranslationKeys>(
   key: TranslationKeys,
@@ -87,13 +85,11 @@ export type BaseTFunction = <T extends TranslationKeys>(
  */
 export default abstract class BaseService<
   TSchema,
-  TCreateDto,
-  TUpdateDto,
   TDoc extends HydratedDocument<TSchema> = HydratedDocument<TSchema>,
-> implements IBaseService<TSchema, TCreateDto, TUpdateDto, TDoc>
+> implements IBaseService<TSchema, TDoc>
 {
   protected readonly queries: Q<TSchema, TDoc>;
-  protected readonly mutations: M<TSchema, TCreateDto, TUpdateDto, TDoc>;
+  protected readonly mutations: M<TSchema, TDoc>;
   protected readonly validations: V<TSchema, TDoc>;
   private _currentUser?: ReturnType<typeof userContext>;
 
@@ -110,7 +106,7 @@ export default abstract class BaseService<
       this._currentUser = user;
       return user;
     } catch (error) {
-      throw new AnonymousError('Something wrong with user context');
+      throw new AnonymousError('Something went wrong with user context');
     }
   }
 
@@ -266,7 +262,7 @@ export default abstract class BaseService<
           paginate?: TPaginate | undefined;
         })
       | undefined
-  ): Promise<FindResult<TSchema, TDoc, TLean, TPaginate>> {
+  ): Promise<FindResult<TSchema, TLean, TPaginate>> {
     return await this.queries.find(options);
   }
 
@@ -432,7 +428,7 @@ export default abstract class BaseService<
    * @throws {AnonymousError} If creation fails.
    */
   async create<TThrowError extends boolean = true>(
-    data: WithId<TCreateDto>,
+    data: WithId<TSchema | AnyKeys<TSchema>>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
     return this.mutations.create(data, options);
@@ -455,6 +451,7 @@ export default abstract class BaseService<
     payload: UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
+    this.model.create();
     return this.mutations.updateOneById(id, payload, options);
   }
 

@@ -28,12 +28,7 @@ import type { IApiBatchResponse } from 'core/utilities/response';
 
 export type IPostService = InstanceType<typeof PostService>;
 @injectable()
-class PostService extends BaseService<
-  IPostEntity,
-  CreatePostDto,
-  UpdatePostDto,
-  PostDocument
-> {
+class PostService extends BaseService<IPostEntity> {
   constructor(
     @inject(delay(() => FileService)) private fileService: FileService,
     @inject(delay(() => UserService)) private userService: UserService,

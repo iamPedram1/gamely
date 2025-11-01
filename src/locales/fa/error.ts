@@ -76,6 +76,12 @@ const errosTranslations = {
     have_been_blocked_by_user: 'شما توسط این کاربر مسدود شده اید',
     have_been_blocked_by_author: 'شما توسط نویسنده مسدود شده اید',
   },
+  report: {
+    target_not_exist: 'هدف مورد نظر برای گزارش وجود ندارد یا حذف شده',
+    already_reported: 'شما قبلا گزارش داده اید، گزارش شما بررسی خواهد شد',
+    report_self: 'نمی‌توانید خودتان را گزارش دهید',
+  },
+
   validation: {
     isString: '{{property}} باید رشته متنی باشد',
     isNotEmpty: '{{property}} نباید خالی باشد',

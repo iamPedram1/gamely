@@ -1,12 +1,6 @@
 import { singleton } from 'tsyringe';
 import { plainToInstance } from 'class-transformer';
 
-// Model
-import {
-  CategoryDocument,
-  CategoryLeanDocument,
-} from 'features/shared/category/category.types';
-
 // DTO
 import {
   CategoryClientResponseDto,
@@ -20,14 +14,16 @@ import {
 
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
-import { INestedCategoryEntity } from 'features/shared/category/category.types';
+import type {
+  INestedCategoryEntity,
+  ICategoryEntity,
+} from 'features/shared/category/category.types';
 
 export type ICategoryMapper = InstanceType<typeof CategoryMapper>;
 
 @singleton()
 export class CategoryMapper extends BaseMapper<
-  CategoryDocument,
-  CategoryLeanDocument,
+  ICategoryEntity,
   CategoryClientResponseDto,
   CategoryManagementResponseDto,
   CategoryClientSummaryResponseDto,

@@ -1,6 +1,5 @@
 // Model
 import { singleton } from 'tsyringe';
-import { TagDocument, TagLeanDocument } from 'features/shared/tag/tag.types';
 
 // DTO
 import {
@@ -22,8 +21,7 @@ export type ITagMapper = InstanceType<typeof TagMapper>;
 
 @singleton()
 export class TagMapper extends BaseMapper<
-  ITagEntity | TagDocument,
-  TagLeanDocument,
+  ITagEntity,
   TagClientResponseDto,
   TagManagementResponseDto,
   TagClientSummaryResponseDto,

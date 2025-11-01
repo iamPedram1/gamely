@@ -27,12 +27,7 @@ import type {
 export type IFavoriteGameService = InstanceType<typeof FavoriteGameService>;
 
 @injectable()
-class FavoriteGameService extends BaseService<
-  IFavoriteGameEntity,
-  CreateFavoriteGameDto,
-  null,
-  FavoriteGameDocument
-> {
+class FavoriteGameService extends BaseService<IFavoriteGameEntity> {
   constructor() {
     super(FavoriteGame);
   }
@@ -61,7 +56,6 @@ class FavoriteGameService extends BaseService<
     const record = await this.getOneByCondition(favoriteGame, {
       throwError: false,
     });
-    console.log(favoriteGame, record);
 
     if (!record) return;
 

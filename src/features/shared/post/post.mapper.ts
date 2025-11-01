@@ -14,17 +14,13 @@ import {
 import { BaseMapper } from 'core/mappers/base';
 
 // Types
-import {
-  PostDocument,
-  PostLeanDocument,
-} from 'features/shared/post/post.types';
+import type { IPostEntity } from 'features/shared/post/post.types';
 
 export type IPostMapper = InstanceType<typeof PostMapper>;
 
 @singleton()
 export class PostMapper extends BaseMapper<
-  PostDocument,
-  PostLeanDocument,
+  IPostEntity,
   ClientPostResponseDto,
   PostManagementResponseDto,
   ClientPostSummaryResponseDto,

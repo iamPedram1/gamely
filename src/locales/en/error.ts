@@ -77,6 +77,11 @@ const errosTranslations = {
     have_been_blocked_by_author: 'You have been blocked by author',
     have_been_blocked_by_user: 'You have been blocked by this user',
   },
+  report: {
+    target_not_exist: 'Report target does not exist or has been removed',
+    already_reported: "You've already reported",
+    report_self: 'You cannot report yourself',
+  },
   validation: {
     isString: '{{property}} must be a string',
     isNotEmpty: '{{property}} should not be empty',

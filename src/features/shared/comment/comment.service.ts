@@ -42,8 +42,7 @@ type CreateCommentInput = CreateCommentDto & {
   threadId?: Types.ObjectId | null;
 };
 
-export interface ICommentService
-  extends IBaseService<ICommentEntity, CreateCommentInput, UpdateCommentDto> {
+export interface ICommentService extends IBaseService<ICommentEntity> {
   getPostComments: (
     postId: string,
     query?: IRequestQueryBase
@@ -56,12 +55,7 @@ type CommentWithReplies = CommentLeanDocument & {
 };
 
 @singleton()
-class CommentService extends BaseService<
-  ICommentEntity,
-  CreateCommentInput,
-  UpdateCommentDto,
-  CommentDocument
-> {
+class CommentService extends BaseService<ICommentEntity, CommentDocument> {
   constructor(
     @inject(delay(() => PostService)) private postService: PostService,
     @inject(delay(() => BlockService)) private blockService: BlockService,

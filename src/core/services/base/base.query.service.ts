@@ -9,7 +9,6 @@ import type {
   HydratedDocument,
   FilterQuery,
   PipelineStage,
-  Types,
 } from 'mongoose';
 import {
   AggregateReturn,
@@ -178,7 +177,7 @@ class BaseQueryService<
       lean?: TLean;
       paginate?: TPaginate;
     }
-  ): Promise<FindResult<TSchema, TDoc, TLean, TPaginate>> {
+  ): Promise<FindResult<TSchema, TLean, TPaginate>> {
     const query = this.model.find(options?.filter || {});
     const enrichedQuery = this.applyQueryOptions(query, options);
 

@@ -27,6 +27,14 @@ export const modelsTranslations = {
     singular: 'Game',
     plural: 'Games',
   },
+  FavoriteGame: {
+    singular: 'Favorite Game',
+    plural: 'Favorite Games',
+  },
+  Report: {
+    singular: 'Report',
+    plural: 'Reports',
+  },
   Tag: {
     singular: 'Tag',
     plural: 'Tags',

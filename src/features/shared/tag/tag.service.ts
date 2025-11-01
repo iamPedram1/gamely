@@ -4,10 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import Tag from 'features/shared/tag/tag.model';
 
 // DTO
-import {
-  CreateTagDto,
-  UpdateTagDto,
-} from 'features/management/tag/tag.management.dto';
+import { UpdateTagDto } from 'features/management/tag/tag.management.dto';
 
 // Services
 import PostService from 'features/shared/post/post.service';
@@ -22,12 +19,7 @@ import type { BaseMutateOptions } from 'core/types/base.service.type';
 export type ITagService = InstanceType<typeof TagService>;
 
 @injectable()
-class TagService extends BaseService<
-  ITagEntity,
-  CreateTagDto,
-  UpdateTagDto,
-  TagDocument
-> {
+class TagService extends BaseService<ITagEntity, TagDocument> {
   constructor(
     @inject(delay(() => PostService)) private postService: PostService
   ) {

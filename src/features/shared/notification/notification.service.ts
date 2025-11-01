@@ -9,10 +9,7 @@ import CommentService from 'features/shared/comment/comment.service';
 import Notification from 'features/shared/notification/notification.model';
 
 // DTO
-import {
-  CreateNotificationDto,
-  UpdateNotificationDto,
-} from 'features/shared/notification/notification.dto';
+import { CreateNotificationDto } from 'features/shared/notification/notification.dto';
 
 // Utilities
 import { AnonymousError } from 'core/utilities/errors';
@@ -40,11 +37,7 @@ type UserCacheMap = Map<string, UserLeanDocument>;
 type CommentCacheMap = Map<string, ICommentPopulated>;
 
 @injectable()
-export default class NotificationService extends BaseService<
-  INotificationEntity,
-  CreateNotificationDto<any>,
-  UpdateNotificationDto
-> {
+export default class NotificationService extends BaseService<INotificationEntity> {
   constructor(
     @inject(delay(() => CommentService))
     private commentService: CommentService,

@@ -31,6 +31,14 @@ const modelsTranslations = {
     singular: 'تگ',
     plural: 'تگ‌ها',
   },
+  FavoriteGame: {
+    singular: 'بازی مورد علاقه',
+    plural: 'بازی‌های مورد علاقه',
+  },
+  Report: {
+    singular: 'گزارش',
+    plural: 'گزارش‌ها',
+  },
 };
 
 export default modelsTranslations;

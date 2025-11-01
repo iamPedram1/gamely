@@ -33,11 +33,7 @@ type ParentMap = Record<string, number[]>;
 
 export type ICategoryService = InstanceType<typeof CategoryService>;
 @injectable()
-class CategoryService extends BaseService<
-  ICategoryEntity,
-  CreateCategoryDto,
-  UpdateCategoryDto
-> {
+class CategoryService extends BaseService<ICategoryEntity> {
   constructor(
     @inject(delay(() => PostService)) private postService: PostService
   ) {

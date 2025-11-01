@@ -14,17 +14,13 @@ import {
 import { BaseMapper } from 'core/mappers/base';
 
 // Types
-import {
-  GameDocument,
-  GameLeanDocument,
-} from 'features/shared/game/game.types';
+import type { IGameEntity } from 'features/shared/game/game.types';
 
 export type IGameMapper = InstanceType<typeof GameMapper>;
 
 @singleton()
 export class GameMapper extends BaseMapper<
-  GameDocument,
-  GameLeanDocument,
+  IGameEntity,
   GameClientResponseDto,
   GameManagementResponseDto,
   GameClientSummaryResponseDto,

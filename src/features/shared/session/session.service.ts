@@ -1,20 +1,16 @@
 import dayjs from 'dayjs';
 import mongoose from 'mongoose';
-import { delay, inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
 // Model
 import Session from 'features/shared/session/session.model';
 
 // Service
-import UserService from 'features/shared/user/user.service';
 import tokenUtils from 'core/services/token.service';
 import BaseService from 'core/services/base/base.service';
 
 // DTO
-import {
-  CreateSessionDto,
-  UpdateSessionDto,
-} from 'features/shared/session/session.dto';
+import { CreateSessionDto } from 'features/shared/session/session.dto';
 
 // Utilities
 import crypto from 'core/utilities/crypto';
@@ -33,14 +29,8 @@ import type { IRefreshToken } from 'features/shared/session/session.types';
 type CreateDto = CreateSessionDto & { _id?: string };
 
 @injectable()
-export default class SessionService extends BaseService<
-  ISessionEntity,
-  CreateDto,
-  UpdateSessionDto
-> {
-  constructor(
-    @inject(delay(() => UserService)) private userService: UserService
-  ) {
+export default class SessionService extends BaseService<ISessionEntity> {
+  constructor() {
     super(Session);
   }
 

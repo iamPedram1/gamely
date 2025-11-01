@@ -25,12 +25,7 @@ import type {
 export type IFileService = InstanceType<typeof FileService>;
 
 @singleton()
-class FileService extends BaseService<
-  IFileEntity,
-  undefined,
-  undefined,
-  FileDocument
-> {
+class FileService extends BaseService<IFileEntity> {
   constructor() {
     super(File);
   }

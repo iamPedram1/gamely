@@ -17,6 +17,7 @@ import { BaseMapper } from 'core/mappers/base';
 
 // Types
 import type {
+  IUserEntity,
   UserDocument,
   UserLeanDocument,
 } from 'features/shared/user/user.types';
@@ -25,8 +26,7 @@ export type IUserMapper = InstanceType<typeof UserMapper>;
 
 @singleton()
 export class UserMapper extends BaseMapper<
-  UserDocument,
-  UserLeanDocument,
+  IUserEntity,
   UserClientResponseDto,
   UserManagementResponseDto,
   UserClientSummaryResponseDto,

@@ -63,12 +63,11 @@ export type ArrayQueryResult<
 /** Result of find queries with optional pagination */
 export type FindResult<
   TSchema,
-  TDoc,
   TLean extends boolean,
   TPaginate extends boolean,
 > = TPaginate extends false
-  ? ArrayQueryResult<TSchema, TDoc, TLean>
-  : WithPagination<QueryResult<TSchema, TDoc, TLean>>;
+  ? ArrayQueryResult<TSchema, HydratedDocument<TSchema>, TLean>
+  : WithPagination<QueryResult<TSchema, HydratedDocument<TSchema>, TLean>>;
 
 /** Common options for query/mutation services */
 interface BaseCommonOptions<TLean extends boolean = boolean> {
@@ -121,18 +120,14 @@ export type IBaseValidationService<
 /** BaseMutateService type alias */
 export type IBaseMutateService<
   TSchema,
-  TCreateDto,
-  TUpdateDto,
   TDoc extends BaseDoc<TSchema> = BaseDoc<TSchema>,
-> = BaseMutateService<TSchema, TCreateDto, TUpdateDto, TDoc>;
+> = BaseMutateService<TSchema, TDoc>;
 
 /** Combined BaseService type alias */
 export type IBaseService<
   TSchema,
-  TCreateDto,
-  TUpdateDto,
   TDoc extends BaseDoc<TSchema> = BaseDoc<TSchema>,
-> = BaseService<TSchema, TCreateDto, TUpdateDto, TDoc>;
+> = BaseService<TSchema, TDoc>;
 
 /** Logical OR/AND filter object */
 export type OrAndFilter<T> = {

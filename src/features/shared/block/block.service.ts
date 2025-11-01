@@ -29,12 +29,7 @@ import type {
 export type IBlockService = InstanceType<typeof BlockService>;
 
 @injectable()
-class BlockService extends BaseService<
-  IBlockEntity,
-  CreateBlockDto,
-  null,
-  BlockDocument
-> {
+class BlockService extends BaseService<IBlockEntity> {
   constructor(
     @inject(delay(() => FollowService))
     private followService: FollowService,

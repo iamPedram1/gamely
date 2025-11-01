@@ -6,12 +6,11 @@ import User from 'features/shared/user/user.model';
 
 // Service
 import BaseService from 'core/services/base/base.service';
-
-// DTO
-import { RegisterDto } from 'features/shared/auth/auth.dto';
-import PostService from 'features/shared/post/post.service';
+import BlockService from 'features/shared/block/block.service';
 import SessionService from 'features/shared/session/session.service';
 import FollowService from 'features/shared/follow/follow.service';
+
+// DTO
 import { UpdateProfileDto } from 'features/client/user/user.client.dto';
 import { UpdateUserDto } from 'features/management/user/user.management.dto';
 
@@ -24,23 +23,16 @@ import type {
 import {
   BadRequestError,
   ForbiddenError,
-  NotFoundError,
   ValidationError,
 } from 'core/utilities/errors';
 
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type { DocumentId } from 'core/types/common';
-import BlockService from 'features/shared/block/block.service';
 
 export type IUserService = InstanceType<typeof UserService>;
 
 @injectable()
-export default class UserService extends BaseService<
-  IUserEntity,
-  RegisterDto,
-  UpdateUserDto | UpdateProfileDto,
-  UserDocument
-> {
+export default class UserService extends BaseService<IUserEntity> {
   constructor(
     @inject(delay(() => FollowService))
     private followService: FollowService,

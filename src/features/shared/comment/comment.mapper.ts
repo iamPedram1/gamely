@@ -12,19 +12,14 @@ import {
 
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
+import { ICommentEntity } from 'features/shared/comment/comment.types';
 
 // Types
-import type {
-  CommentDocument,
-  CommentLeanDocument,
-} from 'features/shared/comment/comment.types';
-
 export type ICommentMapper = InstanceType<typeof CommentMapper>;
 
 @singleton()
 export class CommentMapper extends BaseMapper<
-  CommentDocument,
-  CommentLeanDocument,
+  ICommentEntity,
   CommentClientResponseDto,
   CommentManagementResponseDto,
   CommentClientSummaryResponseDto,

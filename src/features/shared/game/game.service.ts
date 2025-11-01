@@ -4,10 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import Game from 'features/shared/game/game.model';
 
 // DTO
-import {
-  CreateGameDto,
-  UpdateGameDto,
-} from 'features/management/game/game.management.dto';
+import { UpdateGameDto } from 'features/management/game/game.management.dto';
 
 // Services
 import BaseService from 'core/services/base/base.service';
@@ -15,6 +12,7 @@ import PostService from 'features/shared/post/post.service';
 import FavoriteGameService from 'features/shared/favoriteGame/favoriteGame.service';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { IApiBatchResponse } from 'core/utilities/response';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type {
@@ -23,17 +21,11 @@ import type {
   GameMetadata,
   IGameEntity,
 } from 'features/shared/game/game.types';
-import { DocumentId } from 'core/types/common';
 
 export type IGameService = InstanceType<typeof GameService>;
 
 @injectable()
-class GameService extends BaseService<
-  IGameEntity,
-  CreateGameDto,
-  UpdateGameDto,
-  GameDocument
-> {
+class GameService extends BaseService<IGameEntity, GameDocument> {
   constructor(
     @inject(delay(() => PostService)) private postService: PostService,
     @inject(delay(() => FavoriteGameService))
