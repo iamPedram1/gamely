@@ -4,7 +4,10 @@ import { AnonymousError, InternalServerError } from 'core/utilities/errors';
 
 // Types
 import type { i18n as I18nType } from 'i18next';
-import type { IUserContext, UserRole } from 'features/shared/user/user.types';
+import type {
+  IUserContext,
+  UserRole,
+} from 'features/shared/user/core/user.types';
 import type {
   TranslationKeys,
   TranslationVariables,

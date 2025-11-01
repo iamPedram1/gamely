@@ -1,13 +1,13 @@
 import logger from 'core/utilities/logger';
-import User from 'features/shared/user/user.model';
+import User from 'features/shared/user/core/user.model';
 import tokenUtils from 'core/services/token.service';
 import { Request, Response, NextFunction } from 'express';
 import { requestContext, runWithContext } from 'core/utilities/request-context';
 import {
   jwtAccessTokenKey,
   jwtAccessTokenName,
-} from 'features/shared/session/session.constants';
-import type { IToken } from 'features/shared/session/session.types';
+} from 'features/shared/auth/session/session.constants';
+import type { IToken } from 'features/shared/auth/session/session.types';
 
 export const context = (req: Request, res: Response, next: NextFunction) => {
   runWithContext({ user: req.user, i18n: req.i18n, t: req.t }, next);

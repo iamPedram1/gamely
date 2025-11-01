@@ -1,6 +1,6 @@
 // Types
 import type { FlattenMaps, HydratedDocument, ObjectId } from 'mongoose';
-import type { IUser } from 'features/shared/user/user.types';
+import type { IUser } from 'features/shared/user/core/user.types';
 import type {
   FileResponseDto,
   FileSummaryResponseDto,

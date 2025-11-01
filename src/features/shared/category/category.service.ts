@@ -11,7 +11,7 @@ import {
 } from 'features/management/category/category.management.dto';
 
 // Services
-import PostService from 'features/shared/post/post.service';
+import PostService from 'features/shared/post/core/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Utilities

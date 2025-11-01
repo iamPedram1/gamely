@@ -6,7 +6,7 @@ import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Utilities
 import { pickLocaleField } from 'core/utilities/request-context';
-import { UserClientSummaryResponseDto } from 'features/client/user/user.client.dto';
+import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.types';

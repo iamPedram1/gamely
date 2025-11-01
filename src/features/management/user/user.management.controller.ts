@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import sendResponse from 'core/utilities/response';
 
 // Service
-import UserService from 'features/shared/user/user.service';
+import UserService from 'features/shared/user/core/user.service';
 
 // DTO
 import {
@@ -13,7 +13,7 @@ import {
 } from 'features/management/user/user.management.dto';
 
 // Mapper
-import { UserMapper } from 'features/shared/user/user.mapper';
+import { UserMapper } from 'features/shared/user/core/user.mapper';
 
 // Types
 import type { RequestHandler } from 'express';

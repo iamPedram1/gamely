@@ -7,7 +7,7 @@ import Tag from 'features/shared/tag/tag.model';
 import { UpdateTagDto } from 'features/management/tag/tag.management.dto';
 
 // Services
-import PostService from 'features/shared/post/post.service';
+import PostService from 'features/shared/post/core/post.service';
 import BaseService from 'core/services/base/base.service';
 
 // Types

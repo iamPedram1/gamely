@@ -1,10 +1,10 @@
 import { delay, inject, injectable } from 'tsyringe';
 
 // Service
-import GameService from 'features/shared/game/game.service';
+import GameService from 'features/shared/game/core/game.service';
 
 // DTO
-import { GameMapper } from 'features/shared/game/game.mapper';
+import { GameMapper } from 'features/shared/game/core/game.mapper';
 
 // Utilities
 import sendResponse from 'core/utilities/response';

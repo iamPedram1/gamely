@@ -9,4 +9,8 @@ export const modelKeyName: ModelKeys[] = [
   'Post',
   'Tag',
   'User',
+  'FavoriteGame',
+  'GameReview',
+  'Follow',
+  'Block',
 ];

@@ -8,6 +8,10 @@ export type ModelKeys =
   | 'Category'
   | 'File'
   | 'Notification'
-  | 'Comment';
+  | 'Comment'
+  | 'FavoriteGame'
+  | 'GameReview'
+  | 'Block'
+  | 'Follow';
 
 export type DocumentId = string | Types.ObjectId;

@@ -4,8 +4,8 @@ import { Expose, Type } from 'class-transformer';
 // Dto
 import { BaseQueryDto } from 'core/dto/query';
 import { BaseResponseDto } from 'core/dto/response';
-import { CommentManagementResponseDto } from 'features/management/comment/comment.management.dto';
-import { PostManagementResponseDto } from 'features/management/post/post.management.dto';
+import { CommentManagementResponseDto } from 'features/management/post/comment/comment.management.dto';
+import { PostManagementResponseDto } from 'features/management/post/core/post.management.dto';
 import { UserManagementResponseDto } from 'features/management/user/user.management.dto';
 
 // Utilities

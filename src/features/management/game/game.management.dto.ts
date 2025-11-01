@@ -24,7 +24,7 @@ import { IsSlug } from 'core/utilities/validation';
 // Types
 import type { IFileSummary } from 'features/shared/file/file.types';
 import { WithDictionaries } from 'core/types/translations';
-import { GameTranslation } from 'features/shared/game/game.types';
+import { GameTranslation } from 'features/shared/game/core/game.types';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {

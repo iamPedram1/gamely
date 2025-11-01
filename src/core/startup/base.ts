@@ -7,7 +7,7 @@ import express from 'express';
 import requestIp from 'request-ip';
 import mongoSanitize from 'express-mongo-sanitize';
 import type { Express } from 'express';
-import { updateSessionActivity } from 'features/shared/session/session.middleware';
+import { updateSessionActivity } from 'features/shared/auth/session/session.middleware';
 
 export default function baseStartup(app: Express) {
   app.disable('etag');

@@ -1,5 +1,5 @@
 // Types
-import type { UserDocument } from 'features/shared/user/user.types';
+import type { UserDocument } from 'features/shared/user/core/user.types';
 import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 
 export type ReportDocument = HydratedDocument<IReportEntity>;

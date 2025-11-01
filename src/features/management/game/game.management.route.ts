@@ -9,7 +9,7 @@ import { validateQuery } from 'core/middlewares/validateQuery';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
-import Game from 'features/shared/game/game.model';
+import Game from 'features/shared/game/core/game.model';
 
 // Controller
 import GameManagementController from 'features/management/game/game.management.controller';

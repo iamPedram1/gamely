@@ -1,5 +1,4 @@
 import { singleton } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
 
 // DTO
 import {
@@ -14,6 +13,8 @@ import {
 
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
+
+// Types
 import type {
   INestedCategoryEntity,
   ICategoryEntity,
@@ -39,8 +40,6 @@ export class CategoryMapper extends BaseMapper<
   }
 
   toNestedDto(doc: INestedCategoryEntity) {
-    return plainToInstance(NestedCategoryClientResponseDto, doc, {
-      excludeExtraneousValues: true,
-    });
+    return this.toInstance(NestedCategoryClientResponseDto, doc);
   }
 }

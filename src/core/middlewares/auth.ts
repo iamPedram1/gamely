@@ -1,5 +1,5 @@
 // Models
-import User from 'features/shared/user/user.model';
+import User from 'features/shared/user/core/user.model';
 
 // Middlewares
 import { requestContext, t } from 'core/utilities/request-context';
@@ -9,7 +9,7 @@ import tokenUtils from 'core/services/token.service';
 import {
   jwtAccessTokenKey,
   jwtAccessTokenName,
-} from 'features/shared/session/session.constants';
+} from 'features/shared/auth/session/session.constants';
 import {
   AnonymousError,
   ForbiddenError,
@@ -18,8 +18,8 @@ import {
 
 // Types
 import type { Request, Response, NextFunction } from 'express';
-import type { UserRole } from 'features/shared/user/user.types';
-import type { IToken } from 'features/shared/session/session.types';
+import type { UserRole } from 'features/shared/user/core/user.types';
+import type { IToken } from 'features/shared/auth/session/session.types';
 
 export default function auth(roles: UserRole[]) {
   return async function (req: Request, res: Response, next: NextFunction) {

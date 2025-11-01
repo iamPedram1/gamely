@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import { validateQuery } from 'core/middlewares/validateQuery';
 
 // Model
-import Game from 'features/shared/game/game.model';
+import Game from 'features/shared/game/core/game.model';
 
 // Controller
 import GameClientController from 'features/client/game/game.client.controller';

@@ -4,14 +4,14 @@ import mongoose from 'mongoose';
 
 // Models
 import Tag from 'features/shared/tag/tag.model';
-import User from 'features/shared/user/user.model';
+import User from 'features/shared/user/core/user.model';
 
 // Utils
 import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
 import { ITagEntity } from 'features/shared/tag/tag.types';
-import { jwtAccessTokenName } from 'features/shared/session/session.constants';
+import { jwtAccessTokenName } from 'features/shared/auth/session/session.constants';
 
 describe('tag routes', () => {
   afterAll(async () => {

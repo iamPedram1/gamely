@@ -8,9 +8,9 @@ import { CreateReportDto } from 'features/shared/report/report.dto';
 
 // Services
 import BaseService from 'core/services/base/base.service';
-import UserService from 'features/shared/user/user.service';
-import PostService from 'features/shared/post/post.service';
-import CommentService from 'features/shared/comment/comment.service';
+import UserService from 'features/shared/user/core/user.service';
+import PostService from 'features/shared/post/core/post.service';
+import CommentService from 'features/shared/post/comment/comment.service';
 
 // Utilities
 import { BadRequestError, ValidationError } from 'core/utilities/errors';
