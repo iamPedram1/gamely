@@ -1,4 +1,4 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -10,6 +10,7 @@ import {
 // DTO
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
 
 export class CreateCommentDto {
   @IsNotEmpty()
@@ -19,20 +20,17 @@ export class CreateCommentDto {
 
   @IsOptional()
   @IsMongoId()
-  replyToCommentId: string;
+  replyToComment: string;
 }
 
 export class CommentClientResponseDto extends BaseResponseDto {
   @Expose()
   message: string;
 
-  @Expose()
-  @Transform(({ obj }) => obj.creator.username)
-  username: string;
-
-  @Expose()
-  @Transform(({ obj }) => obj.creator.avatar)
-  avatar: FileResponseDto;
+  @Transform(({ obj }) =>
+    plainToInstance(UserClientSummaryResponseDto, obj.creator)
+  )
+  user: UserClientSummaryResponseDto;
 
   @Expose()
   @Type(() => CommentClientResponseDto)
@@ -43,13 +41,10 @@ export class CommentClientSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   message: string;
 
-  @Expose()
-  @Transform(({ obj }) => obj.creator.name)
-  username: string;
-
-  @Expose()
-  @Transform(({ obj }) => obj.creator.avatar)
-  avatar: FileResponseDto;
+  @Transform(({ obj }) =>
+    plainToInstance(UserClientSummaryResponseDto, obj.creator)
+  )
+  user: UserClientSummaryResponseDto;
 
   @Expose()
   @Type(() => CommentClientSummaryResponseDto)

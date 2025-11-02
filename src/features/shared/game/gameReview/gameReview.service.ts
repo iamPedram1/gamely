@@ -60,7 +60,7 @@ class FavoriteGameService extends BaseService<GameReviewEntity> {
 
       const [review] = await Promise.all([
         this.create(
-          { ...data, gameId, userId: this.currentUser.id },
+          { ...data, game: gameId, user: this.currentUser.id },
           { ...options, session }
         ),
         game.save({ session }),
@@ -137,11 +137,11 @@ class FavoriteGameService extends BaseService<GameReviewEntity> {
     }
   ): Promise<FindResult<GameReviewEntity, TLean, TPaginate>> {
     return await this.find({
-      filter: { gameId },
+      filter: { game: gameId },
       lean: true,
       populate: [
-        { path: 'gameId', populate: 'coverImage' },
-        { path: 'userId', populate: 'avatar' },
+        { path: 'game', populate: 'coverImage' },
+        { path: 'user', populate: 'avatar' },
       ],
       ...options,
     });
@@ -149,14 +149,14 @@ class FavoriteGameService extends BaseService<GameReviewEntity> {
 
   private async checkIsAlreadyReviewed(userId: DocumentId, gameId: DocumentId) {
     return await this.existsByCondition({
-      userId: { $eq: userId },
-      gameId: { $eq: gameId },
+      user: { $eq: userId },
+      game: { $eq: gameId },
     });
   }
   private async getReview(userId: DocumentId, gameId: DocumentId) {
     return await this.getOneByCondition({
-      userId: { $eq: userId },
-      gameId: { $eq: gameId },
+      user: { $eq: userId },
+      game: { $eq: gameId },
     });
   }
 }

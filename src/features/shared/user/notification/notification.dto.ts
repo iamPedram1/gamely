@@ -53,11 +53,11 @@ export class CreateNotificationDto<T extends TranslationKeys> {
 
   @IsNotEmpty()
   @IsMongoId()
-  receiverId: string;
+  receiver: string;
 
   @IsNotEmpty()
   @IsMongoId()
-  senderId: string;
+  sender: string;
 
   @IsOptional()
   @IsBoolean()

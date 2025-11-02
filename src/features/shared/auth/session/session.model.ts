@@ -12,7 +12,7 @@ const sessionSchema = new Schema<ISessionEntity, Model<ISessionEntity>>({
     trim: true,
     required: true,
   },
-  userId: {
+  user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,

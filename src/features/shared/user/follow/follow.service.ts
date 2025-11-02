@@ -62,8 +62,8 @@ class FollowService extends BaseService<IFollowEntity> {
         );
 
       const follow = new CreateFollowDto();
-      follow.user = actorId;
-      follow.followed = targetId;
+      follow.follower = actorId;
+      follow.following = targetId;
 
       await Promise.all([
         this.create(follow, { session, ...options }),
@@ -83,8 +83,8 @@ class FollowService extends BaseService<IFollowEntity> {
         throw new ValidationError(this.t('error.follow.unfollow_self'));
 
       const follow = new CreateFollowDto();
-      follow.user = actorId;
-      follow.followed = targetId;
+      follow.follower = actorId;
+      follow.following = targetId;
 
       const record = await this.getOneByCondition(follow, {
         throwError: false,
@@ -127,8 +127,8 @@ class FollowService extends BaseService<IFollowEntity> {
     const followers = await this.find({
       filter: this.getQueryFilterOf(userId, 'followers'),
       lean: true,
-      select: 'createdAt user',
-      populate: 'user',
+      select: 'createdAt follower',
+      populate: [{ path: 'follower', populate: 'avatar' }],
       ...options,
     });
 
@@ -150,7 +150,7 @@ class FollowService extends BaseService<IFollowEntity> {
     return await this.find({
       filter: this.getQueryFilterOf(userId, 'followings'),
       lean: true,
-      populate: 'followed',
+      populate: [{ path: 'following', populate: 'avatar' }],
       ...options,
     });
   }
@@ -158,8 +158,8 @@ class FollowService extends BaseService<IFollowEntity> {
   async checkIsFollowing(followerId: DocumentId, followingId: DocumentId) {
     if (followerId === followingId) return false;
     return await this.existsByCondition({
-      user: { $eq: followerId },
-      followed: { $eq: followingId },
+      follower: { $eq: followerId },
+      following: { $eq: followingId },
     });
   }
 
@@ -168,7 +168,7 @@ class FollowService extends BaseService<IFollowEntity> {
     type: 'followers' | 'followings'
   ): FilterQuery<IFollowEntity> {
     return {
-      [type === 'followers' ? 'followed' : 'user']: {
+      [type === 'followers' ? 'following' : 'follower']: {
         $eq: new mongoose.Types.ObjectId(userId),
       },
     };

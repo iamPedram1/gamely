@@ -30,6 +30,12 @@ export class GameClientResponseDto extends BaseResponseDto {
   releaseDate: string;
 
   @Expose()
+  averageRate: number;
+
+  @Expose()
+  totalRates: number;
+
+  @Expose()
   @Type(() => FileSummaryResponseDto)
   coverImage: IFileSummary;
 

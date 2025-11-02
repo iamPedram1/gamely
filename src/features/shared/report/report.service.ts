@@ -202,7 +202,7 @@ class ReportService extends BaseService<IReportEntity> {
   private async checkIsAlreadyReported(targetId: string) {
     return this.existsByCondition({
       user: this.currentUser.id,
-      targetId,
+      targetId: targetId,
     });
   }
 }

@@ -51,15 +51,43 @@ export class UpdateProfileDto extends BaseUserUpdate {
 
 export class UserBaseResponseDto extends BaseResponseDto {
   @Expose()
+  @Type(() => FileResponseDto)
+  avatar: FileResponseDto;
+
+  @Expose()
+  username: string;
+}
+
+export class UserProfileResponseDto extends UserBaseResponseDto {
+  @Expose()
+  role: UserRole;
+
+  @Expose()
+  blocksCount: number;
+
+  @Expose()
   email: string;
 
   @Expose()
   bio: string;
 
   @Expose()
-  @Type(() => FileResponseDto)
-  avatar: FileResponseDto;
+  lastSeen: string | null;
 
+  @Expose()
+  isFollowing: boolean;
+
+  @Expose()
+  postsCount: number;
+
+  @Expose()
+  followingsCount: number;
+
+  @Expose()
+  followersCount: number;
+}
+
+export class UserClientResponseDto extends UserBaseResponseDto {
   @Expose()
   lastSeen: string | null;
 
@@ -71,24 +99,6 @@ export class UserBaseResponseDto extends BaseResponseDto {
 
   @Expose()
   followersCount: number;
-
-  @Expose()
-  isFollowing: boolean;
-
-  @Expose()
-  username: string;
-}
-export class UserProfileResponseDto extends UserBaseResponseDto {
-  @Expose()
-  role: UserRole;
-
-  @Expose()
-  blocksCount: number;
 }
 
-export class UserClientResponseDto extends UserBaseResponseDto {}
-
-export class UserClientSummaryResponseDto extends BaseSummaryResponseDto {
-  @Expose()
-  username: string;
-}
+export class UserClientSummaryResponseDto extends UserBaseResponseDto {}

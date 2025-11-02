@@ -26,13 +26,13 @@ const notificationSchema = new Schema<
   Model<INotificationEntity>
 >(
   {
-    receiverId: {
+    receiver: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
       index: true,
     },
-    senderId: {
+    sender: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       index: true,

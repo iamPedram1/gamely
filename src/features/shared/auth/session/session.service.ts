@@ -42,7 +42,7 @@ export default class SessionService extends BaseService<ISessionEntity> {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     // Generate Access & Refresh Token
     const { accessToken, refreshToken, sessionId } = this.generateAuthToken(
-      data.userId
+      data.user
     );
 
     // Create a Session
@@ -59,7 +59,7 @@ export default class SessionService extends BaseService<ISessionEntity> {
     const session = await this.getOneById(sessionId);
 
     // Validation
-    if (session.userId.toHexString() !== userId)
+    if (session.user.toHexString() !== userId)
       throw new ValidationError(t('error.refresh_token.invalid'));
 
     const isRefreshTokenCorrect = await crypto.compare(

@@ -14,11 +14,11 @@ export interface ICommentEntity {
   type: CommentType;
   status: CommentStatusType;
   message: string;
-  postId: Types.ObjectId;
+  post: Types.ObjectId;
   parentIds: Types.ObjectId[];
   creator: Types.ObjectId;
-  threadId?: Types.ObjectId | null;
-  replyToCommentId?: Types.ObjectId | null;
+  thread?: Types.ObjectId | null;
+  replyToComment?: Types.ObjectId | null;
   updatedAt: Date;
   createdAt: Date;
 }

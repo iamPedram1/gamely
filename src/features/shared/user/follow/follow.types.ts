@@ -9,6 +9,6 @@ export type FollowLeanDocumentWithMetadata = FollowLeanDocument & {
 };
 export interface IFollowEntity {
   _id: Types.ObjectId;
-  user: Types.ObjectId;
-  followed: Types.ObjectId;
+  follower: Types.ObjectId;
+  following: Types.ObjectId;
 }

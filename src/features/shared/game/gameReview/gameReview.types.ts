@@ -22,8 +22,8 @@ export type GameReviewPopulatedLeanDocument = GameReviewDocument & {
 
 export interface GameReviewEntity {
   _id: Types.ObjectId;
-  userId: Types.ObjectId;
-  gameId: Types.ObjectId;
+  user: Types.ObjectId;
+  game: Types.ObjectId;
   rate: number;
   description: string;
   createdAt: Date;

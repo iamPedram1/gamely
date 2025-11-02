@@ -132,7 +132,7 @@ class PostService extends BaseService<IPostEntity> {
 
       // Prepare cleanup operations
       const cleanupTasks: Promise<any>[] = [
-        this.commentService.deleteManyByKey('postId', id, { session }),
+        this.commentService.deleteManyByKey('post', id, { session }),
         this.notificationService.deletePostAllNotification(id, { session }),
         this.userService.adjustPostCount(creatorId, -1, { session }),
       ];

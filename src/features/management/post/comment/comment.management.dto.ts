@@ -52,11 +52,7 @@ export class CommentManagementResponseDto extends BaseResponseDto {
   replies: CommentManagementResponseDto;
 
   @Expose()
-  @Transform(({ obj }) =>
-    plainToInstance(PostManagementSummaryResponseDto, obj.postId, {
-      excludeExtraneousValues: true,
-    })
-  )
+  @Type(() => PostManagementSummaryResponseDto)
   post: PostManagementSummaryResponseDto;
 }
 

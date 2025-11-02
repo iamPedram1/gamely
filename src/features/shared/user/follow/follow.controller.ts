@@ -62,7 +62,7 @@ export default class FollowController {
       const actorId = req.user.id;
       await Promise.all(
         (docs as FollowLeanDocumentWithMetadata[]).map(async (doc) => {
-          const targetId = doc.followed._id;
+          const targetId = doc.following._id;
 
           doc.isFollowing = await this.followService.checkIsFollowing(
             actorId,
@@ -109,7 +109,7 @@ export default class FollowController {
 
     await Promise.all(
       (docs as FollowLeanDocumentWithMetadata[]).map(async (doc) => {
-        const targetId = doc.followed._id;
+        const targetId = doc.following._id;
         const [isBlocked, isFollowing] = await Promise.all([
           this.blockService.checkIsBlock(actorId, targetId),
           this.followService.checkIsFollowing(actorId, targetId),

@@ -28,7 +28,7 @@ const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
       enum: commentStatus,
       default: 'pending',
     },
-    replyToCommentId: {
+    replyToComment: {
       type: Schema.Types.ObjectId,
       ref: 'Comment',
       immutable: true,
@@ -36,7 +36,7 @@ const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
         return this.type === 'reply';
       },
     },
-    threadId: {
+    thread: {
       type: Schema.Types.ObjectId,
       ref: 'Comment',
       immutable: true,
@@ -49,7 +49,7 @@ const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
       ref: 'Comment',
       default: [],
     },
-    postId: {
+    post: {
       type: Schema.Types.ObjectId,
       ref: 'Post',
       required: true,

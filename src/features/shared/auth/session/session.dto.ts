@@ -1,6 +1,7 @@
 import {
   IsDate,
   IsJWT,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -32,8 +33,8 @@ export class CreateSessionDto {
   refreshToken: string;
 
   @IsNotEmpty()
-  @IsString()
-  userId: string;
+  @IsMongoId()
+  user: string;
 
   @IsNotEmpty()
   @IsDate()
@@ -66,7 +67,8 @@ export class UpdateSessionDto {
   refreshToken: string;
 
   @IsOptional()
-  userId: string;
+  @IsMongoId()
+  user: string;
 
   @IsOptional()
   @IsDate()

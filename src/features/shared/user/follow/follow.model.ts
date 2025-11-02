@@ -5,13 +5,13 @@ import type { IFollowEntity } from 'features/shared/user/follow/follow.types';
 
 const followSchema = new Schema<IFollowEntity, Model<IFollowEntity>>(
   {
-    user: {
+    follower: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
       immutable: true,
     },
-    followed: {
+    following: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -21,7 +21,7 @@ const followSchema = new Schema<IFollowEntity, Model<IFollowEntity>>(
   { timestamps: true }
 );
 
-followSchema.index({ user: 1, followed: 1 }, { unique: true });
+followSchema.index({ follower: 1, following: 1 }, { unique: true });
 
 export const Follow = model<IFollowEntity>('Follow', followSchema);
 

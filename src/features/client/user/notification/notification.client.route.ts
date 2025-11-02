@@ -37,7 +37,7 @@ notificationClientRouter.post(
 notificationClientRouter.post(
   '/:id/seen',
   validateParam(Notification, 'id', '_id', { type: 'id' }),
-  validateDocumentOwnership(Notification, 'id', 'receiverId', 'params'),
+  validateDocumentOwnership(Notification, 'id', 'receiver', 'params'),
   notificationClientController.seenNotification
 );
 
@@ -49,7 +49,7 @@ notificationClientRouter.delete(
 notificationClientRouter.delete(
   '/:id',
   validateParam(Notification, 'id', '_id', { type: 'id' }),
-  validateDocumentOwnership(Notification, 'id', 'receiverId', 'params'),
+  validateDocumentOwnership(Notification, 'id', 'receiver', 'params'),
   notificationClientController.deleteNotification
 );
 

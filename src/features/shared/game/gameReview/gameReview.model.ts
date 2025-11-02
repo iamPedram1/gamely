@@ -16,14 +16,14 @@ const gameReviewSchema = new Schema<GameReviewEntity, Model<GameReviewEntity>>(
       max: 5,
       index: true,
     },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
       immutable: true,
       index: true,
     },
-    gameId: {
+    game: {
       type: Schema.Types.ObjectId,
       ref: 'Game',
       required: true,

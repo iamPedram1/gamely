@@ -30,7 +30,7 @@ export class BlockResponseDto extends BaseSummaryResponseDto {
 
   @Expose()
   @Transform(({ obj }) => obj.blocked?._id)
-  userId: string;
+  user: string;
 
   @Expose()
   @Transform(({ obj }) => obj.createdAt)

@@ -115,9 +115,7 @@ export default class UserService extends BaseService<IUserEntity> {
       throw new ForbiddenError();
     return await this.withTransaction(async (session) => {
       if (isBlocking)
-        await this.sessionService.deleteManyByKey('userId', userId, {
-          session,
-        });
+        await this.sessionService.deleteManyByKey('user', userId, { session });
       return await this.updateOneById(userId, data, { session, lean: true });
     });
   }
@@ -172,7 +170,7 @@ export default class UserService extends BaseService<IUserEntity> {
       (
         await this.sessionService.find({
           lean: true,
-          filter: { userId },
+          filter: { user: userId },
           select: 'lastActivity',
           sort: { lastActivity: -1 },
           paginate: false,

@@ -32,7 +32,7 @@ export default class CommentManagementController {
       searchBy: [{ queryKey: 'search', modelKeys: ['message'], options: 'i' }],
       filterBy: [
         { queryKey: 'status', modelKey: 'status', logic: 'and' },
-        { queryKey: 'post', modelKey: 'postId', logic: 'or' },
+        { queryKey: 'post', modelKey: 'post', logic: 'or' },
         { queryKey: 'user', modelKey: 'creator', logic: 'or' },
       ],
     });
@@ -40,7 +40,7 @@ export default class CommentManagementController {
       lean: true,
       filter,
       populate: [
-        { path: 'postId', select: '_id translations' },
+        { path: 'post', select: '_id translations' },
         { path: 'creator', select: 'username status type' },
       ],
     });

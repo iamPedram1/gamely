@@ -18,8 +18,8 @@ export interface NotificationMetadata {
 export interface INotificationEntity {
   _id: Types.ObjectId;
   type: NotificationType;
-  receiverId: Types.ObjectId;
-  senderId: Types.ObjectId;
+  receiver: Types.ObjectId;
+  sender: Types.ObjectId;
   seen: boolean;
   message: string;
   metadata: NotificationMetadata;

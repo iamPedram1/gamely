@@ -96,13 +96,13 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     const firstLevel = await super.find({
       query,
       lean: true,
-      filter: { postId, type: 'main' },
+      filter: { post: postId, type: 'main' },
       populate: [{ path: 'creator', populate: 'avatar' }],
     });
 
     const ids = firstLevel.docs.map((doc) => String(doc._id));
     const replies = await super.find({
-      filter: { postId, type: 'reply', threadId: { $in: ids } },
+      filter: { post: postId, type: 'reply', thread: { $in: ids } },
       lean: true,
       paginate: false,
       populate: 'creator',
@@ -123,17 +123,17 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     const firstLevel = await super.find({
       query,
       lean: true,
-      filter: { postId, status: 'approved', type: 'main' },
+      filter: { post: postId, status: 'approved', type: 'main' },
       populate: [{ path: 'creator', populate: 'avatar' }],
     });
 
     const ids = firstLevel.docs.map((doc) => String(doc._id));
     const replies = await super.find({
       filter: {
-        postId,
+        post: postId,
         type: 'reply',
         status: 'approved',
-        threadId: { $in: ids },
+        thread: { $in: ids },
       },
       lean: true,
       paginate: false,
@@ -160,8 +160,8 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
         lean: true,
         select: 'creator',
       }),
-      ...(data.replyToCommentId
-        ? [this.getOneById(data.replyToCommentId, { lean: true })]
+      ...(data.replyToComment
+        ? [this.getOneById(data.replyToComment, { lean: true })]
         : []),
     ]);
 
@@ -190,7 +190,7 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
         );
 
       data.type = 'reply';
-      data.threadId = comment.threadId || comment._id;
+      data.threadId = comment.thread || comment._id;
       data.parentIds = [...(comment?.parentIds || []), comment._id];
     } else data.type = 'main';
 
@@ -204,9 +204,9 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
   ) {
     return await this.withTransaction(async (session) => {
       const comment = await this.getOneById(commentId, {
-        populate: 'replyToCommentId postId',
+        populate: 'replyToComment post',
       });
-      const post = comment.postId as unknown as IPostEntity;
+      const post = comment.post as unknown as IPostEntity;
       const isCommentApproved = comment.status === 'approved';
 
       // Ownership check for authors
@@ -228,7 +228,7 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
       if (
         comment.isModified('status') &&
         comment.status === 'approved' &&
-        comment.replyToCommentId
+        comment.replyToComment
       ) {
         await this.notificationService.sendCommentReplyNotify(
           comment as unknown as ICommentPopulated,
@@ -242,7 +242,7 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
 
   private async getCommentPost(commentId: string) {
     const cm = await this.getOneById(commentId, { lean: true });
-    return await this.postService.getOneById(cm.postId.toHexString());
+    return await this.postService.getOneById(cm.post.toHexString());
   }
 
   private getReplies(
@@ -253,8 +253,8 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     const id = comment?._id ? String(comment._id) : '';
     return (id ? parentMap?.[id] || [] : []).map((index) => {
       const category = comments[index];
-      const isReply = category.replyToCommentId
-        ? String(category.replyToCommentId)
+      const isReply = category.replyToComment
+        ? String(category.replyToComment)
         : null;
       if (isReply)
         category.replies = this.getReplies(category, comments, parentMap);
@@ -267,8 +267,8 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
 
     // Build Parent Map
     comments.forEach((comment) => {
-      const parentId = comment.replyToCommentId
-        ? String(comment.replyToCommentId)
+      const parentId = comment.replyToComment
+        ? String(comment.replyToComment)
         : null;
       if (!parentId) return;
 

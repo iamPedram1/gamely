@@ -39,6 +39,7 @@ import { CreateSessionDto } from 'features/shared/auth/session/session.dto';
 import {
   IRecoveryKey,
   IUserEntity,
+  UserDocument,
 } from 'features/shared/user/core/user.types';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 
@@ -113,7 +114,7 @@ export default class AuthService {
       user.password = data.password;
       await Promise.all([
         user.save({ session }),
-        this.sessionService.deleteManyByKey('userId', userId, {
+        this.sessionService.deleteManyByKey('user', userId, {
           session,
           lean: true,
         }),
@@ -124,11 +125,11 @@ export default class AuthService {
   async login(data: LoginDto, sessionData: CreateSessionDto) {
     const mask = t('error.invalid_credentials');
 
-    const user = await this.userService.getOneByKey(
+    const user = (await this.userService.getOneByKey(
       'email',
       data.email.toLowerCase(),
       { select: '+password', throwError: false }
-    );
+    )) as UserDocument;
 
     // Existance Check
     if (!user) throw new AnonymousError('User not found', mask);
@@ -144,7 +145,7 @@ export default class AuthService {
     // Generate Token
     const session = await this.sessionService.createSession({
       ...sessionData,
-      userId: user._id.toHexString(),
+      user: user._id.toHexString(),
     });
 
     if (!session)

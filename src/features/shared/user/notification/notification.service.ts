@@ -75,7 +75,7 @@ export default class NotificationService extends BaseService<INotificationEntity
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
     await this.updateManyByKey(
-      'receiverId',
+      'receiver',
       this.currentUser.id,
       { seen: true },
       options
@@ -92,7 +92,7 @@ export default class NotificationService extends BaseService<INotificationEntity
   async deleteAllNotifications(
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
-    await this.deleteManyByKey('receiverId', this.currentUser.id, options);
+    await this.deleteManyByKey('receiver', this.currentUser.id, options);
   }
 
   async sendCommentReplyNotify<TThrowError extends boolean = true>(
@@ -105,8 +105,8 @@ export default class NotificationService extends BaseService<INotificationEntity
       new CreateNotificationDto<'messages.notification.comment_reply'>();
 
     notify.type = 'comment-reply';
-    notify.senderId = String(comment.creator._id);
-    notify.receiverId = String(comment.replyToCommentId.creator._id);
+    notify.sender = String(comment.creator._id);
+    notify.receiver = String(comment.replyToCommentId.creator._id);
     notify.messageKey = 'messages.notification.comment_reply';
     notify.metadata = {
       parentType: 'Post',
@@ -128,8 +128,8 @@ export default class NotificationService extends BaseService<INotificationEntity
       new CreateNotificationDto<'messages.notification.post_reply'>();
 
     notify.type = 'post-reply';
-    notify.senderId = String(comment.creator._id);
-    notify.receiverId = String(comment.postId.creator._id);
+    notify.sender = String(comment.creator._id);
+    notify.receiver = String(comment.postId.creator._id);
     notify.messageKey = 'messages.notification.post_reply';
     notify.metadata = {
       sourceType: 'Comment',
@@ -153,8 +153,8 @@ export default class NotificationService extends BaseService<INotificationEntity
 
     const batch = followers.map((flw) => ({
       type: 'new-post',
-      senderId: this.currentUser.id,
-      receiverId: flw.user._id,
+      sender: this.currentUser.id,
+      receiver: flw.follower._id,
       messageKey: 'messages.notification.post_created',
       metadata: { sourceType: 'Post', sourceId: postId },
     }));
@@ -170,7 +170,7 @@ export default class NotificationService extends BaseService<INotificationEntity
     const notifications = await this.find({
       query,
       lean: true,
-      filter: { receiverId: this.currentUser.id },
+      filter: { receiver: this.currentUser.id },
     });
 
     const userCache = new Map<string, UserLeanDocument>();

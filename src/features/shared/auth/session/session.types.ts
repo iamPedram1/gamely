@@ -10,7 +10,7 @@ export interface ISessionEntity {
   ip: string;
   userAgent: string;
   refreshToken: string;
-  userId: Types.ObjectId;
+  user: Types.ObjectId;
   expiresAt: Date;
   generatedAt: Date;
   refreshedAt: Date | null;

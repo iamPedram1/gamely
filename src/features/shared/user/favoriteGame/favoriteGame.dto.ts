@@ -1,6 +1,7 @@
 import { Expose, Transform, Type } from 'class-transformer';
 import { BaseSummaryResponseDto } from 'core/dto/response';
 import { IsMongoId, IsNotEmpty } from 'core/utilities/validation';
+import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { UserRole } from 'features/shared/user/core/user.types';
 
@@ -15,21 +16,8 @@ export class CreateFavoriteGameDto {
 
 export class FavoriteGameResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  @Transform(({ obj }) => obj.user?.role)
-  role: UserRole;
-
-  @Expose()
-  @Transform(({ obj }) => obj.user?.avatar)
-  @Type(() => FileResponseDto)
-  avatar: FileResponseDto;
-
-  @Expose()
-  @Transform(({ obj }) => obj.user?.username)
-  username: string;
-
-  @Expose()
-  @Transform(({ obj }) => obj.user?._id)
-  userId: string;
+  @Type(() => UserClientSummaryResponseDto)
+  user: UserClientSummaryResponseDto;
 
   @Expose()
   isFollowing: boolean;
@@ -44,21 +32,8 @@ export class FavoriteGameResponseDto extends BaseSummaryResponseDto {
 
 export class FollowingResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  @Transform(({ obj }) => obj.followed?.role)
-  role: UserRole;
-
-  @Expose()
-  @Transform(({ obj }) => obj.followed?.avatar)
-  @Type(() => FileResponseDto)
-  avatar: FileResponseDto;
-
-  @Expose()
-  @Transform(({ obj }) => obj.followed?.username)
-  username: string;
-
-  @Expose()
-  @Transform(({ obj }) => obj.followed?._id)
-  userId: string;
+  @Type(() => UserClientSummaryResponseDto)
+  user: UserClientSummaryResponseDto;
 
   @Expose()
   isFollowing: boolean;
