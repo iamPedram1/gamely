@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Response } from 'express';
 import { ValidationError } from 'class-validator';
-import { jwtCookieExpiresInMinutes } from 'features/shared/auth/core/auth.constants';
+import { jwtCookieExpiresInMinutes } from 'features/shared/auth/core/auth.constant';
 
 export const setTokenCookie = (res: Response, token: string) => {
   res.cookie('Token', token, {
@@ -53,4 +53,8 @@ export function flattenValidationErrors(errors: ValidationError[]): string[] {
 
     return messages;
   });
+}
+
+export function includeIf<T>(condition: boolean | any, value: T): T[] {
+  return condition ? [value] : [];
 }

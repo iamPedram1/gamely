@@ -7,13 +7,13 @@ import validateBody from 'core/middlewares/validateBody';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
 
 // Controller
-import UserManagementController from 'features/management/user/user.management.controller';
+import UserManagementController from 'features/management/user/core/user.management.controller';
 
 // DTO
 import {
   UpdateUserDto,
   UserManagementQueryDto,
-} from 'features/management/user/user.management.dto';
+} from 'features/management/user/core/user.management.dto';
 
 const userManagementRouter = express.Router();
 const userController = container.resolve(UserManagementController);

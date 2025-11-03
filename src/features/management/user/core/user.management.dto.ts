@@ -8,10 +8,7 @@ import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Utilities
-import {
-  userRoles,
-  userStatus,
-} from 'features/shared/user/core/user.constants';
+import { userRoles, userStatus } from 'features/shared/user/core/user.constant';
 
 // Types
 import type { Types } from 'mongoose';

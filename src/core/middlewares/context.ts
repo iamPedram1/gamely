@@ -6,7 +6,7 @@ import { requestContext, runWithContext } from 'core/utilities/request-context';
 import {
   jwtAccessTokenKey,
   jwtAccessTokenName,
-} from 'features/shared/auth/session/session.constants';
+} from 'features/shared/auth/session/session.constant';
 import type { IToken } from 'features/shared/auth/session/session.types';
 
 export const context = (req: Request, res: Response, next: NextFunction) => {
@@ -43,7 +43,6 @@ export const initializeContext = async (
           username: user.username,
           email: user.email,
           role: user.role,
-          status: user.status,
           sessionId,
         };
 

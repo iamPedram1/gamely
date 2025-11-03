@@ -7,12 +7,10 @@ export type CommentDocument = HydratedDocument<ICommentEntity>;
 export type CommentLeanDocument = FlattenMaps<ICommentEntity>;
 
 export type CommentType = 'main' | 'reply';
-export type CommentStatusType = 'approved' | 'rejected' | 'pending';
 
 export interface ICommentEntity {
   _id: Types.ObjectId;
   type: CommentType;
-  status: CommentStatusType;
   message: string;
   post: Types.ObjectId;
   parentIds: Types.ObjectId[];
@@ -24,8 +22,8 @@ export interface ICommentEntity {
 }
 
 export interface ICommentPopulated
-  extends Omit<ICommentEntity, 'creator' | 'postId' | 'replyToCommentId'> {
-  postId: IPostEntity;
-  replyToCommentId?: ICommentEntity & { creator: IUserEntity };
+  extends Omit<ICommentEntity, 'creator' | 'post' | 'replyToComment'> {
+  post: IPostEntity;
+  replyToComment?: ICommentEntity & { creator: IUserEntity };
   creator: IUserEntity;
 }

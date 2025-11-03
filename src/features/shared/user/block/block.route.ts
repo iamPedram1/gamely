@@ -24,7 +24,11 @@ blockRouter.get('/', blockController.getUserBlockList);
 
 // <----------------   POST   ---------------->
 
-blockRouter.post('/:targetId/block', blockController.block);
+blockRouter.post(
+  '/:targetId/block',
+  validateParam(User, 'targetId', '_id', { type: 'id' }),
+  blockController.block
+);
 
 // <----------------   DELETE   ---------------->
 blockRouter.delete(

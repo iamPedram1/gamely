@@ -99,21 +99,23 @@ export default class NotificationService extends BaseService<INotificationEntity
     comment: ICommentPopulated,
     options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
   ): Promise<void> {
-    if (!comment.replyToCommentId) return;
+    console.log('1 sendCommentReplyNotify', comment, options);
+    if (!comment.replyToComment) return;
 
     const notify =
       new CreateNotificationDto<'messages.notification.comment_reply'>();
 
     notify.type = 'comment-reply';
     notify.sender = String(comment.creator._id);
-    notify.receiver = String(comment.replyToCommentId.creator._id);
+    notify.receiver = String(comment.replyToComment.creator._id);
     notify.messageKey = 'messages.notification.comment_reply';
     notify.metadata = {
       parentType: 'Post',
-      parentId: comment.postId._id,
+      parentId: comment.post._id,
       sourceType: 'Comment',
-      sourceId: comment.replyToCommentId._id,
+      sourceId: comment.replyToComment._id,
     };
+    console.log('2 sendCommentReplyNotify', comment, options, notify);
 
     await this.create(notify, options);
   }
@@ -122,14 +124,14 @@ export default class NotificationService extends BaseService<INotificationEntity
     comment: ICommentPopulated,
     options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
   ): Promise<void> {
-    if (!comment.replyToCommentId) return;
+    if (!comment.replyToComment) return;
 
     const notify =
       new CreateNotificationDto<'messages.notification.post_reply'>();
 
     notify.type = 'post-reply';
     notify.sender = String(comment.creator._id);
-    notify.receiver = String(comment.postId.creator._id);
+    notify.receiver = String(comment.post.creator._id);
     notify.messageKey = 'messages.notification.post_reply';
     notify.metadata = {
       sourceType: 'Comment',
@@ -228,7 +230,7 @@ export default class NotificationService extends BaseService<INotificationEntity
       comment = (await this.commentService.getOneById(commentId, {
         lean: true,
         populate: [
-          { path: 'postId', select: '_id translations slug' },
+          { path: 'post', select: '_id translations slug' },
           { path: 'creator' },
         ],
       })) as unknown as ICommentPopulated;
@@ -298,7 +300,7 @@ export default class NotificationService extends BaseService<INotificationEntity
     return this.t(notification.messageKey, {
       username: comment.creator.username,
       postTitle:
-        comment.postId.translations[this.i18n.language as AppLanguages].title,
+        comment.post.translations[this.i18n.language as AppLanguages].title,
     });
   }
 
@@ -313,7 +315,7 @@ export default class NotificationService extends BaseService<INotificationEntity
     return this.t(notification.messageKey, {
       username: comment.creator.username,
       postTitle:
-        comment.postId.translations[this.i18n.language as AppLanguages].title,
+        comment.post.translations[this.i18n.language as AppLanguages].title,
     });
   }
 }

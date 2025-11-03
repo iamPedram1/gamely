@@ -2,7 +2,7 @@ import { Model, Schema, model } from 'mongoose';
 
 // Utilities
 import { modelKeyName } from 'core/utilities/common';
-import { notificationTypeOptions } from 'features/shared/user/notification/notification.constants';
+import { notificationTypeOptions } from 'features/shared/user/notification/notification.constant';
 
 // Types
 import type {

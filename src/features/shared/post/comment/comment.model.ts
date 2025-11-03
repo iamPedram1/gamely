@@ -1,10 +1,7 @@
 import { model, Schema, Model } from 'mongoose';
 
 // Constants
-import {
-  commentStatus,
-  commentType,
-} from 'features/shared/post/comment/comment.constants';
+import { commentType } from 'features/shared/post/comment/comment.constant';
 
 // Types
 import type { ICommentEntity } from 'features/shared/post/comment/comment.types';
@@ -22,11 +19,6 @@ const commentSchema = new Schema<ICommentEntity, Model<ICommentEntity>>(
       type: String,
       enum: commentType,
       default: 'main',
-    },
-    status: {
-      type: String,
-      enum: commentStatus,
-      default: 'pending',
     },
     replyToComment: {
       type: Schema.Types.ObjectId,

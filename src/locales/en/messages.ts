@@ -6,8 +6,7 @@ const messageTranslations = {
     post_reply: '{{username}} has replied to your post in {{postTitle}}',
   },
   comment: {
-    create_success:
-      'Comment created successfully and will be visible after admin review',
+    create_success: 'Comment created successfully',
   },
   file: {
     upload_some_failed: 'Some files upload failed ',

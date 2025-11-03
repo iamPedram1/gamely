@@ -3,18 +3,15 @@ import User from 'features/shared/user/core/user.model';
 
 // Middlewares
 import { requestContext, t } from 'core/utilities/request-context';
+import { validateBanStatus } from 'features/management/user/ban/ban.middleware';
 
 // Utilities
 import tokenUtils from 'core/services/token.service';
+import { AnonymousError, UnauthorizedError } from 'core/utilities/errors';
 import {
   jwtAccessTokenKey,
   jwtAccessTokenName,
-} from 'features/shared/auth/session/session.constants';
-import {
-  AnonymousError,
-  ForbiddenError,
-  UnauthorizedError,
-} from 'core/utilities/errors';
+} from 'features/shared/auth/session/session.constant';
 
 // Types
 import type { Request, Response, NextFunction } from 'express';
@@ -46,10 +43,6 @@ export default function auth(roles: UserRole[]) {
         new AnonymousError('User with given id does not exist', mask, 400)
       );
 
-    // Check Status
-    if (user.status === 'blocked')
-      throw new ForbiddenError(t('error.user.is_blocked'));
-
     // Check Role
     if (!roles.includes(user.role))
       throw new AnonymousError(
@@ -63,7 +56,6 @@ export default function auth(roles: UserRole[]) {
       username: user.username,
       email: user.email,
       role: user.role,
-      status: user.status,
       sessionId,
     };
 

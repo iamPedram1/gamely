@@ -19,6 +19,10 @@ export const modelsTranslations = {
     singular: 'Post',
     plural: 'Posts',
   },
+  UserBan: {
+    singular: 'User Ban',
+    plural: 'User Ban List',
+  },
   Comment: {
     singular: 'Comment',
     plural: 'Comments',

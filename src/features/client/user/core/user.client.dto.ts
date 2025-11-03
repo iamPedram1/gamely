@@ -1,12 +1,12 @@
 import { Expose, Type } from 'class-transformer';
 
 // DTO
-import { BaseUserUpdate } from 'features/shared/user/core/user.dto';
+import { BaseResponseDto } from 'core/dto/response';
 import { FileResponseDto } from 'features/shared/file/file.dto';
-import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
+import { BaseUserUpdate } from 'features/shared/user/core/user.dto';
 
 // Utilities
-import { usernameRegex } from 'features/shared/user/core/user.constants';
+import { usernameRegex } from 'features/shared/user/core/user.constant';
 import {
   IsEmail,
   IsMongoId,
@@ -45,6 +45,9 @@ export class UpdateProfileDto extends BaseUserUpdate {
   @IsOptional()
   @IsMongoId()
   avatar: Types.ObjectId;
+
+  @Expose()
+  showLastSeen: number;
 }
 
 // <----------------   RESPONSE   ---------------->
@@ -61,9 +64,6 @@ export class UserBaseResponseDto extends BaseResponseDto {
 export class UserProfileResponseDto extends UserBaseResponseDto {
   @Expose()
   role: UserRole;
-
-  @Expose()
-  blocksCount: number;
 
   @Expose()
   email: string;
@@ -85,6 +85,9 @@ export class UserProfileResponseDto extends UserBaseResponseDto {
 
   @Expose()
   followersCount: number;
+
+  @Expose()
+  blocksCount: number;
 }
 
 export class UserClientResponseDto extends UserBaseResponseDto {

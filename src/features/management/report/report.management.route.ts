@@ -5,10 +5,14 @@ import { container } from 'tsyringe';
 import auth from 'core/middlewares/auth';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
 
+// Model
+import Report from 'features/shared/report/report.model';
+
 // Controller
 import ReportManagementController from 'features/management/report/report.management.controller';
 
 // DTO
+import { validateParam } from 'core/middlewares/validations';
 import { ReportManagementQueryDto } from 'features/management/report/report.management.dto';
 
 const reportManagementRouter = express.Router();
@@ -16,14 +20,21 @@ const reportManagementController = container.resolve(
   ReportManagementController
 );
 
-const accessMiddleware = auth(['admin', 'superAdmin']);
+reportManagementRouter.use(auth(['admin', 'superAdmin']));
 
-// <----------------   POST   ---------------->
+// <----------------   GET   ---------------->
+reportManagementRouter.get('/overview', reportManagementController.getOverview);
 reportManagementRouter.get(
   '/',
-  accessMiddleware,
   softValidateQuery(ReportManagementQueryDto),
   reportManagementController.getReports
+);
+
+// <----------------   PATCH   ---------------->
+reportManagementRouter.patch(
+  '/:id',
+  validateParam(Report, 'id', '_id', { type: 'id' }),
+  reportManagementController.updateReport
 );
 
 export default reportManagementRouter;

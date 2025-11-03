@@ -11,7 +11,7 @@ import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
 import { ITagEntity } from 'features/shared/tag/tag.types';
-import { jwtAccessTokenName } from 'features/shared/auth/session/session.constants';
+import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
 
 describe('tag routes', () => {
   afterAll(async () => {

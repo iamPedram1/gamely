@@ -19,6 +19,10 @@ const modelsTranslations = {
     singular: 'پست',
     plural: 'پست‌ها',
   },
+  UserBan: {
+    singular: 'User Ban',
+    plural: 'User Ban List',
+  },
   Comment: {
     singular: 'نظر',
     plural: 'نظرات',

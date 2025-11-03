@@ -12,7 +12,7 @@ import FollowService from 'features/shared/user/follow/follow.service';
 
 // DTO
 import { UpdateProfileDto } from 'features/client/user/core/user.client.dto';
-import { UpdateUserDto } from 'features/management/user/user.management.dto';
+import { UpdateUserDto } from 'features/management/user/core/user.management.dto';
 
 // Types
 import type { IUserEntity } from 'features/shared/user/core/user.types';

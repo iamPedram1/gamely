@@ -7,7 +7,7 @@ import User from 'features/shared/user/core/user.model';
 
 // Utils
 import { prefixBaseUrl } from 'core/utilities/configs';
-import { jwtAccessTokenName } from 'features/shared/auth/session/session.constants';
+import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
 
 // Types
 import { IUserEntity } from 'features/shared/user/core/user.types';

@@ -10,7 +10,10 @@ import { CreateReportDto } from 'features/shared/report/report.dto';
 // Utilities
 import sendResponse from 'core/utilities/response';
 import { ReportMapper } from 'features/shared/report/report.mapper';
-import { ReportManagementQueryDto } from 'features/management/report/report.management.dto';
+import {
+  ReportManagementQueryDto,
+  UpdateReportDto,
+} from 'features/management/report/report.management.dto';
 
 @injectable()
 export default class ReportManagementController {
@@ -22,9 +25,9 @@ export default class ReportManagementController {
   ) {}
 
   updateReport: RequestHandler = async (req, res) => {
-    const dto = req.body as unknown as CreateReportDto;
+    const dto = req.body as unknown as UpdateReportDto;
 
-    await this.reportService.report(dto, { lean: true });
+    await this.reportService.updateReportStatus(req.params.id, dto.status);
 
     sendResponse(res, 204);
   };
@@ -70,6 +73,16 @@ export default class ReportManagementController {
           docs: reports.docs.map((doc) => this.reportMapper.toReportDto(doc)),
         },
       },
+    });
+  };
+
+  getOverview: RequestHandler = async (req, res) => {
+    const reports = await this.reportService.getOverview();
+
+    sendResponse(res, 200, {
+      httpMethod: 'GET',
+      featureName: 'models.Report.plural',
+      body: { data: reports },
     });
   };
 }

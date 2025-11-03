@@ -22,7 +22,7 @@ import notificationClientRouter from 'features/client/user/notification/notifica
 import gameManagementRouter from 'features/management/game/game.management.route';
 import tagManagementRouter from 'features/management/tag/tag.management.route';
 import postManagementRouter from 'features/management/post/core/post.management.route';
-import userManagementRouter from 'features/management/user/user.management.route';
+import userManagementRouter from 'features/management/user/core/user.management.route';
 import commentManagementRouter from 'features/management/post/comment/comment.management.route';
 import categoryManagementRouter from 'features/management/category/category.management.route';
 import reportManagementRouter from 'features/management/report/report.management.route';
@@ -34,6 +34,7 @@ import notFound from 'core/middlewares/notFound';
 
 // Utilities
 import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
+import userBanRouter from 'features/management/user/ban/ban.route';
 
 export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);
@@ -56,12 +57,13 @@ export default function routesStartup(app: Express) {
   app.use(prefixBaseUrl('/categories'), categoryClientRouter);
 
   // Management
+  app.use(prefixManagementBaseUrl('/bans'), userBanRouter);
+  app.use(prefixManagementBaseUrl('/users'), userManagementRouter);
+  app.use(prefixManagementBaseUrl('/games'), gameManagementRouter);
   app.use(prefixManagementBaseUrl('/tags'), tagManagementRouter);
   app.use(prefixManagementBaseUrl('/posts'), postManagementRouter);
   app.use(prefixManagementBaseUrl('/reports'), reportManagementRouter);
   app.use(prefixManagementBaseUrl('/comments'), commentManagementRouter);
-  app.use(prefixManagementBaseUrl('/users'), userManagementRouter);
-  app.use(prefixManagementBaseUrl('/games'), gameManagementRouter);
   app.use(prefixManagementBaseUrl('/categories'), categoryManagementRouter);
 
   app.use(notFound);

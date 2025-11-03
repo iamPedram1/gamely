@@ -1,8 +1,7 @@
 import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
-import type { UserManagementResponseDto } from 'features/management/user/user.management.dto';
+import type { UserManagementResponseDto } from 'features/management/user/core/user.management.dto';
 
 export interface IUserEntityMethods {
-  isBlocked: () => boolean;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -24,18 +23,18 @@ export interface IUserEntity extends PrivateKeys {
   username: string;
   bio: string;
   email: string;
-  status: UserStatus;
   avatar: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   postsCount: number;
   blocksCount: number;
+  showLastSeen: boolean;
+  isPagePrivate: boolean;
   followersCount: number;
   followingsCount: number;
 }
 
 export type IUser = InstanceType<typeof UserManagementResponseDto>;
-export type IUserContext = Pick<
-  IUser,
-  'id' | 'role' | 'username' | 'email' | 'status'
-> & { sessionId: string };
+export type IUserContext = Pick<IUser, 'id' | 'role' | 'username' | 'email'> & {
+  sessionId: string;
+};

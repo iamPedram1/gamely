@@ -11,7 +11,7 @@ import { prefixBaseUrl } from 'core/utilities/configs';
 
 // Types
 import { IGameEntity } from 'features/shared/game/core/game.types';
-import { jwtAccessTokenName } from 'features/shared/auth/session/session.constants';
+import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
 
 describe('game routes', () => {
   afterAll(async () => {

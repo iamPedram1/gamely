@@ -17,7 +17,7 @@ import { BaseResponseDto } from 'core/dto/response';
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { GameManagementResponseDto } from 'features/management/game/game.management.dto';
 import { TagManagementSummaryResponseDto } from 'features/management/tag/tag.management.dto';
-import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
+import { UserManagementSummaryResponseDto } from 'features/management/user/core/user.management.dto';
 import { CategoryManagementResponseDto } from 'features/management/category/category.management.dto';
 import {
   createTranslationsWrapper,

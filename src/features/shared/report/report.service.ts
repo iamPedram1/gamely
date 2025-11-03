@@ -23,11 +23,9 @@ import type {
 } from 'core/types/base.service.type';
 import type {
   IReportEntity,
-  ReportDocument,
   ReportStatusType,
   ReportType,
 } from 'features/shared/report/report.types';
-import { Document, Types } from 'mongoose';
 
 export type IReportService = InstanceType<typeof ReportService>;
 
@@ -56,7 +54,7 @@ class ReportService extends BaseService<IReportEntity> {
     const reports = await this.find({
       ...options,
       lean: true,
-      populate: 'user',
+      populate: 'user reviewer',
     });
 
     // Group report IDs by type
@@ -158,7 +156,31 @@ class ReportService extends BaseService<IReportEntity> {
     status: ReportStatusType,
     options?: BaseMutateOptions
   ) {
-    return super.updateOneById(reportId, { status }, options);
+    return super.updateOneById(
+      reportId,
+      { status, reviewer: this.currentUser.id },
+      options
+    );
+  }
+
+  async getOverview() {
+    const results = (await this.aggregate(
+      [{ $group: { _id: '$status', count: { $sum: 1 } } }],
+      { paginate: false, lean: true }
+    )) as Array<IReportEntity & { _id: ReportStatusType; count: number }>;
+
+    const data: Record<ReportStatusType, number> = {
+      dismissed: 0,
+      pending: 0,
+      resolved: 0,
+      reviewed: 0,
+    };
+
+    results.forEach(
+      (result) => (data[result._id as ReportStatusType] = result.count)
+    );
+
+    return data;
   }
 
   private async checkTargetExistance(

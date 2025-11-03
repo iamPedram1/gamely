@@ -6,7 +6,7 @@ import { BaseQueryDto } from 'core/dto/query';
 import { BaseResponseDto } from 'core/dto/response';
 import { CommentManagementResponseDto } from 'features/management/post/comment/comment.management.dto';
 import { PostManagementResponseDto } from 'features/management/post/core/post.management.dto';
-import { UserManagementResponseDto } from 'features/management/user/user.management.dto';
+import { UserManagementResponseDto } from 'features/management/user/core/user.management.dto';
 
 // Utilities
 import {
@@ -20,7 +20,7 @@ import {
   reportReason,
   reportStatus,
   returnType,
-} from 'features/shared/report/report.constants';
+} from 'features/shared/report/report.constant';
 import {
   ReportReasonType,
   ReportStatusType,
@@ -52,6 +52,10 @@ export class ReportManagementResponseDto extends BaseResponseDto {
   @Expose()
   @Type(() => UserManagementResponseDto)
   user: UserManagementResponseDto;
+
+  @Expose()
+  @Type(() => UserManagementResponseDto)
+  reviewer: UserManagementResponseDto;
 
   @Expose()
   @Type(() => PostManagementResponseDto)

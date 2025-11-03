@@ -10,7 +10,7 @@ import UserService from 'features/shared/user/core/user.service';
 import {
   UpdateUserDto,
   UserManagementQueryDto,
-} from 'features/management/user/user.management.dto';
+} from 'features/management/user/core/user.management.dto';
 
 // Mapper
 import { UserMapper } from 'features/shared/user/core/user.mapper';
@@ -46,10 +46,7 @@ export default class UserManagementController {
       searchBy: [
         { queryKey: 'search', modelKeys: ['username', 'email'], options: 'i' },
       ],
-      filterBy: [
-        { queryKey: 'role', modelKey: 'role', logic: 'and' },
-        { queryKey: 'status', modelKey: 'status', logic: 'and' },
-      ],
+      filterBy: [{ queryKey: 'role', modelKey: 'role', logic: 'and' }],
     });
     const user = await this.userService.find({
       filter,

@@ -10,7 +10,7 @@ import { t } from 'core/utilities/request-context';
 import {
   jwtAccessTokenKey,
   jwtAccessTokenName,
-} from 'features/shared/auth/session/session.constants';
+} from 'features/shared/auth/session/session.constant';
 
 // Types
 import type { IToken } from 'features/shared/auth/session/session.types';

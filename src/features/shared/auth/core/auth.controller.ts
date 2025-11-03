@@ -16,7 +16,7 @@ import {
 
 // Utilities
 import sendResponse from 'core/utilities/response';
-import { jwtRefreshTokenExpiresInDays } from 'features/shared/auth/session/session.constants';
+import { jwtRefreshTokenExpiresInDays } from 'features/shared/auth/session/session.constant';
 
 @injectable()
 export default class AuthController {

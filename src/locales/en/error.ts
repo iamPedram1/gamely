@@ -77,6 +77,14 @@ const errosTranslations = {
     have_been_blocked_by_author: 'You have been blocked by author',
     have_been_blocked_by_user: 'You have been blocked by this user',
   },
+  ban: {
+    unban: 'Unban',
+    ban_self: 'You cannot ban yourself',
+    unban_self: 'You cannot unban yourself',
+    not_banned: 'This user is not banned',
+    already_banned: 'This user is already banned',
+    have_been_baned_by_admin: 'You have been banned by admin',
+  },
   report: {
     target_not_exist: 'Report target does not exist or has been removed',
     already_reported: "You've already reported",

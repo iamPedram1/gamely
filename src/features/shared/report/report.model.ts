@@ -5,7 +5,7 @@ import {
   reportReason,
   reportStatus,
   returnType,
-} from 'features/shared/report/report.constants';
+} from 'features/shared/report/report.constant';
 
 // Types
 import type { IReportEntity } from 'features/shared/report/report.types';
@@ -41,6 +41,11 @@ const reportSchema = new Schema<IReportEntity, Model<IReportEntity>>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      immutable: true,
+    },
+    reviewer: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       immutable: true,
     },
     targetId: { type: Schema.Types.ObjectId, required: true, immutable: true },

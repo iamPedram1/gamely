@@ -4,6 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 // Service
 import tokenUtils from 'core/services/token.service';
 import UserService from 'features/shared/user/core/user.service';
+import UserBanService from 'features/management/user/ban/ban.service';
 import SessionService from 'features/shared/auth/session/session.service';
 
 // DTO
@@ -32,7 +33,7 @@ import {
 import {
   jwtRecoverPasswordKey,
   jwtRecoverPasswordKeyExpiresInMinutes,
-} from 'features/shared/auth/core/auth.constants';
+} from 'features/shared/auth/core/auth.constant';
 
 // Types
 import { CreateSessionDto } from 'features/shared/auth/session/session.dto';
@@ -47,6 +48,7 @@ import type { BaseMutateOptions } from 'core/types/base.service.type';
 export default class AuthService {
   constructor(
     @inject(delay(() => UserService)) private userService: UserService,
+    @inject(delay(() => UserBanService)) private banService: UserBanService,
     @inject(delay(() => SessionService)) private sessionService: SessionService
   ) {}
 
@@ -140,7 +142,8 @@ export default class AuthService {
       throw new AnonymousError('Password is not correct', mask);
 
     // Status Check
-    if (user.isBlocked()) throw new ForbiddenError(t('error.user.is_blocked'));
+    if (await this.banService.checkIsBanned(user._id))
+      throw new ForbiddenError(t('error.user.is_blocked'));
 
     // Generate Token
     const session = await this.sessionService.createSession({

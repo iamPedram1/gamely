@@ -1,7 +1,7 @@
 import { ValidateIf } from 'class-validator';
 import { Expose, Type } from 'class-transformer';
 import { modelKeyName } from 'core/utilities/common';
-import { notificationTypeOptions } from 'features/shared/user/notification/notification.constants';
+import { notificationTypeOptions } from 'features/shared/user/notification/notification.constant';
 import {
   IsBoolean,
   IsIn,

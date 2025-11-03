@@ -45,7 +45,7 @@ export default class UserClientController {
     const user = await this.userService.update(req.user.id, dto);
 
     sendResponse(res, 200, {
-      httpMethod: 'GET',
+      httpMethod: 'PATCH',
       customName: req.t('common.profile'),
       body: { data: this.userMapper.toProfileDto(user) },
     });

@@ -1,5 +1,4 @@
 import { singleton } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
 
 // DTO
 import {
@@ -10,7 +9,7 @@ import {
 import {
   UserManagementResponseDto,
   UserManagementSummaryResponseDto,
-} from 'features/management/user/user.management.dto';
+} from 'features/management/user/core/user.management.dto';
 
 // Mapper
 import { BaseMapper } from 'core/mappers/base';
@@ -43,8 +42,6 @@ export class UserMapper extends BaseMapper<
   public toProfileDto(
     entity: UserDocument | UserLeanDocument
   ): UserProfileResponseDto {
-    return plainToInstance(UserProfileResponseDto, this.toPlain(entity), {
-      excludeExtraneousValues: true,
-    });
+    return this.toInstance(UserProfileResponseDto, entity);
   }
 }

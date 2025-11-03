@@ -12,7 +12,7 @@ import {
 // DTO
 import { FileSummaryResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
-import { UserManagementSummaryResponseDto } from 'features/management/user/user.management.dto';
+import { UserManagementSummaryResponseDto } from 'features/management/user/core/user.management.dto';
 import {
   createTranslationsWrapper,
   IsTranslationsField,

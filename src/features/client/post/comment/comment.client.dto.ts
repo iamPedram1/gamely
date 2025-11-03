@@ -27,6 +27,7 @@ export class CommentClientResponseDto extends BaseResponseDto {
   @Expose()
   message: string;
 
+  @Expose()
   @Transform(({ obj }) =>
     plainToInstance(UserClientSummaryResponseDto, obj.creator)
   )
@@ -34,7 +35,7 @@ export class CommentClientResponseDto extends BaseResponseDto {
 
   @Expose()
   @Type(() => CommentClientResponseDto)
-  replies: CommentClientResponseDto;
+  replies: CommentClientResponseDto[];
 }
 
 export class CommentClientSummaryResponseDto extends BaseSummaryResponseDto {
@@ -48,5 +49,5 @@ export class CommentClientSummaryResponseDto extends BaseSummaryResponseDto {
 
   @Expose()
   @Type(() => CommentClientSummaryResponseDto)
-  replies: CommentClientSummaryResponseDto;
+  replies: CommentClientSummaryResponseDto[];
 }

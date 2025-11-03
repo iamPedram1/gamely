@@ -15,6 +15,7 @@ import NotificationService from 'features/shared/user/notification/notification.
 
 // Utilities
 import { ValidationError } from 'core/utilities/errors';
+import { includeIf } from 'core/utilities/helperPack';
 
 // Types
 import type { IPostEntity } from 'features/shared/post/core/post.types';
@@ -24,7 +25,6 @@ import type { IRequestQueryBase } from 'core/types/query';
 import type {
   CommentType,
   ICommentEntity,
-  ICommentPopulated,
 } from 'features/shared/post/comment/comment.types';
 import type {
   BaseMutateOptions,
@@ -36,10 +36,10 @@ import type {
 } from 'features/shared/post/comment/comment.types';
 
 type CreateCommentInput = CreateCommentDto & {
-  postId: string;
+  post: string;
   parentIds: Types.ObjectId[];
   type?: CommentType;
-  threadId?: Types.ObjectId | null;
+  thread?: Types.ObjectId | null;
 };
 
 export interface ICommentService extends IBaseService<ICommentEntity> {
@@ -118,85 +118,71 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
       pagination: firstLevel.pagination,
     };
   }
-
-  async getPostApprovedComments(postId: string, query: any) {
-    const firstLevel = await super.find({
-      query,
-      lean: true,
-      filter: { post: postId, status: 'approved', type: 'main' },
-      populate: [{ path: 'creator', populate: 'avatar' }],
-    });
-
-    const ids = firstLevel.docs.map((doc) => String(doc._id));
-    const replies = await super.find({
-      filter: {
-        post: postId,
-        type: 'reply',
-        status: 'approved',
-        thread: { $in: ids },
-      },
-      lean: true,
-      paginate: false,
-      populate: 'creator',
-    });
-
-    const allComments = [
-      ...firstLevel.docs,
-      ...replies,
-    ] as CommentWithReplies[];
-
-    return {
-      docs: this.attachReplies(allComments),
-      pagination: firstLevel.pagination,
-    };
-  }
-
   async create(
     data: CreateCommentInput,
     options?: BaseMutateOptions
   ): Promise<CommentDocument> {
-    const [post, comment] = await Promise.all([
-      this.postService.getOneById(data.postId, {
-        lean: true,
-        select: 'creator',
-      }),
-      ...(data.replyToComment
-        ? [this.getOneById(data.replyToComment, { lean: true })]
-        : []),
+    const isReply = Boolean(data.replyToComment);
+
+    // --- Fetch target post + optional parent comment ---
+    const [post, parentComment] = await Promise.all([
+      this.postService.getOneById(data.post, { lean: true, select: 'creator' }),
+      ...includeIf(
+        isReply,
+        this.getOneById(data.replyToComment!, { lean: true })
+      ),
     ]);
 
-    const blockChecks: Promise<boolean>[] = [
-      this.blockService.checkIsBlock(post.creator._id, this.currentUser.id),
-    ];
+    // --- Validate block relations ---
+    const [isBlockedByPostAuthor, isBlockedByParentAuthor = false] =
+      await Promise.all([
+        this.blockService.checkIsBlock(post.creator._id, this.currentUser.id),
+        ...includeIf(
+          Boolean(parentComment),
+          this.blockService.checkIsBlock(
+            parentComment.creator._id,
+            this.currentUser.id
+          )
+        ),
+      ]);
 
-    if (comment) {
-      blockChecks.push(
-        this.blockService.checkIsBlock(comment.creator._id, this.currentUser.id)
-      );
-    }
-
-    const [isBlockedByAuthor, isBlockedByUser = false] =
-      await Promise.all(blockChecks);
-
-    if (isBlockedByAuthor)
+    if (isBlockedByPostAuthor) {
       throw new ValidationError(
         this.t('error.block.have_been_blocked_by_author')
       );
+    }
 
-    if (comment) {
-      if (isBlockedByUser)
-        throw new ValidationError(
-          this.t('error.block.have_been_blocked_by_user')
-        );
+    if (isReply && isBlockedByParentAuthor) {
+      throw new ValidationError(
+        this.t('error.block.have_been_blocked_by_user')
+      );
+    }
 
+    // --- Prepare comment data ---
+    if (isReply && parentComment) {
       data.type = 'reply';
-      data.threadId = comment.thread || comment._id;
-      data.parentIds = [...(comment?.parentIds || []), comment._id];
-    } else data.type = 'main';
+      data.thread = parentComment.thread || parentComment._id;
+      data.parentIds = [...(parentComment.parentIds ?? []), parentComment._id];
+    } else {
+      data.type = 'main';
+    }
 
-    return super.create(data, options);
+    // --- Create comment in a transaction ---
+    return this.withTransaction(async (session) => {
+      const newComment = await (
+        await super.create(data, { ...options, session })
+      ).populate('replyToComment');
+
+      if (isReply) {
+        await this.notificationService.sendCommentReplyNotify(
+          newComment as any,
+          { session }
+        );
+      }
+
+      return newComment;
+    }, options?.session);
   }
-
   async updateOneById(
     commentId: string,
     payload: UpdateCommentDto,
@@ -207,34 +193,13 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
         populate: 'replyToComment post',
       });
       const post = comment.post as unknown as IPostEntity;
-      const isCommentApproved = comment.status === 'approved';
 
       // Ownership check for authors
       if (this.currentUser.is('author')) {
         await this.postService.assertOwnership(post);
       }
 
-      this.setIfDefined(comment, 'status', payload.status);
       this.setIfDefined(comment, 'message', payload.message);
-
-      // Check if is trying to update approved comment status
-      if (isCommentApproved && comment.isModified('status')) {
-        throw new ValidationError(
-          this.t('error.comment.approved_cannot_change')
-        );
-      }
-
-      // Send notification if its replying
-      if (
-        comment.isModified('status') &&
-        comment.status === 'approved' &&
-        comment.replyToComment
-      ) {
-        await this.notificationService.sendCommentReplyNotify(
-          comment as unknown as ICommentPopulated,
-          { session }
-        );
-      }
 
       return await comment.save({ session, ...options });
     }, options?.session);

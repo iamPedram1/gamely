@@ -8,7 +8,7 @@ import {
   jwtRefreshTokenKey,
   jwtAccessTokenExpiresInMinutes,
   jwtAccessTokenKey,
-} from 'features/shared/auth/session/session.constants';
+} from 'features/shared/auth/session/session.constant';
 
 const tokenUtils = {
   verify<T>(token: string, secret: string, name: string) {

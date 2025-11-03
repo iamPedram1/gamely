@@ -31,6 +31,7 @@ export interface IReportEntity {
   reason: ReportReasonType;
   description: string;
   user: Types.ObjectId;
+  reviewer: Types.ObjectId;
   updatedAt: Date;
   createdAt: Date;
   targetId: Types.ObjectId;

@@ -7,7 +7,7 @@ import {
   usernameRegex,
   userRoles,
   userStatus,
-} from 'features/shared/user/core/user.constants';
+} from 'features/shared/user/core/user.constant';
 
 // Types
 import type {
@@ -32,12 +32,6 @@ const userSchema = new Schema<
       enum: userRoles,
       required: true,
       default: 'user',
-      index: true,
-    },
-    status: {
-      type: String,
-      enum: userStatus,
-      default: 'active',
       index: true,
     },
     username: {
@@ -86,6 +80,8 @@ const userSchema = new Schema<
     followersCount: { type: Number, default: 0 },
     followingsCount: { type: Number, default: 0 },
     postsCount: { type: Number, default: 0 },
+    showLastSeen: { type: Boolean, default: true },
+    isPagePrivate: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
@@ -93,10 +89,6 @@ const userSchema = new Schema<
 userSchema.methods.comparePassword = async function (password) {
   if (!this.password) return false;
   return await crypto.compare(password, this.password);
-};
-
-userSchema.methods.isBlocked = function () {
-  return this.status === 'blocked';
 };
 
 const methods = ['findOneAndUpdate', 'updateOne'] as const;

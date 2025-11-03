@@ -6,8 +6,7 @@ const messageTranslations = {
     post_reply: '{{username}} در پست شما({{postTitle}}) نظری ارسال کرد',
   },
   comment: {
-    create_success:
-      'کامنت شما با موفقیت ایجاد شد و پس از تایید ادمین نمایش داده خواهد شد',
+    create_success: 'کامنت شما با موفقیت ایجاد شد',
   },
   file: {
     upload_some_failed: 'بارگذاری برخی فایل‌ها ناموفق بود',

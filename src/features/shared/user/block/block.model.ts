@@ -23,6 +23,6 @@ const blockSchema = new Schema<IBlockEntity, Model<IBlockEntity>>(
 
 blockSchema.index({ user: 1, blocked: 1 }, { unique: true });
 
-export const UserBlock = model<IBlockEntity>('Block', blockSchema);
+export const Block = model<IBlockEntity>('Block', blockSchema);
 
-export default UserBlock;
+export default Block;

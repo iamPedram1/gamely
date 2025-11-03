@@ -91,7 +91,6 @@ export default abstract class BaseService<
   protected readonly queries: Q<TSchema, TDoc>;
   protected readonly mutations: M<TSchema, TDoc>;
   protected readonly validations: V<TSchema, TDoc>;
-  private _currentUser?: ReturnType<typeof userContext>;
 
   constructor(private model: Model<TSchema>) {
     this.mutations = new BaseMutateService(model, this.t);
@@ -100,10 +99,8 @@ export default abstract class BaseService<
   }
 
   protected get currentUser() {
-    if (this._currentUser) return this._currentUser;
     try {
       const user = userContext();
-      this._currentUser = user;
       return user;
     } catch (error) {
       throw new AnonymousError('Something went wrong with user context');
@@ -111,10 +108,8 @@ export default abstract class BaseService<
   }
 
   protected get softCurrentUser() {
-    if (this._currentUser) return this._currentUser;
     try {
       const user = userContext();
-      this._currentUser = user;
       return user;
     } catch {
       return null;

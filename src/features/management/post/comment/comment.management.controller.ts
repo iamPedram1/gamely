@@ -31,7 +31,6 @@ export default class CommentManagementController {
     const filter = await this.commentService.buildFilterFromQuery(query, {
       searchBy: [{ queryKey: 'search', modelKeys: ['message'], options: 'i' }],
       filterBy: [
-        { queryKey: 'status', modelKey: 'status', logic: 'and' },
         { queryKey: 'post', modelKey: 'post', logic: 'or' },
         { queryKey: 'user', modelKey: 'creator', logic: 'or' },
       ],

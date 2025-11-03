@@ -26,8 +26,10 @@ export default class CommentClientController {
   getComments: RequestHandler = async (req, res) => {
     const postId = req.params.id as string;
     const query = req.query as unknown as IRequestQueryBase;
-    const { pagination, docs } =
-      await this.commentService.getPostApprovedComments(postId, query);
+    const { pagination, docs } = await this.commentService.getPostComments(
+      postId,
+      query
+    );
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -47,7 +49,7 @@ export default class CommentClientController {
     const comment = await this.commentService.create({
       ...dto,
       parentIds: [],
-      postId: req.params.id,
+      post: req.params.id,
     });
 
     sendResponse(res, 201, {

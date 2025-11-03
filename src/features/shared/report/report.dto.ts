@@ -10,7 +10,7 @@ import {
 import {
   reportReason,
   returnType,
-} from 'features/shared/report/report.constants';
+} from 'features/shared/report/report.constant';
 import {
   ReportReasonType,
   ReportType,

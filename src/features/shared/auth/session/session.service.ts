@@ -19,7 +19,7 @@ import { AnonymousError, ValidationError } from 'core/utilities/errors';
 import {
   jwtRefreshTokenKey,
   jwtRefreshTokenExpiresInDays,
-} from 'features/shared/auth/session/session.constants';
+} from 'features/shared/auth/session/session.constant';
 
 // Types
 import type { BaseMutateOptions } from 'core/types/base.service.type';
