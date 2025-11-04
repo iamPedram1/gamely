@@ -5,7 +5,6 @@ import { faker } from '@faker-js/faker';
 import UserService from 'features/shared/user/core/user.service';
 
 // Utils
-import { prefixBaseUrl } from 'core/utilities/configs';
 import {
   ChangePasswordDto,
   LoginDto,
@@ -23,9 +22,6 @@ import {
   sendRegisterRequest,
 } from 'core/utilities/testHelpers';
 
-// Type
-import type { Response } from 'supertest';
-
 describe('auth routes', () => {
   const userService = container.resolve(UserService);
 
@@ -38,7 +34,7 @@ describe('auth routes', () => {
       token = '';
     });
 
-    const exec = async () => await sendRegisterRequest(payload, token);
+    const exec = async () => await sendRegisterRequest({ payload, token });
 
     it('should return 400 if user have token in header', async () => {
       token = generateAccessToken();
@@ -87,14 +83,16 @@ describe('auth routes', () => {
 
   describe('POST /login', () => {
     let token: string;
+    let register: RegisterDto;
     let payload: LoginDto;
 
     beforeEach(() => {
-      payload = generateUser();
+      register = generateUser();
+      payload = register;
       token = '';
     });
 
-    const exec = async () => await sendLoginRequest(payload, token);
+    const exec = async () => await sendLoginRequest({ payload, token });
 
     it('should return 400 if user have token in header', async () => {
       token = generateAccessToken();
@@ -105,7 +103,7 @@ describe('auth routes', () => {
     });
 
     it('should return 200 if user credentials is valid', async () => {
-      await sendRegisterRequest(payload);
+      await sendRegisterRequest({ payload: register });
 
       const response = await exec();
 
@@ -113,7 +111,7 @@ describe('auth routes', () => {
     });
 
     it('should return 400 if password is not correct', async () => {
-      await sendRegisterRequest(payload);
+      await sendRegisterRequest({ payload: register });
 
       payload.password = 'incorrect-password';
 
@@ -137,12 +135,13 @@ describe('auth routes', () => {
 
     beforeEach(async () => {
       register = generateUser();
-      await sendRegisterRequest(register);
+      await sendRegisterRequest({ payload: register });
       payload = { email: register.email };
       token = '';
     });
 
-    const exec = async () => await sendRecoverPasswordRequest(payload, token);
+    const exec = async () =>
+      await sendRecoverPasswordRequest({ payload, token });
 
     it('should return 400 if user have token in header', async () => {
       token = generateAccessToken();
@@ -188,7 +187,7 @@ describe('auth routes', () => {
       token = '';
       register = generateUser();
 
-      await sendRegisterRequest(register);
+      await sendRegisterRequest({ payload: register });
 
       payload = {
         password: faker.internet.password(),
@@ -196,7 +195,8 @@ describe('auth routes', () => {
       };
     });
 
-    const exec = async () => await sendChangePasswordRequest(payload, token);
+    const exec = async () =>
+      await sendChangePasswordRequest({ payload, token });
 
     it('should return 400 if user have token in header', async () => {
       token = generateAccessToken();
@@ -214,9 +214,9 @@ describe('auth routes', () => {
 
     it('should change the password if recoveryKey is valid', async () => {
       const recoverResponse = await sendRecoverPasswordRequest({
-        email: register.email,
+        payload: { email: register.email },
       });
-      payload.recoveryKey = recoverResponse.body.data.recoveryKey;
+      payload.recoveryKey = recoverResponse.body.data!.recoveryKey;
 
       const userPrev = await userService.getUserByEmail(register.email, {
         select: '+recoveryKey +password',
@@ -236,10 +236,10 @@ describe('auth routes', () => {
 
     it('should clear recoveryKey if password changed', async () => {
       const recoverResponse = await sendRecoverPasswordRequest({
-        email: register.email,
+        payload: { email: register.email },
       });
 
-      payload.recoveryKey = recoverResponse?.body?.data?.recoveryKey;
+      payload.recoveryKey = recoverResponse?.body?.data!.recoveryKey;
 
       const response = await exec();
 

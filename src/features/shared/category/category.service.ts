@@ -45,7 +45,8 @@ class CategoryService extends BaseService<ICategoryEntity> {
     options?: BaseMutateOptions
   ): Promise<CategoryDocument> {
     if (data.parentId) {
-      const exists = await super.existsBySlug(data.parentId);
+      const exists = await super.existsById(data.parentId);
+
       if (!exists)
         throw new NotFoundError(
           this.t('error.not_exists_by_id', { id: data.parentId })

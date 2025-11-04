@@ -8,8 +8,6 @@ export let server: any;
 beforeAll(async () => {
   // Start server & connect DB
   server = await startApp();
-
-  logger.info('✅ Test DB ready');
 });
 
 beforeEach(async () => {
@@ -19,7 +17,6 @@ beforeEach(async () => {
 afterAll(async () => {
   if (server) {
     await server.close();
-    logger.info('🛑 Server stopped after tests');
   }
 });
 

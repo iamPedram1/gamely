@@ -65,16 +65,16 @@ export class UpdateTranslationsDto extends createTranslationsWrapper(
 export class UpdateCategoryDto {
   @IsOptional()
   @IsSlug()
-  slug: string;
+  slug?: string;
 
   @IsOptional()
   @IsTranslationsField(UpdateTranslationsDto)
-  translations: UpdateTranslationsDto;
+  translations?: UpdateTranslationsDto;
 
   @IsOptional()
   @IsMongoId()
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-  parentId: string;
+  parentId?: string | null;
 }
 
 // <----------------   RESPONSE   ---------------->

@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
   IsEmail,
   IsJWT,
@@ -49,3 +50,18 @@ export class LoginDto {
   @Length(8, 255)
   password: string;
 }
+
+// <----------------   RESPONSE   ---------------->
+
+export class BaseAuthResponseDto {
+  @Expose()
+  @IsJWT()
+  refreshToken: string;
+
+  @Expose()
+  @IsJWT()
+  accessToken: string;
+}
+export class RegisterResponseDto extends BaseAuthResponseDto {}
+
+export class LoginResponseDto extends BaseAuthResponseDto {}

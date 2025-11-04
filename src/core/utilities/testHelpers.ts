@@ -1,18 +1,32 @@
-import { faker } from '@faker-js/faker';
+import { faker, fakerFA } from '@faker-js/faker';
 import tokenUtils from 'core/services/token.service';
 import User from 'features/shared/user/core/user.model';
 import {
   ChangePasswordDto,
   LoginDto,
+  LoginResponseDto,
   RecoverPasswordDto,
   RegisterDto,
+  RegisterResponseDto,
 } from 'features/shared/auth/core/auth.dto';
-import supertest from 'core/utilities/supertest';
+import supertest, {
+  sendDeleteRequest,
+  sendGetRequest,
+  sendPatchRequest,
+  sendPostRequest,
+  SendRequestOptions,
+} from 'core/utilities/supertest';
 
-import { Collection, Document, Model } from 'mongoose';
-import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
+import { Model } from 'mongoose';
 import { Response } from 'supertest';
-import { prefixBaseUrl } from 'core/utilities/configs';
+import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
+import {
+  CategoryManagementResponseDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from 'features/management/category/category.management.dto';
+import Category from 'features/shared/category/category.model';
+import { UserRole } from 'features/shared/user/core/user.types';
 
 export function generateUser() {
   return {
@@ -40,30 +54,26 @@ export async function createUser(user: RegisterDto = generateUser()) {
   return await new User(user).save();
 }
 
-export const sendPostRequest = async (
-  endpoint: string,
-  payload: any,
-  token?: string
-) => {
-  return await supertest()
-    .post(endpoint)
-    .set(jwtAccessTokenName, token || '')
-    .send(payload);
-};
+export async function registerAndLogin(
+  options?: SendRequestOptions<RegisterDto> & { role?: UserRole }
+) {
+  const payload = options?.payload ?? generateUser();
 
-export const sendPatchRequest = async (
-  endpoint: string,
-  payload: any,
-  token?: string
-) => {
-  return await supertest()
-    .patch(endpoint)
-    .set(jwtAccessTokenName, token || '')
-    .send(payload);
-};
-export const sendGetRequest = async (endpoint: string) => {
-  return await supertest().get(endpoint);
-};
+  await sendRegisterRequest({
+    payload,
+    ...options,
+  });
+
+  if (options?.role)
+    await User.findOneAndUpdate(
+      { email: payload.email },
+      { role: options.role }
+    );
+
+  const res = await sendLoginRequest({ payload });
+
+  return res?.body?.data || null;
+}
 
 export const cleanUpDatabase = async (...args: Model<any>[]) => {
   await Promise.all(args.map((model) => model.deleteMany()));
@@ -78,6 +88,11 @@ export const expectBadRequest = (response: Response, regex?: RegExp) => {
   if (regex) expect(response.body.message).toMatch(regex);
 };
 
+export const expectUnauthorizedError = (response: Response, regex?: RegExp) => {
+  expect(response.status).toBe(401);
+  if (regex) expect(response.body.message).toMatch(regex);
+};
+
 export const expectRejectsWhenAuthenticated = async (
   exec: (token: string) => Promise<any>
 ) => {
@@ -89,21 +104,82 @@ const registerURL = prefixBaseUrl('/auth/register');
 const loginURL = prefixBaseUrl('/auth/login');
 const recoverPasswordURL = prefixBaseUrl('/auth/recover-password');
 const changePasswordURL = prefixBaseUrl('/auth/change-password');
+
+// <----------------   AUTH   ---------------->
+export function generateCategory() {
+  return {
+    parentId: null,
+    slug: faker.lorem.slug({ min: 2, max: 3 }),
+    translations: {
+      en: { title: faker.internet.displayName() },
+      fa: { title: fakerFA.internet.displayName() },
+    },
+  } as CreateCategoryDto;
+}
+
 export const sendRegisterRequest = async (
-  payload: LoginDto = generateUser(),
-  token?: string
-): Promise<Response> => await sendPostRequest(registerURL, payload, token);
+  options?: SendRequestOptions<RegisterDto>
+) =>
+  await sendPostRequest<RegisterResponseDto>(registerURL, {
+    payload: generateUser(),
+    ...options,
+  });
+
 export const sendLoginRequest = async (
-  payload: LoginDto = generateUser(),
-  token?: string
-): Promise<Response> => await sendPostRequest(loginURL, payload, token);
+  options?: SendRequestOptions<LoginDto>
+) =>
+  await sendPostRequest<LoginResponseDto>(loginURL, {
+    payload: generateUser(),
+    ...options,
+  });
+
 export const sendRecoverPasswordRequest = async (
-  payload: RecoverPasswordDto,
-  token?: string
-): Promise<Response> =>
-  await sendPostRequest(recoverPasswordURL, payload, token);
+  options?: SendRequestOptions<RecoverPasswordDto>
+) =>
+  await sendPostRequest<{ recoveryKey: string }>(recoverPasswordURL, {
+    payload: generateUser(),
+    ...options,
+  });
+
 export const sendChangePasswordRequest = async (
-  payload: ChangePasswordDto,
-  token?: string
-): Promise<Response> =>
-  await sendPostRequest(changePasswordURL, payload, token);
+  options?: SendRequestOptions<ChangePasswordDto>
+) =>
+  await sendPostRequest(changePasswordURL, {
+    payload: generateUser(),
+    ...options,
+  });
+
+// <----------------   CATEGORY   ---------------->
+const categoriesURL = prefixManagementBaseUrl('/categories');
+
+export const sendCreateCategoryRequest = async (
+  options?: SendRequestOptions<CreateCategoryDto>
+) => {
+  return await sendPostRequest<CategoryManagementResponseDto>(categoriesURL, {
+    payload: generateCategory(),
+    ...options,
+  });
+};
+export const sendPatchCategoryRequest = async (
+  id: string,
+  options: SendRequestOptions<UpdateCategoryDto>
+) => {
+  return await sendPatchRequest<
+    CategoryManagementResponseDto,
+    UpdateCategoryDto
+  >(`${categoriesURL}/${id}`, options);
+};
+
+export const sendGetCategoryRequest = async <T = any>(token: string) => {
+  return await sendGetRequest<T>(categoriesURL, { token });
+};
+
+export const sendDeleteCategoryRequest = async (id: string, token: string) => {
+  return await sendDeleteRequest(`${categoriesURL}/${id}`, { token });
+};
+
+export async function createCategory(
+  category: CreateCategoryDto = generateCategory()
+) {
+  return await new Category(category).save();
+}

@@ -3,6 +3,10 @@ import type {
   UserStatus,
 } from 'features/shared/user/core/user.types';
 
+export const adminRoles: Exclude<UserRole, 'user' | 'author'>[] = [
+  'admin',
+  'superAdmin',
+];
 export const userRoles: UserRole[] = ['user', 'author', 'admin', 'superAdmin'];
 export const userStatus: UserStatus[] = ['active', 'blocked'];
 export const usernameRegex = /^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/;

@@ -14,6 +14,9 @@ import commonFA from '../../locales/fa/common';
 import modelsFA from '../../locales/fa/models';
 import errorFA from '../../locales/fa/error';
 import messagesFA from '../../locales/fa/messages';
+import { AppLanguages } from 'core/types/i18n';
+
+export const appLanguages: AppLanguages[] = ['fa', 'en'];
 
 export default function i18nStartup(app: Express) {
   const resources = {

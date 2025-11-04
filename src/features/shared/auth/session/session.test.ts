@@ -11,17 +11,11 @@ import { prefixBaseUrl } from 'core/utilities/configs';
 import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
 import { RegisterDto } from 'features/shared/auth/core/auth.dto';
 import { IRefreshToken } from 'features/shared/auth/session/session.types';
-import {
-  generateUser,
-  sendLoginRequest,
-  sendRegisterRequest,
-} from 'core/utilities/testHelpers';
+import { generateUser, registerAndLogin } from 'core/utilities/testHelpers';
 import {
   RefreshTokenDto,
   RevokeTokenDto,
 } from 'features/shared/auth/session/session.dto';
-import User from 'features/shared/user/core/user.model';
-import Session from 'features/shared/auth/session/session.model';
 
 describe('auth routes', () => {
   const sessionService = container.resolve(SessionService);
@@ -35,9 +29,8 @@ describe('auth routes', () => {
       token = '';
 
       register = generateUser();
-      await sendRegisterRequest(register);
-      const response = await sendLoginRequest(register);
-      payload = { refreshToken: response?.body?.data?.refreshToken };
+      const response = await registerAndLogin({ payload: register });
+      payload = { refreshToken: response!.refreshToken };
     });
 
     const exec = async () => await sendRefreshTokenRequest(payload, token);
@@ -90,10 +83,9 @@ describe('auth routes', () => {
       token = '';
 
       register = generateUser();
-      await sendRegisterRequest(register);
-      const response = await sendLoginRequest(register);
+      const response = await registerAndLogin();
 
-      payload = { refreshToken: response.body?.data?.refreshToken || '' };
+      payload = { refreshToken: response!.refreshToken };
     });
 
     const exec = async () => await sendRefreshTokenRequest(payload, token);

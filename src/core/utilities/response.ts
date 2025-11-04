@@ -11,7 +11,7 @@ type HttpMethod =
   | 'OPTIONS'
   | 'HEAD';
 
-interface IApiResponse<T = null> {
+export interface IApiResponse<T = null> {
   message?: string;
   isSuccess: boolean;
   errors?: string[];
