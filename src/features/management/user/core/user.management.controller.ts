@@ -5,6 +5,7 @@ import sendResponse from 'core/utilities/response';
 
 // Service
 import UserService from 'features/shared/user/core/user.service';
+import UserBanService from 'features/management/user/ban/ban.service';
 
 // DTO
 import {
@@ -22,14 +23,17 @@ import type { RequestHandler } from 'express';
 export default class UserManagementController {
   constructor(
     @inject(delay(() => UserService)) private userService: UserService,
+    @inject(delay(() => UserBanService)) private banService: UserBanService,
     @inject(delay(() => UserMapper)) private userMapper: UserMapper
   ) {}
 
   getOne: RequestHandler = async (req, res) => {
     const user = await this.userService.getOneById(req.params.id, {
-      lean: true,
       populate: 'avatar',
+      lean: true,
     });
+
+    // user.isBanned = Boolean(await this.banService.getUserBan(user._id));
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -48,19 +52,25 @@ export default class UserManagementController {
       ],
       filterBy: [{ queryKey: 'role', modelKey: 'role', logic: 'and' }],
     });
-    const user = await this.userService.find({
+    const users = await this.userService.find({
       filter,
       populate: 'avatar',
       lean: true,
     });
+
+    // await Promise.all(
+    //   users.docs.map(async (user) => {
+    //     user.isBanned = await this.banService.checkIsBanned(user._id);
+    //   })
+    // );
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
       featureName: 'models.User.plural',
       body: {
         data: {
-          docs: user.docs.map((user) => this.userMapper.toManagementDto(user)),
-          pagination: user.pagination,
+          docs: users.docs.map((user) => this.userMapper.toManagementDto(user)),
+          pagination: users.pagination,
         },
       },
     });

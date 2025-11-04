@@ -188,7 +188,7 @@ export default abstract class BaseService<
    * @returns True if the document exists, false otherwise.
    */
   async existsById(id: string): Promise<boolean> {
-    return this.queries.existsById(id);
+    return await this.queries.existsById(id);
   }
 
   /**
@@ -197,7 +197,7 @@ export default abstract class BaseService<
    * @returns True if a document exists, false otherwise.
    */
   async existsBySlug(slug: string): Promise<boolean> {
-    return this.queries.existsBySlug(slug);
+    return await this.queries.existsBySlug(slug);
   }
 
   /**
@@ -206,7 +206,7 @@ export default abstract class BaseService<
    * @returns True if a document exists, false otherwise.
    */
   async existsByCondition(filter: FilterQuery<TSchema>): Promise<boolean> {
-    return this.queries.existsByCondition(filter);
+    return await this.queries.existsByCondition(filter);
   }
 
   /**
@@ -219,11 +219,11 @@ export default abstract class BaseService<
     key: K,
     match: NestedValueOf<TSchema, K>
   ): Promise<boolean> {
-    return this.queries.existsByKey(key, match);
+    return await this.queries.existsByKey(key, match);
   }
 
   async isMadeBySelf(documentId: string, userId: string): Promise<boolean> {
-    return this.queries.isMadeBySelf(documentId, userId);
+    return await this.queries.isMadeBySelf(documentId, userId);
   }
 
   // =====================
@@ -231,7 +231,7 @@ export default abstract class BaseService<
   // =====================
 
   async countDocuments(filter: FilterQuery<TSchema>): Promise<number> {
-    return this.queries.countDocuments(filter);
+    return await this.queries.countDocuments(filter);
   }
 
   // =====================
@@ -279,7 +279,7 @@ export default abstract class BaseService<
       paginate?: TPaginate;
     }
   ) {
-    return this.queries.aggregate(pipeline, options);
+    return await this.queries.aggregate(pipeline, options);
   }
 
   /**
@@ -310,7 +310,7 @@ export default abstract class BaseService<
     lookups: RelatedLookup<TSchema>[],
     options?: BaseQueryOptions<TSchema> & { paginate?: TPaginate }
   ): Promise<AggregateReturn<TResult, TPaginate>> {
-    return this.queries.findWithRelatedCounts(lookups, options);
+    return await this.queries.findWithRelatedCounts(lookups, options);
   }
 
   /**
@@ -334,7 +334,7 @@ export default abstract class BaseService<
       throwError?: TThrowError;
     }
   ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
-    return this.queries.getOneById(id, options);
+    return await this.queries.getOneById(id, options);
   }
 
   /**
@@ -358,7 +358,7 @@ export default abstract class BaseService<
       throwError?: TThrowError;
     }
   ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
-    return this.queries.getOneByCondition(filter, options);
+    return await this.queries.getOneByCondition(filter, options);
   }
 
   /**
@@ -385,7 +385,7 @@ export default abstract class BaseService<
         ? FlattenMaps<TSchema> | null
         : TDoc | null
   > {
-    return this.queries.getOneBySlug(slug, options);
+    return await this.queries.getOneBySlug(slug, options);
   }
 
   /**
@@ -408,7 +408,7 @@ export default abstract class BaseService<
       throwError?: TThrowError;
     }
   ): Promise<NullableQueryResult<TSchema, TDoc, TLean, TThrowError>> {
-    return this.queries.getOneByKey(key, value, options);
+    return await this.queries.getOneByKey(key, value, options);
   }
 
   // =====================
@@ -426,7 +426,7 @@ export default abstract class BaseService<
     data: WithId<TSchema | AnyKeys<TSchema>>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
-    return this.mutations.create(data, options);
+    return await this.mutations.create(data, options);
   }
 
   // =====================
@@ -446,7 +446,7 @@ export default abstract class BaseService<
     payload: UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
-    return this.mutations.updateOneById(id, payload, options);
+    return await this.mutations.updateOneById(id, payload, options);
   }
 
   /**
@@ -462,7 +462,7 @@ export default abstract class BaseService<
     payload: UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? TDoc : TDoc | null> {
-    return this.mutations.updateOneByCondition(filter, payload, options);
+    return await this.mutations.updateOneByCondition(filter, payload, options);
   }
 
   /**
@@ -481,7 +481,12 @@ export default abstract class BaseService<
     data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    return this.mutations.updateManyByKey(keyName, matchValue, data, options);
+    return await this.mutations.updateManyByKey(
+      keyName,
+      matchValue,
+      data,
+      options
+    );
   }
 
   /**
@@ -498,7 +503,7 @@ export default abstract class BaseService<
     value: any,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    return this.mutations.updateManyByReference(
+    return await this.mutations.updateManyByReference(
       referenceId,
       referenceKey,
       value,
@@ -522,7 +527,11 @@ export default abstract class BaseService<
     data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ) {
-    return this.mutations.updateManyWithConditions(conditions, data, options);
+    return await this.mutations.updateManyWithConditions(
+      conditions,
+      data,
+      options
+    );
   }
 
   /**
@@ -540,7 +549,7 @@ export default abstract class BaseService<
     value: NestedValueOf<TSchema, K>,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    return this.mutations.updateManyByReferences(
+    return await this.mutations.updateManyByReferences(
       referenceIds,
       referenceKey,
       value,
@@ -563,7 +572,7 @@ export default abstract class BaseService<
     id: DocumentId,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
-    return this.mutations.deleteOneById(id, options);
+    return await this.mutations.deleteOneById(id, options);
   }
 
   /**
@@ -577,7 +586,7 @@ export default abstract class BaseService<
     filter: FilterQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
-    return this.mutations.deleteOneByCondition(filter, options);
+    return await this.mutations.deleteOneByCondition(filter, options);
   }
 
   /**
@@ -593,7 +602,7 @@ export default abstract class BaseService<
     matchValue: any,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<DeleteResult> {
-    return this.mutations.deleteManyByKey(keyName, matchValue, options);
+    return await this.mutations.deleteManyByKey(keyName, matchValue, options);
   }
 
   /**
@@ -608,7 +617,7 @@ export default abstract class BaseService<
     ids: string[],
     options?: BaseMutateOptions & { additionalFilter?: FilterQuery<TSchema> }
   ): Promise<IApiBatchResponse> {
-    return this.mutations.batchDelete(ids, options);
+    return await this.mutations.batchDelete(ids, options);
   }
 
   /**
@@ -626,7 +635,7 @@ export default abstract class BaseService<
     conditions: OrAndFilter<TSchema> | FilterQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<DeleteResult> {
-    return this.mutations.deleteManyWithConditions(conditions, options);
+    return await this.mutations.deleteManyWithConditions(conditions, options);
   }
 
   // =====================
@@ -645,7 +654,7 @@ export default abstract class BaseService<
     id: DocumentId,
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    return this.mutations.removeIdFromArrayField(keyName, id, options);
+    return await this.mutations.removeIdFromArrayField(keyName, id, options);
   }
 
   /**
@@ -661,7 +670,7 @@ export default abstract class BaseService<
     ids: string[],
     options?: BaseMutateOptions
   ): Promise<UpdateResult> {
-    return this.mutations.removeIdsFromArrayField(keyName, ids, options);
+    return await this.mutations.removeIdsFromArrayField(keyName, ids, options);
   }
 
   // =====================

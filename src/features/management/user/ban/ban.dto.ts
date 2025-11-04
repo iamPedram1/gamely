@@ -1,23 +1,25 @@
 import { Expose, Type } from 'class-transformer';
 import { ValidateIf } from 'class-validator';
+import { BaseQueryDto } from 'core/dto/query';
 import { BaseSummaryResponseDto } from 'core/dto/response';
 import {
   IsIn,
   IsISO8601,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
 } from 'core/utilities/validation';
 
-import { banType } from 'features/management/user/ban/ban.constant';
-import { BanType, IBanEntity } from 'features/management/user/ban/ban.types';
+import { banStatus, banType } from 'features/management/user/ban/ban.constant';
+import {
+  BanStatusType,
+  BanType,
+  IBanEntity,
+} from 'features/management/user/ban/ban.types';
 import { UserManagementResponseDto } from 'features/management/user/core/user.management.dto';
 
 export class CreateBanDto {
-  @IsNotEmpty()
-  @IsMongoId()
-  user: string;
-
   @IsNotEmpty()
   @IsString()
   @IsIn(banType)
@@ -46,8 +48,34 @@ export class BanResponseDto extends BaseSummaryResponseDto {
   type: BanType;
 
   @Expose()
+  status: BanStatusType;
+
+  @Expose()
   startAt: Date;
 
   @Expose()
+  reason: Date;
+
+  @Expose()
   endAt: Date | null;
+}
+
+// <----------------   QUERY   ---------------->
+
+export class BanManagementQueryDto extends BaseQueryDto {
+  @IsOptional()
+  @IsMongoId({ each: true })
+  actor: string | string[];
+
+  @IsOptional()
+  @IsMongoId({ each: true })
+  user: string | string[];
+
+  @IsOptional()
+  @IsIn(banType)
+  type: BanType;
+
+  @IsOptional()
+  @IsIn(banStatus)
+  status: BanStatusType;
 }

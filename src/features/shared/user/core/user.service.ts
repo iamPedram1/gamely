@@ -26,7 +26,10 @@ import {
   ValidationError,
 } from 'core/utilities/errors';
 
-import type { BaseMutateOptions } from 'core/types/base.service.type';
+import type {
+  BaseMutateOptions,
+  BaseQueryOptions,
+} from 'core/types/base.service.type';
 import type { DocumentId } from 'core/types/common';
 
 export type IUserService = InstanceType<typeof UserService>;
@@ -188,6 +191,16 @@ export default class UserService extends BaseService<IUserEntity> {
     );
 
     return user._id.toHexString();
+  }
+
+  async getUserByEmail(
+    email: string,
+    options?: BaseQueryOptions<UserDocument>
+  ) {
+    return await this.getOneByKey('email', email.trim().toLowerCase(), {
+      lean: true,
+      ...options,
+    });
   }
 
   private validateBlocking(

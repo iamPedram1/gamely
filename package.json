@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@getbrevo/brevo": "^3.0.1",
     "@sendinblue/client": "^3.3.1",
     "async_hooks": "^1.0.0",
@@ -28,12 +29,13 @@
     "sharp": "^0.34.4",
     "sib-api-v3-sdk": "^8.5.0",
     "tsyringe": "^4.10.0",
+    "vite-tsconfig-paths": "^5.1.4",
     "winston": "^3.17.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
-    "@babel/preset-typescript": "^7.27.1",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
     "@tsconfig/node22": "^22.0.2",
     "@types/config": "^3.3.5",
     "@types/cors": "^2.8.19",
@@ -47,17 +49,22 @@
     "@types/nodemailer": "^7.0.2",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.3",
-    "babel-jest": "^30.0.5",
-    "jest": "^30.0.5",
+    "@vitest/coverage-v8": "^4.0.6",
+    "@vitest/ui": "^4.0.6",
+    "babel-jest": "^30.2.0",
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^10.3.0",
     "prettier": "^3.6.2",
     "supertest": "^7.1.4",
-    "ts-jest": "^29.4.1",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.16",
-    "tsx": "^4.20.3",
+    "tsx": "^4.20.6",
     "typeorm": "^0.3.27",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "^4.0.6"
   },
   "name": "gamely",
   "version": "1.0.0",
@@ -66,7 +73,8 @@
     "dev": "set NODE_ENV=development&& tsx --watch src/app.ts",
     "start": "set NODE_ENV=production&& node dist/app.ts",
     "build": "tsc",
-    "test": "jest --watchAll --runInBand"
+    "test": "set NODE_ENV=test&& vitest --watch",
+    "test:cov": "vitest run --coverage"
   },
   "tsup": {
     "entry": [

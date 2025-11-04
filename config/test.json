@@ -1,4 +1,4 @@
 {
   "PORT": 3000,
-  "DB": "mongodb://localhost/gamely-test"
+  "DB": "mongodb://localhost/gamely-test?replicaSet=rs0"
 }

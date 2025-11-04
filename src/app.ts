@@ -15,19 +15,17 @@ import { appPort } from 'core/utilities/configs';
 
 const app = express();
 
-(async () => {
-  dbStartup();
-  await i18nStartup(app);
+const startApp = async () => {
+  i18nStartup(app);
   baseStartup(app);
   routesStartup(app);
-})();
+  await dbStartup();
 
-const server = app.listen(appPort, () => {
-  logger.info(`Listening on port ${appPort}`);
-});
+  const server = app.listen(appPort, () => {
+    logger.info(`Listening on port ${appPort}`);
+  });
 
-process.on('unhandledRejection', (ex) => {
-  throw ex;
-});
+  return server;
+};
 
-export default server;
+export default startApp;

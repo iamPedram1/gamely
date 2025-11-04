@@ -7,8 +7,10 @@ import UserBanService from 'features/management/user/ban/ban.service';
 // Utilities
 import sendResponse from 'core/utilities/response';
 import { UserBanMapper } from 'features/management/user/ban/ban.mapper';
-import { BaseQueryDto } from 'core/dto/query';
-import { CreateBanDto } from 'features/management/user/ban/ban.dto';
+import {
+  BanManagementQueryDto,
+  CreateBanDto,
+} from 'features/management/user/ban/ban.dto';
 
 @injectable()
 export default class UserBanController {
@@ -22,7 +24,7 @@ export default class UserBanController {
   ban: RequestHandler = async (req, res) => {
     const dto = req.body as CreateBanDto;
 
-    await this.userBanService.ban(dto);
+    await this.userBanService.ban(req.params.targetId, dto);
 
     sendResponse(res, 204);
   };
@@ -34,8 +36,16 @@ export default class UserBanController {
   };
 
   getBanList: RequestHandler = async (req, res) => {
-    const query = req.query as unknown as BaseQueryDto;
-    const bans = await this.userBanService.getBanList();
+    const query = req.query as unknown as BanManagementQueryDto;
+    const filter = await this.userBanService.buildFilterFromQuery(query, {
+      filterBy: [
+        { queryKey: 'type', modelKey: 'type', logic: 'and' },
+        { queryKey: 'actor', modelKey: 'actor', logic: 'and' },
+        { queryKey: 'user', modelKey: 'user', logic: 'and' },
+        { queryKey: 'status', modelKey: 'status', logic: 'and' },
+      ],
+    });
+    const bans = await this.userBanService.getBanList({ query, filter });
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

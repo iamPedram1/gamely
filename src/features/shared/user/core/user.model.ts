@@ -41,7 +41,7 @@ const userSchema = new Schema<
       index: true,
       lowercase: true,
       minlength: 3,
-      maxlength: 255,
+      maxlength: 30,
       match: usernameRegex,
       required: true,
     },

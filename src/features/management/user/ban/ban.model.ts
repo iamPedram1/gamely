@@ -1,10 +1,11 @@
 import { model, Schema, Model } from 'mongoose';
 
 // Utilities
-import { banType } from 'features/management/user/ban/ban.constant';
+import { banStatus, banType } from 'features/management/user/ban/ban.constant';
 
 // Types
 import type { IBanEntity } from 'features/management/user/ban/ban.types';
+import dayjs from 'dayjs';
 
 const userBanSchema = new Schema<IBanEntity, Model<IBanEntity>>(
   {
@@ -31,6 +32,12 @@ const userBanSchema = new Schema<IBanEntity, Model<IBanEntity>>(
       required: true,
       index: true,
     },
+    status: {
+      type: String,
+      enum: banStatus,
+      required: true,
+      index: true,
+    },
     startAt: {
       type: Date,
       default: Date.now,
@@ -39,7 +46,15 @@ const userBanSchema = new Schema<IBanEntity, Model<IBanEntity>>(
       type: Date,
       default: null,
       required: function () {
-        return this.type === 'permanent';
+        return this.type === 'temporary';
+      },
+
+      validate: {
+        message: 'endAt cannot be before startAt',
+        validator: function (value) {
+          if (this.type === 'permanent') return true;
+          return dayjs(value).isAfter(this.startAt);
+        },
       },
     },
   },

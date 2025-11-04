@@ -99,7 +99,6 @@ export default class NotificationService extends BaseService<INotificationEntity
     comment: ICommentPopulated,
     options?: BaseMutateOptions<boolean> & { throwError?: TThrowError }
   ): Promise<void> {
-    console.log('1 sendCommentReplyNotify', comment, options);
     if (!comment.replyToComment) return;
 
     const notify =
@@ -115,7 +114,6 @@ export default class NotificationService extends BaseService<INotificationEntity
       sourceType: 'Comment',
       sourceId: comment.replyToComment._id,
     };
-    console.log('2 sendCommentReplyNotify', comment, options, notify);
 
     await this.create(notify, options);
   }

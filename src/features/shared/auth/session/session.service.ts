@@ -55,7 +55,8 @@ export default class SessionService extends BaseService<ISessionEntity> {
     refreshToken: string,
     mongooseSession?: mongoose.ClientSession
   ) {
-    const { userId, sessionId } = this.verifyRefreshJwt(refreshToken);
+    const { sessionId, userId } = this.verifyRefreshJwt(refreshToken);
+
     const session = await this.getOneById(sessionId);
 
     // Validation
@@ -66,6 +67,7 @@ export default class SessionService extends BaseService<ISessionEntity> {
       refreshToken,
       session.refreshToken
     );
+
     if (!isRefreshTokenCorrect)
       throw new ValidationError(t('error.refresh_token.invalid'));
 

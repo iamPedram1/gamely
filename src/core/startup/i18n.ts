@@ -1,6 +1,6 @@
 import i18next from 'i18next';
-import middleware from 'i18next-http-middleware';
 import type { Express } from 'express';
+import { handle, LanguageDetector } from 'i18next-http-middleware';
 
 // Middlewares
 import { context } from 'core/middlewares/context';
@@ -15,7 +15,7 @@ import modelsFA from '../../locales/fa/models';
 import errorFA from '../../locales/fa/error';
 import messagesFA from '../../locales/fa/messages';
 
-export default async function i18nStartup(app: Express) {
+export default function i18nStartup(app: Express) {
   const resources = {
     en: {
       error: errorEN,
@@ -31,8 +31,8 @@ export default async function i18nStartup(app: Express) {
     },
   };
 
-  await i18next.use(middleware.LanguageDetector).init({
-    fallbackLng: 'fa',
+  i18next.use(LanguageDetector).init({
+    fallbackLng: 'en',
     preload: ['fa'],
     ns: ['error', 'models', 'common', 'messages'],
     defaultNS: 'error',
@@ -44,6 +44,6 @@ export default async function i18nStartup(app: Express) {
     },
   });
 
-  app.use(middleware.handle(i18next));
+  app.use(handle(i18next));
   app.use(context);
 }

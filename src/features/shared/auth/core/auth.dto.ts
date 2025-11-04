@@ -26,7 +26,7 @@ export class ChangePasswordDto {
 export class RegisterDto {
   @IsNotEmpty()
   @IsString()
-  @Length(3, 255)
+  @Length(3, 30)
   username: string;
 
   @IsNotEmpty()

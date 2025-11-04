@@ -15,7 +15,7 @@ export default function blockRequestWithToken(
     throw new AnonymousError(
       'Client passed token to an endpoint that cannot execute with token',
       req.t('error.bad_request'),
-      401
+      400
     );
 
   next();

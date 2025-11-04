@@ -54,26 +54,26 @@ class BaseQueryService<
   }
 
   async isMadeBySelf(documentId: string, userId: string) {
-    return this.exists({ _id: documentId, creator: userId });
+    return await this.exists({ _id: documentId, creator: userId });
   }
 
   async existsById(id: DocumentId): Promise<boolean> {
-    return this.exists({ _id: id } as FilterQuery<TSchema>);
+    return await this.exists({ _id: id } as FilterQuery<TSchema>);
   }
 
   async existsByCondition(filter: FilterQuery<TSchema>): Promise<boolean> {
-    return this.exists(filter);
+    return await this.exists(filter);
   }
 
   async existsBySlug(slug: string): Promise<boolean> {
-    return this.exists({ slug } as FilterQuery<TSchema>);
+    return await this.exists({ slug } as FilterQuery<TSchema>);
   }
 
   async existsByKey<K extends NestedKeyOf<TSchema>>(
     key: K,
     match: NestedValueOf<TSchema, K>
   ): Promise<boolean> {
-    return this.exists({ [key]: match } as FilterQuery<TSchema>);
+    return await this.exists({ [key]: match } as FilterQuery<TSchema>);
   }
 
   // <----------------   SINGLE DOCUMENT   ---------------->
@@ -185,7 +185,7 @@ class BaseQueryService<
       return paginate<TDoc, TDoc>(enrichedQuery, options?.query) as any;
     }
 
-    return enrichedQuery.exec();
+    return await enrichedQuery.exec();
   }
 
   async aggregate<

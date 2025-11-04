@@ -32,9 +32,11 @@ class UserBanService extends BaseService<IBanEntity> {
   ) {
     super(Ban);
   }
-  async ban(data: CreateBanDto, options?: BaseMutateOptions): Promise<void> {
-    const targetId = data.user;
-
+  async ban(
+    targetId: string,
+    data: CreateBanDto,
+    options?: BaseMutateOptions
+  ): Promise<void> {
     const targetUser = await this.userService.getOneById(targetId, {
       lean: true,
       select: 'role',
@@ -52,7 +54,10 @@ class UserBanService extends BaseService<IBanEntity> {
     if (await this.checkIsBanned(targetId))
       throw new ValidationError(this.t('error.ban.already_banned'));
 
-    this.create({ ...data, actor: this.currentUser.id }, options);
+    this.create(
+      { ...data, status: 'active', user: targetId, actor: this.currentUser.id },
+      options
+    );
   }
 
   async unban(targetId: string, options?: BaseMutateOptions): Promise<void> {
@@ -79,11 +84,13 @@ class UserBanService extends BaseService<IBanEntity> {
 
     const bans = await this.find({
       lean: true,
-      select: 'createdAt user',
       populate: [
         {
           path: 'user',
-          select: 'username',
+          match: search ? { username: new RegExp(search, 'i') } : {},
+        },
+        {
+          path: 'actor',
           match: search ? { username: new RegExp(search, 'i') } : {},
         },
       ],

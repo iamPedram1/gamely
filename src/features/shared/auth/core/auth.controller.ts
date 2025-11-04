@@ -27,12 +27,15 @@ export default class AuthController {
   recoverPassword: RequestHandler = async (req, res) => {
     const dto = req.body as RecoverPasswordDto;
 
-    await this.authService.recoverPassword(dto);
+    const result = await this.authService.recoverPassword(dto);
 
     sendResponse(res, 200, {
       body: {
         isSuccess: true,
         message: req.t('messages.auth.recover_password'),
+        ...(process.env.NODE_ENV === 'test' && {
+          data: { recoveryKey: result?.recoveryKey },
+        }),
       },
     });
   };
@@ -55,7 +58,7 @@ export default class AuthController {
 
     await this.authService.register(dto);
 
-    sendResponse(res, 200, {
+    sendResponse(res, 201, {
       body: { message: req.t('messages.auth.register_success') },
     });
   };
@@ -67,7 +70,7 @@ export default class AuthController {
     sessionDto.generatedAt = new Date();
     sessionDto.lastActivity = new Date();
     sessionDto.ip = req.clientIp || '';
-    sessionDto.userAgent = req.headers['user-agent'] || '';
+    sessionDto.userAgent = req.headers['user-agent'] || 'unknown';
     sessionDto.refreshToken = req.body.refreshToken;
     sessionDto.expiresAt = dayjs()
       .add(jwtRefreshTokenExpiresInDays, 'days')

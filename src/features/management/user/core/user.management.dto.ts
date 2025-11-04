@@ -50,6 +50,9 @@ export class UserManagementResponseDto extends BaseResponseDto {
   bio: string;
 
   @Expose()
+  isBanned: boolean;
+
+  @Expose()
   @Type(() => FileResponseDto)
   avatar: FileResponseDto;
 

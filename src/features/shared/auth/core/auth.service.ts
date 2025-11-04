@@ -66,14 +66,14 @@ export default class AuthService {
   async recoverPassword(
     data: RecoverPasswordDto,
     options?: BaseMutateOptions
-  ): Promise<void> {
-    const email = data.email.toLowerCase();
+  ): Promise<{ recoveryKey: string } | void> {
+    const email = data.email.trim().toLowerCase();
+
     const user = await this.userService.getOneByKey('email', email, {
       select: '+recoveryKey',
       throwError: false,
     });
     if (!user) return;
-
     if (user.recoveryKey) {
       try {
         this.verifyRecoveryJwt(user.recoveryKey);
@@ -86,11 +86,12 @@ export default class AuthService {
       }
     }
 
-    await this.userService.mutateWithTransaction(async (session) => {
+    return await this.userService.mutateWithTransaction(async (session) => {
       const key = this.generatePasswordRecoveryKey(user._id.toHexString());
       await user.set('recoveryKey', key).save({ session, ...options });
       const result = await this.sendRecoveryEmail(user, key);
       if (!result.success) throw new InternalServerError();
+      return { recoveryKey: key };
     }, options?.session);
   }
 
@@ -103,13 +104,6 @@ export default class AuthService {
       select: '+recoveryKey',
     });
     const userId = user._id.toHexString();
-
-    const isRecoveryKeyCorrect = user.recoveryKey
-      ? await crypto.compare(data.recoveryKey, user.recoveryKey)
-      : false;
-
-    if (!isRecoveryKeyCorrect)
-      throw new ValidationError(t('error.recovery_token.invalid'));
 
     return await this.userService.mutateWithTransaction(async (session) => {
       user.recoveryKey = null;
@@ -134,12 +128,12 @@ export default class AuthService {
     )) as UserDocument;
 
     // Existance Check
-    if (!user) throw new AnonymousError('User not found', mask);
+    if (!user) throw new AnonymousError('User not found', mask, 400);
 
     // Password Check
     const isPasswordCorrect = await user.comparePassword(data.password);
     if (!isPasswordCorrect)
-      throw new AnonymousError('Password is not correct', mask);
+      throw new AnonymousError('Password is not correct', mask, 400);
 
     // Status Check
     if (await this.banService.checkIsBanned(user._id))

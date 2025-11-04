@@ -1,19 +1,25 @@
-import { Config } from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
-  verbose: true,
-  preset: 'ts-jest',
-  watchAll: true,
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  moduleNameMapper: {
-    '^app$': '<rootDir>/src/app',
-    '^api/(.*)$': '<rootDir>/src/api/$1',
-    '^middleware/(.*)$': '<rootDir>/src/middleware/$1',
-    '^dto/(.*)$': '<rootDir>/src/dto/$1',
-    '^services/(.*)$': '<rootDir>/src/services/$1',
-    '^startup/(.*)$': '<rootDir>/src/startup/$1',
-    '^utilities/(.*)$': '<rootDir>/src/utilities/$1',
+
+  transform: {
+    '^.+\\.ts$': ['ts-jest', { useESM: true }],
   },
+
+  extensionsToTreatAsEsm: ['.ts'],
+
+  moduleNameMapper: {
+    '^app$': '<rootDir>/src/app.ts',
+    '^core/(.*)$': '<rootDir>/src/core/$1',
+    '^features/(.*)$': '<rootDir>/src/features/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+
+  // ✅ modern Jest setup — remove deprecated globals
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  verbose: true,
 };
 
 export default config;
