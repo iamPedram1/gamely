@@ -21,14 +21,14 @@ describe('POST /management/games', () => {
   const gameService = container.resolve(GameService);
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
     payload = await generateGame(token);
   });
 
   const exec = async () => sendCreateGameRequest({ payload, token });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
@@ -67,7 +67,6 @@ describe('POST /management/games', () => {
   );
 
   it('should return 201 if the payload is valid', async () => {
-    payload.translations.fa.title = 'اوت لست';
     const response = await exec();
     const game = await gameService.getOneBySlug(payload.slug, { lean: true });
 

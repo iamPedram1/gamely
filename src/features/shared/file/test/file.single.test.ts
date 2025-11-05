@@ -12,10 +12,9 @@ describe('POST /files/:location', () => {
   let location: FileLocationType;
 
   beforeEach(async () => {
-    const user = await registerAndLogin();
+    token = (await registerAndLogin())?.accessToken || '';
     location = 'post';
     fileCount = 1;
-    token = user!.accessToken;
   });
 
   const exec = async () =>

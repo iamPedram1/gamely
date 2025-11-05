@@ -27,7 +27,7 @@ describe('POST /management/categories', () => {
   beforeEach(async () => {
     payload = generateCategory();
 
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
   });
 
   const exec = async () => sendCreateCategoryRequest({ payload, token });
@@ -41,7 +41,7 @@ describe('POST /management/categories', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 

@@ -2,32 +2,32 @@ import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
 // Services
-import CategoryService from 'features/shared/category/category.service';
+import TagService from 'features/shared/tag/tag.service';
 
 // Utils
 import { adminRoles } from 'features/shared/user/core/user.constant';
 import { expectUnauthorizedError } from 'core/utilities/testHelpers';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  sendCreateCategoryRequest,
-  sendDeleteCategoryRequest,
-} from 'features/management/category/tests/category.testUtilts';
+  sendCreateTagRequest,
+  sendDeleteTagRequest,
+} from 'features/management/tag/tests/tag.testUtils';
 
-describe('DELETE /management/categories', () => {
-  const categoryService = container.resolve(CategoryService);
+describe('DELETE /management/tags', () => {
+  const tagService = container.resolve(TagService);
 
   let token: string;
-  let payload: { categoryId: string };
+  let payload: { tagId: string };
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
-    const response = await sendCreateCategoryRequest({ token });
+    const response = await sendCreateTagRequest({ token });
 
-    payload = { categoryId: response.body.data!.id };
+    payload = { tagId: response.body.data!.id };
   });
 
-  const exec = async () => sendDeleteCategoryRequest(payload.categoryId, token);
+  const exec = async () => sendDeleteTagRequest(payload.tagId, token);
 
   it('should return 401 if user does not have token in header', async () => {
     token = '';
@@ -38,15 +38,15 @@ describe('DELETE /management/categories', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
     expect(response.status).toBe(403);
   });
 
-  it('should return 400 if role is author but you dont own the category', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+  it('should return 400 if role is author but you dont own the tag', async () => {
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     const response = await exec();
 
@@ -55,12 +55,10 @@ describe('DELETE /management/categories', () => {
     expect(response.body.message).toMatch(/you didn't/i);
   });
 
-  it('should return 200 if role is author and you own the category', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+  it('should return 200 if role is author and you own the tag', async () => {
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-    payload.categoryId = (
-      await sendCreateCategoryRequest({ token })
-    ).body.data!.id;
+    payload.tagId = (await sendCreateTagRequest({ token })).body.data!.id;
 
     const response = await exec();
 
@@ -70,25 +68,25 @@ describe('DELETE /management/categories', () => {
   });
 
   describe.each(adminRoles)(
-    'should return 200 and delete category if',
+    'should return 200 and delete tag if',
     async (role) => {
       it(`role is ${role}`, async () => {
-        token = (await registerAndLogin({ role }))!.accessToken;
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
-        const category = await categoryService.getOneById(payload.categoryId, {
+        const tag = await tagService.getOneById(payload.tagId, {
           throwError: false,
         });
 
         expect(response.status).toBe(200);
-        expect(category).toBeNull();
+        expect(tag).toBeNull();
         expect(response.body.isSuccess).toBe(true);
       });
     }
   );
 
-  it('should return 404 if category does not exist', async () => {
-    payload.categoryId = faker.database.mongodbObjectId();
+  it('should return 404 if tag does not exist', async () => {
+    payload.tagId = faker.database.mongodbObjectId();
 
     const response = await exec();
 

@@ -28,7 +28,7 @@ describe('PATCH /management/tags', () => {
   const tagService = container.resolve(TagService);
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
     const response = await sendCreateTagRequest({ token });
     payload.slug = response.body.data!.slug;
@@ -48,7 +48,7 @@ describe('PATCH /management/tags', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 

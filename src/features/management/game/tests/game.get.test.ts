@@ -28,7 +28,7 @@ describe('GET /management/games', () => {
   const exec = async () => sendGetGameRequest(token);
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
@@ -39,7 +39,7 @@ describe('GET /management/games', () => {
     'should return 200',
     (role) => {
       it(`if role is ${role}`, async () => {
-        token = (await registerAndLogin({ role }))!.accessToken;
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
 

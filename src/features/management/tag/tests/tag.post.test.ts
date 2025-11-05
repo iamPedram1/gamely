@@ -26,7 +26,7 @@ describe('POST /management/tags', () => {
   beforeEach(async () => {
     payload = generateTag();
 
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
   });
 
   const exec = async () => sendCreateTagRequest({ payload, token });
@@ -40,7 +40,7 @@ describe('POST /management/tags', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 

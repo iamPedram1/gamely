@@ -18,10 +18,9 @@ describe('POST /files/:location/batch', () => {
   let fileService = container.resolve(FileService);
 
   beforeEach(async () => {
-    const user = await registerAndLogin();
+    token = (await registerAndLogin())?.accessToken || '';
     location = 'post';
     fileCount = 2;
-    token = user!.accessToken;
   });
 
   const exec = async () =>

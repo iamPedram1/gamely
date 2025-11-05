@@ -20,7 +20,7 @@ describe('DELETE /management/categories', () => {
   let payload: { categoryId: string };
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
     const response = await sendCreateCategoryRequest({ token });
 
@@ -38,7 +38,7 @@ describe('DELETE /management/categories', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
@@ -46,7 +46,7 @@ describe('DELETE /management/categories', () => {
   });
 
   it('should return 400 if role is author but you dont own the category', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     const response = await exec();
 
@@ -56,7 +56,7 @@ describe('DELETE /management/categories', () => {
   });
 
   it('should return 200 if role is author and you own the category', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     payload.categoryId = (
       await sendCreateCategoryRequest({ token })
@@ -73,7 +73,7 @@ describe('DELETE /management/categories', () => {
     'should return 200 and delete category if',
     async (role) => {
       it(`role is ${role}`, async () => {
-        token = (await registerAndLogin({ role }))!.accessToken;
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
         const category = await categoryService.getOneById(payload.categoryId, {

@@ -20,7 +20,7 @@ describe('DELETE /management/games', () => {
   let payload: { gameId: string };
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
     const response = await sendCreateGameRequest({ token });
 
@@ -38,7 +38,7 @@ describe('DELETE /management/games', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
@@ -46,7 +46,7 @@ describe('DELETE /management/games', () => {
   });
 
   it('should return 400 if role is author but you dont own the game', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     const response = await exec();
 
@@ -56,7 +56,7 @@ describe('DELETE /management/games', () => {
   });
 
   it('should return 200 if role is author and you own the game', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     payload.gameId = (await sendCreateGameRequest({ token })).body.data!.id;
 
@@ -71,7 +71,7 @@ describe('DELETE /management/games', () => {
     'should return 200 and delete game if',
     async (role) => {
       it(`role is ${role}`, async () => {
-        token = (await registerAndLogin({ role }))!.accessToken;
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
         const game = await gameService.getOneById(payload.gameId, {

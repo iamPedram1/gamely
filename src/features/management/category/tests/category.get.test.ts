@@ -16,7 +16,7 @@ describe('GET /management/categories', () => {
   const categoryService = container.resolve(CategoryService);
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
     await sendCreateCategoryRequest({ token });
   });
@@ -32,7 +32,7 @@ describe('GET /management/categories', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
@@ -40,7 +40,7 @@ describe('GET /management/categories', () => {
   });
 
   it('should return 200 if role is author', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     const response = await exec();
 

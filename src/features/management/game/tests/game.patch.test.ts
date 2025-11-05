@@ -28,7 +28,7 @@ describe('PATCH /management/games', () => {
   const gameService = container.resolve(GameService);
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
     const response = await sendCreateGameRequest({ token });
     payload.slug = response.body.data!.slug;
@@ -50,7 +50,7 @@ describe('PATCH /management/games', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 

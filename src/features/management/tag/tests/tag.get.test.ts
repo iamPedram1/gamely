@@ -1,27 +1,29 @@
 import { container } from 'tsyringe';
 
 // Services
-import CategoryService from 'features/shared/category/category.service';
+import TagService from 'features/shared/tag/tag.service';
 
 // Utils
 import { expectUnauthorizedError } from 'core/utilities/testHelpers';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  sendCreateCategoryRequest,
-  sendGetCategoryRequest,
-} from 'features/management/category/tests/category.testUtilts';
+  sendCreateTagRequest,
+  sendGetTagRequest,
+} from 'features/management/tag/tests/tag.testUtils';
+import { adminRoles } from 'features/shared/user/core/user.constant';
+import { UserRole } from 'features/shared/user/core/user.types';
 
-describe('GET /management/categories', () => {
+describe('GET /management/tags', () => {
   let token: string;
-  const categoryService = container.resolve(CategoryService);
+  const tagService = container.resolve(TagService);
 
   beforeEach(async () => {
-    token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
+    token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
-    await sendCreateCategoryRequest({ token });
+    await sendCreateTagRequest({ token });
   });
 
-  const exec = async () => sendGetCategoryRequest(token);
+  const exec = async () => sendGetTagRequest(token);
 
   it('should return 401 if user does not have token in header', async () => {
     token = '';
@@ -32,26 +34,25 @@ describe('GET /management/categories', () => {
   });
 
   it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())!.accessToken;
+    token = (await registerAndLogin())?.accessToken || '';
 
     const response = await exec();
 
     expect(response.status).toBe(403);
   });
 
-  it('should return 200 if role is author', async () => {
-    token = (await registerAndLogin({ role: 'author' }))!.accessToken;
+  describe.each(['author', ...adminRoles] as UserRole[])(
+    'should return 200',
+    async (role) => {
+      it(`if role is ${role}`, async () => {
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
-    const response = await exec();
+        const response = await exec();
 
-    expect(response.status).toBe(200);
-  });
-
-  it('should return 200 if role is [admin,superAdmin]', async () => {
-    const response = await exec();
-
-    expect(response.status).toBe(200);
-  });
+        expect(response.status).toBe(200);
+      });
+    }
+  );
 
   it('should return pagination if authorized', async () => {
     const response = await exec();
