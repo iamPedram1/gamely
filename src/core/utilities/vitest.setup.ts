@@ -13,8 +13,4 @@ beforeAll(async () => {
   request = supertest(server);
 });
 
-afterAll(async () => {
-  server.close();
-});
-
 export { server, request };

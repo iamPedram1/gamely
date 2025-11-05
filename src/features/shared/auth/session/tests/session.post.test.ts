@@ -8,8 +8,12 @@ import crypto from 'core/utilities/crypto';
 import tokenUtils from 'core/services/token.service';
 import { prefixBaseUrl } from 'core/utilities/configs';
 import { sendPostRequest } from 'core/utilities/supertest';
-import { IRefreshToken } from 'features/shared/auth/session/session.types';
-import { generateUser, registerAndLogin } from 'core/utilities/testHelpers';
+import {
+  generateUser,
+  registerAndLogin,
+} from 'features/shared/auth/core/tests/auth.testUtils';
+
+// Dto
 import {
   LoginResponseDto,
   RegisterDto,
@@ -18,6 +22,9 @@ import {
   RefreshTokenDto,
   RevokeTokenDto,
 } from 'features/shared/auth/session/session.dto';
+
+// Types
+import { IRefreshToken } from 'features/shared/auth/session/session.types';
 
 describe('session routes', () => {
   const sessionService = container.resolve(SessionService);

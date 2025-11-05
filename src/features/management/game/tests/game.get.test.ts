@@ -4,18 +4,19 @@ import { container } from 'tsyringe';
 import GameService from 'features/shared/game/core/game.service';
 
 // Utils
+import { adminRoles } from 'features/shared/user/core/user.constant';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  expectUnauthorizedError,
-  registerAndLogin,
   sendCreateGameRequest,
   sendGetGameRequest,
-  sendUploadFileRequest,
-} from 'core/utilities/testHelpers';
-import { adminRoles } from 'features/shared/user/core/user.constant';
+} from 'features/management/game/tests/game.testUtils';
+
+// Types
 import { UserRole } from 'features/shared/user/core/user.types';
 
 describe('GET /management/games', () => {
   let token: string;
+
   const gameService = container.resolve(GameService);
 
   beforeEach(async () => {

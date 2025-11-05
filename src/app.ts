@@ -16,8 +16,7 @@ import { appPort } from 'core/utilities/configs';
 const app = express();
 
 const startApp = async () => {
-  await dbStartup();
-  await i18nStartup(app);
+  await Promise.all([dbStartup(), i18nStartup(app)]);
   baseStartup(app);
   routesStartup(app);
 

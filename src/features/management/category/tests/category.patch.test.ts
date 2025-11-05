@@ -6,13 +6,14 @@ import CategoryService from 'features/shared/category/category.service';
 
 // Utils
 import { appLanguages } from 'core/startup/i18n';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
+import {
+  sendCreateCategoryRequest,
+  sendPatchCategoryRequest,
+} from 'features/management/category/tests/category.testUtilts';
 import {
   expectBadRequest,
   expectUnauthorizedError,
-  generateCategory,
-  registerAndLogin,
-  sendCreateCategoryRequest,
-  sendPatchCategoryRequest,
 } from 'core/utilities/testHelpers';
 
 // DTO

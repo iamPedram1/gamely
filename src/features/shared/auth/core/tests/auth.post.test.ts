@@ -5,22 +5,24 @@ import { faker } from '@faker-js/faker';
 import UserService from 'features/shared/user/core/user.service';
 
 // Utils
-import {
-  ChangePasswordDto,
-  LoginDto,
-  RecoverPasswordDto,
-  RegisterDto,
-} from 'features/shared/auth/core/auth.dto';
+import { expectBadRequest } from 'core/utilities/testHelpers';
 import {
   createUser,
-  expectBadRequest,
   generateAccessToken,
   generateUser,
   sendChangePasswordRequest,
   sendLoginRequest,
   sendRecoverPasswordRequest,
   sendRegisterRequest,
-} from 'core/utilities/testHelpers';
+} from 'features/shared/auth/core/tests/auth.testUtils';
+
+// Dto
+import {
+  ChangePasswordDto,
+  LoginDto,
+  RecoverPasswordDto,
+  RegisterDto,
+} from 'features/shared/auth/core/auth.dto';
 
 describe('auth routes', () => {
   const userService = container.resolve(UserService);

@@ -5,10 +5,8 @@ import FileService from 'features/shared/file/file.service';
 
 // Utilities
 import { fileLocations } from 'features/shared/file/file.constant';
-import {
-  registerAndLogin,
-  sendMultipleUploadFileRequest,
-} from 'core/utilities/testHelpers';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
+import { sendMultipleUploadFileRequest } from 'features/shared/file/test/file.testUtils';
 
 // Types
 import { FileLocationType } from 'features/shared/file/file.types';

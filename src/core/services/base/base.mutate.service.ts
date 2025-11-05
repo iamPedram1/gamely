@@ -161,7 +161,7 @@ class BaseMutateService<
   async updateManyWithConditions<TThrowError extends boolean = true>(
     conditions: OrAndFilter<TSchema> | FilterQuery<TSchema>,
     data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
-    options: BaseMutateOptions & { throwError?: TThrowError }
+    options?: BaseMutateOptions & { throwError?: TThrowError }
   ) {
     const query = this.model.updateMany(conditions, data);
 

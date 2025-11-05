@@ -2,44 +2,42 @@ import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
 // Services
-import GameService from 'features/shared/game/core/game.service';
+import TagService from 'features/shared/tag/tag.service';
 
 // Utils
 import { appLanguages } from 'core/startup/i18n';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
+  sendCreateTagRequest,
+  sendPatchTagRequest,
+} from 'features/management/tag/tests/tag.testUtils';
+import {
   expectBadRequest,
   expectUnauthorizedError,
 } from 'core/utilities/testHelpers';
-import {
-  sendCreateGameRequest,
-  sendPatchGameRequest,
-} from 'features/management/game/tests/game.testUtils';
 
 // DTO
-import { UpdateGameDto } from 'features/management/game/game.management.dto';
+import { UpdateTagDto } from 'features/management/tag/tag.management.dto';
 
-describe('PATCH /management/games', () => {
+describe('PATCH /management/tags', () => {
   let token: string;
-  let payload: UpdateGameDto = {
+  let payload: UpdateTagDto = {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
   };
-  let gameId: string;
-  const gameService = container.resolve(GameService);
+  let tagId: string;
+  const tagService = container.resolve(TagService);
 
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))!.accessToken;
 
-    const response = await sendCreateGameRequest({ token });
+    const response = await sendCreateTagRequest({ token });
     payload.slug = response.body.data!.slug;
     payload.translations = response.body.data!.translations;
-    payload.coverImage = response.body.data!.coverImage.id;
-    payload.releaseDate = response.body.data!.releaseDate;
 
-    gameId = response.body.data!.id;
+    tagId = response.body.data!.id;
   });
 
-  const exec = async () => sendPatchGameRequest(gameId, { payload, token });
+  const exec = async () => sendPatchTagRequest(tagId, { payload, token });
 
   it('should return 401 if user does not have token in header', async () => {
     token = '';
@@ -58,8 +56,8 @@ describe('PATCH /management/games', () => {
   });
 
   it('should return 400 if the slug is already taken', async () => {
-    const game = await sendCreateGameRequest({ token });
-    payload.slug = game.body.data!.slug;
+    const tag = await sendCreateTagRequest({ token });
+    payload.slug = tag.body.data!.slug;
 
     const response = await exec();
 
@@ -72,47 +70,26 @@ describe('PATCH /management/games', () => {
       it(`fails for ${lang}`, async () => {
         payload.translations![lang] = { title: 'ab' };
         delete payload.slug;
-        delete payload.releaseDate;
-        delete payload.coverImage;
         const response = await exec();
         expectBadRequest(response, /title/i);
       });
     }
   );
 
-  describe.each(appLanguages)(
-    'should return 400 if translations.%s.description is not valid',
-    (lang) => {
-      it(`fails for ${lang}`, async () => {
-        payload.translations![lang] = { description: 'a' };
-        delete payload.slug;
-        const response = await exec();
-        expectBadRequest(response, /description/i);
-      });
-    }
-  );
-
   it('should return 200 if slug update is valid', async () => {
-    delete payload.slug;
-    delete payload.releaseDate;
     delete payload.translations;
-
     payload.slug = faker.lorem.slug({ min: 2, max: 4 });
 
     const response = await exec();
-    const game = await gameService.getOneById(gameId, {
+    const tag = await tagService.getOneById(tagId, {
       lean: true,
     });
 
     expect(response.status).toBe(200);
-    expect(game).toBeDefined();
-    if (payload.slug) expect(game.slug).toBe(payload.slug);
-    if (payload.releaseDate)
-      expect(game.releaseDate.toISOString()).toBe(payload.releaseDate);
-    if (payload.coverImage)
-      expect(String(game.coverImage?._id)).toBe(payload.coverImage);
+    expect(tag).toBeDefined();
+    if (payload.slug) expect(tag.slug).toBe(payload.slug);
     if (payload.translations)
-      expect(game.translations).toMatchObject(payload.translations);
+      expect(tag.translations).toMatchObject(payload.translations);
   });
 
   it('should return 200 even on empty object', async () => {

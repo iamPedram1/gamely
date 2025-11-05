@@ -5,15 +5,13 @@ import { container } from 'tsyringe';
 import GameService from 'features/shared/game/core/game.service';
 
 // Utils
+import { adminRoles } from 'features/shared/user/core/user.constant';
+import { expectUnauthorizedError } from 'core/utilities/testHelpers';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  expectUnauthorizedError,
-  registerAndLogin,
   sendCreateGameRequest,
   sendDeleteGameRequest,
-} from 'core/utilities/testHelpers';
-
-// DTO
-import { adminRoles } from 'features/shared/user/core/user.constant';
+} from 'features/management/game/tests/game.testUtils';
 
 describe('DELETE /management/games', () => {
   const gameService = container.resolve(GameService);

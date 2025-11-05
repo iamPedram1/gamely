@@ -1,9 +1,7 @@
 // Utilities
 import { fileLocations } from 'features/shared/file/file.constant';
-import {
-  registerAndLogin,
-  sendUploadFileRequest,
-} from 'core/utilities/testHelpers';
+import { sendUploadFileRequest } from 'features/shared/file/test/file.testUtils';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 
 // Types
 import { FileLocationType } from 'features/shared/file/file.types';

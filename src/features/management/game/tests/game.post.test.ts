@@ -5,12 +5,12 @@ import GameService from 'features/shared/game/core/game.service';
 
 // Utils
 import { appLanguages } from 'core/startup/i18n';
+import { expectBadRequest } from 'core/utilities/testHelpers';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  expectBadRequest,
   generateGame,
-  registerAndLogin,
   sendCreateGameRequest,
-} from 'core/utilities/testHelpers';
+} from 'features/management/game/tests/game.testUtils';
 
 // DTO
 import { CreateGameDto } from 'features/management/game/game.management.dto';

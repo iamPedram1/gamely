@@ -60,11 +60,11 @@ export class UpdateTranslationsDto extends createTranslationsWrapper(
 export class UpdateTagDto {
   @IsOptional()
   @IsSlug()
-  slug: string;
+  slug?: string;
 
   @IsOptional()
   @IsTranslationsField(UpdateTranslationsDto)
-  translations: UpdateTranslationsDto;
+  translations?: UpdateTranslationsDto;
 }
 
 // <----------------   RESPONSE   ---------------->
