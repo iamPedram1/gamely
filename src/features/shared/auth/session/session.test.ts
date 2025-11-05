@@ -5,19 +5,21 @@ import SessionService from 'features/shared/auth/session/session.service';
 
 // Utils
 import crypto from 'core/utilities/crypto';
-import supertest from 'core/utilities/supertest';
 import tokenUtils from 'core/services/token.service';
 import { prefixBaseUrl } from 'core/utilities/configs';
-import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
-import { RegisterDto } from 'features/shared/auth/core/auth.dto';
+import { sendPostRequest } from 'core/utilities/supertest';
 import { IRefreshToken } from 'features/shared/auth/session/session.types';
 import { generateUser, registerAndLogin } from 'core/utilities/testHelpers';
+import {
+  LoginResponseDto,
+  RegisterDto,
+} from 'features/shared/auth/core/auth.dto';
 import {
   RefreshTokenDto,
   RevokeTokenDto,
 } from 'features/shared/auth/session/session.dto';
 
-describe('auth routes', () => {
+describe('session routes', () => {
   const sessionService = container.resolve(SessionService);
 
   describe('POST /token-refresh', () => {
@@ -52,13 +54,13 @@ describe('auth routes', () => {
 
       const response = await exec();
       const afterJWT = tokenUtils.decode<IRefreshToken>(
-        response.body.data.refreshToken
+        response.body.data!.refreshToken
       );
       const sessionAfter = await sessionService.getOneById(afterJWT.sessionId, {
         select: '+refreshToken',
       });
       const isJWTMatch = await crypto.compare(
-        response.body.data.refreshToken,
+        response.body.data!.refreshToken,
         sessionAfter.refreshToken
       );
       expect(isJWTMatch).toBe(true);
@@ -69,8 +71,8 @@ describe('auth routes', () => {
       expect(sessionAfter.refreshToken).toBeDefined();
       expect(response.body.data).toHaveProperty('accessToken');
       expect(response.body.data).toHaveProperty('refreshToken');
-      expect(response.body.data.accessToken.length).toBeGreaterThan(0);
-      expect(response.body.data.refreshToken.length).toBeGreaterThan(0);
+      expect(response.body.data!.accessToken.length).toBeGreaterThan(0);
+      expect(response.body.data!.refreshToken.length).toBeGreaterThan(0);
     });
   });
 
@@ -128,16 +130,9 @@ export const sendRefreshTokenRequest = async (
   payload: RefreshTokenDto,
   token: string = ''
 ) =>
-  await supertest()
-    .post(refreshTokenURL)
-    .set(jwtAccessTokenName, token)
-    .send(payload);
+  await sendPostRequest<LoginResponseDto>(refreshTokenURL, { token, payload });
 
 export const sendRevokeTokenRequest = async (
   payload: RevokeTokenDto,
   token: string = ''
-) =>
-  await supertest()
-    .post(revokeTokenURL)
-    .set(jwtAccessTokenName, token)
-    .send(payload);
+) => await sendPostRequest(revokeTokenURL, { token, payload });

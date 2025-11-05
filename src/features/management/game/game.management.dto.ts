@@ -66,12 +66,12 @@ export class UpdateTranslationDto {
   @IsOptional()
   @IsString()
   @Length(3, 255)
-  title: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
   @Length(10, 500)
-  description: string;
+  description?: string;
 }
 
 export class UpdateTranslationsDto extends createTranslationsWrapper(
@@ -81,19 +81,19 @@ export class UpdateTranslationsDto extends createTranslationsWrapper(
 export class UpdateGameDto {
   @IsOptional()
   @IsSlug()
-  slug: string;
+  slug?: string;
 
   @IsOptional()
   @IsMongoId()
-  coverImage: string | null;
+  coverImage?: string | null;
 
   @IsOptional()
   @IsISO8601()
-  releaseDate: string;
+  releaseDate?: string;
 
   @IsOptional()
   @IsTranslationsField(UpdateTranslationsDto)
-  translations: UpdateTranslationsDto;
+  translations?: UpdateTranslationsDto;
 }
 
 // <----------------   RESPONSE   ---------------->

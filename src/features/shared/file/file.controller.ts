@@ -11,7 +11,7 @@ import { FileMapper } from 'features/shared/file/file.mapper';
 
 // Types
 import type { RequestHandler } from 'express';
-import type { IFileLocation } from 'features/shared/file/file.types';
+import type { FileLocationType } from 'features/shared/file/file.types';
 
 @injectable()
 export default class FileController {
@@ -21,7 +21,7 @@ export default class FileController {
   ) {}
 
   uploadOne: RequestHandler = async (req, res) => {
-    const location = req.params?.location as IFileLocation;
+    const location = req.params?.location as FileLocationType;
     const file = req.file;
 
     const doc = await this.fileService.uploadOne(location, file!, req.user?.id);
@@ -39,7 +39,7 @@ export default class FileController {
 
   uploadMany: RequestHandler = async (req, res) => {
     const result = await this.fileService.uploadMany(
-      req.params?.location as IFileLocation,
+      req.params?.location as FileLocationType,
       req.files as Express.Multer.File[],
       req.user?.id
     );

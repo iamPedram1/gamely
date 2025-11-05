@@ -9,14 +9,14 @@ import type {
 export type FileDocument = HydratedDocument<IFileEntity>;
 export type FileLeanDocument = FlattenMaps<IFileEntity>;
 
-export type IFileLocation = 'game' | 'post' | 'user';
+export type FileLocationType = 'game' | 'post' | 'user';
 
 export interface IFileEntity extends Omit<Document, 'location'> {
   _id: ObjectId;
   creator: IUser;
   createdAt: Date;
   updatedAt: Date;
-  location: IFileLocation;
+  location: FileLocationType;
   originalname: string;
   size: number;
   mimetype: string;

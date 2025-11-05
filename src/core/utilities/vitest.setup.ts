@@ -1,25 +1,20 @@
 import 'reflect-metadata';
-import mongoose from 'mongoose';
-import logger from 'core/utilities/logger';
 import startApp from 'app';
+import { beforeAll, afterAll } from 'vitest';
+import supertest, { Agent } from 'supertest';
+import { Server } from 'http';
 
-export let server: any;
+let server: Server;
+let request: Agent;
 
 beforeAll(async () => {
-  // Start server & connect DB
   server = await startApp();
-});
 
-beforeEach(async () => {
-  await cleanUp();
+  request = supertest(server);
 });
 
 afterAll(async () => {
-  if (server) {
-    await server.close();
-  }
+  server.close();
 });
 
-async function cleanUp() {
-  (await mongoose?.connection?.db?.dropDatabase()) || [];
-}
+export { server, request };

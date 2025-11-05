@@ -3,7 +3,10 @@ import { container } from 'tsyringe';
 
 // Middlewares
 import auth from 'core/middlewares/auth';
-import { uploadManyFiles, uploadOneFile } from 'core/middlewares/upload';
+import {
+  uploadManyFiles,
+  uploadOneFile,
+} from 'features/shared/file/file.middleware.ts';
 
 // Module
 import FileController from 'features/shared/file/file.controller';

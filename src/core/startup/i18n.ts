@@ -18,7 +18,7 @@ import { AppLanguages } from 'core/types/i18n';
 
 export const appLanguages: AppLanguages[] = ['fa', 'en'];
 
-export default function i18nStartup(app: Express) {
+export default async function i18nStartup(app: Express) {
   const resources = {
     en: {
       error: errorEN,
@@ -34,7 +34,7 @@ export default function i18nStartup(app: Express) {
     },
   };
 
-  i18next.use(LanguageDetector).init({
+  await i18next.use(LanguageDetector).init({
     fallbackLng: 'en',
     preload: ['fa'],
     ns: ['error', 'models', 'common', 'messages'],

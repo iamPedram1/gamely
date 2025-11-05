@@ -39,9 +39,7 @@ export default function auth(roles: UserRole[]) {
     // Check User Exists
     const user = await User.findById(userId).lean();
     if (!user)
-      return next(
-        new AnonymousError('User with given id does not exist', mask, 400)
-      );
+      throw new AnonymousError('User with given id does not exist', mask, 400);
 
     // Check Role
     if (!roles.includes(user.role))
@@ -62,6 +60,6 @@ export default function auth(roles: UserRole[]) {
     const ctx = requestContext.getStore();
     if (ctx) ctx.user = req.user;
 
-    return next();
+    next();
   };
 }

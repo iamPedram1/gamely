@@ -10,7 +10,6 @@ import File from 'features/shared/file/file.model';
 import BaseService from 'core/services/base/base.service';
 
 // Utilities
-import { t } from 'core/utilities/request-context';
 import { AnonymousError, BadRequestError } from 'core/utilities/errors';
 
 // Types
@@ -18,7 +17,7 @@ import type { DocumentId } from 'core/types/common';
 import type { BaseMutateOptions } from 'core/types/base.service.type';
 import type {
   IFileEntity,
-  IFileLocation,
+  FileLocationType,
   FileDocument,
 } from 'features/shared/file/file.types';
 
@@ -50,24 +49,25 @@ class FileService extends BaseService<IFileEntity> {
   }
 
   async uploadOne(
-    location: IFileLocation,
+    location: FileLocationType,
     file: Express.Multer.File,
     userId?: string
   ): Promise<FileDocument> {
-    if (!file) throw new BadRequestError(t('messages.file.not_provided'));
+    if (!file) throw new BadRequestError(this.t('messages.file.not_provided'));
     if (!location)
-      throw new BadRequestError(t('messages.file.location_not_provided'));
+      throw new BadRequestError(this.t('messages.file.location_not_provided'));
 
     // ✅ Compute destination folder
-    const folderMap: Record<IFileLocation, string> = {
+    const folderMap: Record<FileLocationType, string> = {
       game: 'public/images/games',
       user: 'public/images/users',
       post: 'public/images/posts',
     };
 
     const uploadPath = folderMap[location];
+
     if (!uploadPath)
-      throw new BadRequestError(t('messages.file.location_invalid'));
+      throw new BadRequestError(this.t('messages.file.location_invalid'));
 
     // Ensure directory exists
     const absolutePath = path.join(process.cwd(), uploadPath);
@@ -94,13 +94,13 @@ class FileService extends BaseService<IFileEntity> {
       ...(userId && { creator: userId }),
     }).save();
 
-    if (!doc) throw new BadRequestError(t('messages.file.upload_failed'));
+    if (!doc) throw new BadRequestError(this.t('messages.file.upload_failed'));
 
     return doc;
   }
 
   async uploadMany(
-    location: IFileLocation,
+    location: FileLocationType,
     files: Express.Multer.File[],
     userId?: string
   ) {

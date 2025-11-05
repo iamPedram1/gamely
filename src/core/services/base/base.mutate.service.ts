@@ -105,7 +105,7 @@ class BaseMutateService<
     keyName: keyof AnyKeys<TSchema>,
     matchValue: any,
     data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { throwError?: boolean }
   ): Promise<UpdateResult> {
     const query = this.model.updateMany(
       { [keyName]: matchValue } as FilterQuery<TSchema>,
@@ -114,13 +114,13 @@ class BaseMutateService<
 
     const result = await this.applyMutateOptions(query, options).exec();
 
-    if (result.matchedCount === 0) {
+    if ((options?.throwError ?? false) && result.matchedCount === 0) {
       throw new NotFoundError(
         this.t('error.not_found_by_key', { key: String(keyName) })
       );
     }
 
-    if (result.modifiedCount === 0) {
+    if ((options?.throwError ?? false) && result.modifiedCount === 0) {
       throw new AnonymousError(
         `${this.model.modelName} matched but could not be updated`
       );
@@ -133,7 +133,7 @@ class BaseMutateService<
     id: DocumentId,
     referenceKey: K,
     value: NestedValueOf<TSchema, K>,
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { throwError?: boolean }
   ): Promise<UpdateResult> {
     return this.updateManyByReferences([id], referenceKey, value, options);
   }
@@ -142,16 +142,16 @@ class BaseMutateService<
     ids: Array<DocumentId>,
     referenceKey: K,
     value: NestedValueOf<TSchema, K>,
-    options?: BaseMutateOptions
+    options?: BaseMutateOptions & { throwError?: boolean }
   ): Promise<UpdateResult> {
-    const query = this.model.updateMany(
-      { [referenceKey]: { $in: ids } } as FilterQuery<TSchema>,
-      { [referenceKey]: value } as UpdateQuery<TSchema>
-    );
+    const filter = { [referenceKey]: { $in: ids } } as FilterQuery<TSchema>;
+    const query = this.model.updateMany(filter, {
+      [referenceKey]: value,
+    } as UpdateQuery<TSchema>);
 
     const result = await this.applyMutateOptions(query, options).exec();
 
-    if (result.matchedCount === 0) {
+    if ((options?.throwError ?? false) && result.matchedCount === 0) {
       throw new NotFoundError(this.t('error.no_documents_with_references'));
     }
 
@@ -161,13 +161,13 @@ class BaseMutateService<
   async updateManyWithConditions<TThrowError extends boolean = true>(
     conditions: OrAndFilter<TSchema> | FilterQuery<TSchema>,
     data: UpdateWithAggregationPipeline | UpdateQuery<TSchema>,
-    options?: BaseMutateOptions & { throwError?: TThrowError }
+    options: BaseMutateOptions & { throwError?: TThrowError }
   ) {
     const query = this.model.updateMany(conditions, data);
 
     const result = await this.applyMutateOptions(query, options).exec();
 
-    if (result.matchedCount === 0) {
+    if ((options?.throwError ?? false) && result.matchedCount === 0) {
       throw new NotFoundError(this.t('error.not_found_docs'));
     }
 

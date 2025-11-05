@@ -1,6 +1,7 @@
 import multer, { MulterError } from 'multer';
 import { BadRequestError } from 'core/utilities/errors';
 import { t } from 'core/utilities/request-context';
+import { NextFunction, Request, Response } from 'express';
 
 type UploadOptions = {
   fieldName: string;
@@ -17,7 +18,7 @@ export const uploadOneFile = ({
     limits: { fileSize: maxSize },
   });
 
-  return (req: any, res: any, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     upload.single(fieldName)(req, res, (err: any) => {
       if (err instanceof MulterError) {
         switch (err.code) {
@@ -28,7 +29,9 @@ export const uploadOneFile = ({
               )
             );
           case 'LIMIT_UNEXPECTED_FILE':
-            return next(t('messages.file.unexpected_file'));
+            return next(
+              new BadRequestError(t('messages.file.unexpected_file'))
+            );
           default:
             return next(new BadRequestError(t('messages.file.upload_failed')));
         }
@@ -49,7 +52,7 @@ export const uploadManyFiles = ({
     limits: { files: maxFiles, fileSize: maxSize },
   });
 
-  return (req: any, res: any, next: any) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     upload.array(fieldName)(req, res, (err: any) => {
       if (err instanceof MulterError) {
         switch (err.code) {
@@ -72,7 +75,9 @@ export const uploadManyFiles = ({
               )
             );
           default:
-            return next(t('messages.file.upload_failed_plural'));
+            return next(
+              new BadRequestError(t('messages.file.upload_failed_plural'))
+            );
         }
       }
       if (err)

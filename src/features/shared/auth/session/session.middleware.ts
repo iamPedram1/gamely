@@ -14,16 +14,17 @@ import {
 
 // Types
 import type { IToken } from 'features/shared/auth/session/session.types';
+import { request } from 'core/utilities/vitest.setup';
 
 export async function updateSessionActivity(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const token = req.header(jwtAccessTokenName);
-  if (!token) return next();
-
   try {
+    const token = req.header(jwtAccessTokenName);
+    if (!token) return;
+
     const { sessionId } = tokenUtils.verify<IToken>(
       token,
       jwtAccessTokenKey,
@@ -32,12 +33,13 @@ export async function updateSessionActivity(
 
     // Fetch lastActivity
     const session = await Session.findById(sessionId).select('lastActivity');
-    if (!session) return next();
+    if (!session) return;
 
     const now = new Date();
     const THROTTLE_MS = 60 * 1000;
+    const lastActivity = session.lastActivity?.getTime() ?? 0;
 
-    if (now.getTime() - session.lastActivity.getTime() > THROTTLE_MS) {
+    if (now.getTime() - lastActivity > THROTTLE_MS) {
       // Fire-and-forget update
       Session.findByIdAndUpdate(sessionId, { lastActivity: now }).catch(
         logger.error

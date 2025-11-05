@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { faker, fakerFA } from '@faker-js/faker';
 import tokenUtils from 'core/services/token.service';
 import User from 'features/shared/user/core/user.model';
@@ -9,12 +10,13 @@ import {
   RegisterDto,
   RegisterResponseDto,
 } from 'features/shared/auth/core/auth.dto';
-import supertest, {
+import {
   sendDeleteRequest,
   sendGetRequest,
   sendPatchRequest,
   sendPostRequest,
   SendRequestOptions,
+  SuperTestResponse,
 } from 'core/utilities/supertest';
 
 import { Model } from 'mongoose';
@@ -27,6 +29,18 @@ import {
 } from 'features/management/category/category.management.dto';
 import Category from 'features/shared/category/category.model';
 import { UserRole } from 'features/shared/user/core/user.types';
+import {
+  CreateGameDto,
+  GameManagementResponseDto,
+  UpdateGameDto,
+} from 'features/management/game/game.management.dto';
+import Game from 'features/shared/game/core/game.model';
+import path from 'path';
+import { jwtAccessTokenName } from 'features/shared/auth/session/session.constant';
+import { IApiResponse } from 'core/utilities/response';
+import { FileResponseDto } from 'features/shared/file/file.dto';
+import { FileLocationType } from 'features/shared/file/file.types';
+import { request } from 'core/utilities/vitest.setup';
 
 export function generateUser() {
   return {
@@ -183,3 +197,94 @@ export async function createCategory(
 ) {
   return await new Category(category).save();
 }
+
+// <----------------   GAME   ---------------->
+const gameURL = prefixManagementBaseUrl('/games');
+export async function generateGame(token?: string) {
+  const img = await sendUploadFileRequest({
+    token: token || '',
+    payload: 'game',
+  });
+
+  return {
+    coverImage: img?.body?.data?.id || '',
+    releaseDate: faker.date.anytime().toISOString(),
+    slug: faker.lorem.slug({ min: 2, max: 3 }),
+    translations: {
+      en: {
+        title: faker.book.title(),
+        description: faker.lorem.paragraph({ min: 4, max: 7 }),
+      },
+      fa: {
+        title: fakerFA.book.title(),
+        description: fakerFA.lorem.paragraph({ min: 4, max: 7 }),
+      },
+    },
+  } as CreateGameDto;
+}
+
+export const sendCreateGameRequest = async (
+  options?: SendRequestOptions<CreateGameDto>
+) => {
+  return await sendPostRequest<GameManagementResponseDto>(gameURL, {
+    payload: await generateGame(options?.token),
+    ...options,
+  });
+};
+export const sendPatchGameRequest = async (
+  id: string,
+  options: SendRequestOptions<UpdateGameDto>
+) => {
+  return await sendPatchRequest<GameManagementResponseDto, UpdateGameDto>(
+    `${gameURL}/${id}`,
+    options
+  );
+};
+
+export const sendGetGameRequest = async <T = any>(token: string) => {
+  return await sendGetRequest<T>(gameURL, { token });
+};
+
+export const sendDeleteGameRequest = async (id: string, token: string) => {
+  return await sendDeleteRequest(`${gameURL}/${id}`, { token });
+};
+
+// <----------------   FILE   ---------------->
+const uploadURL = prefixBaseUrl('/upload');
+
+const getSampleImage = (name?: string) => {
+  return path.join(
+    process.cwd(),
+    'public/images/test',
+    name || 'a-way-out.jpg'
+  );
+};
+export const sendUploadFileRequest = async (
+  options: SendRequestOptions<FileLocationType> & {
+    token: string;
+    noFile?: boolean;
+  }
+): Promise<SuperTestResponse<IApiResponse<FileResponseDto>>> => {
+  let q = request
+    .post(`${uploadURL}/${options.payload}`)
+    .set(jwtAccessTokenName, options.token);
+
+  return !options?.noFile ? await q.attach('image', getSampleImage()) : await q;
+};
+
+export const sendMultipleUploadFileRequest = async (
+  options: SendRequestOptions<FileLocationType> & {
+    token: string;
+    count: number;
+  }
+): Promise<SuperTestResponse<IApiResponse<FileResponseDto[]>>> => {
+  const q = request
+    .post(`${uploadURL}/${options.payload}/batch`)
+    .set(jwtAccessTokenName, options.token);
+
+  for (let i = 0; i < options.count; i++) {
+    q.attach('image', getSampleImage());
+  }
+
+  return await q;
+};

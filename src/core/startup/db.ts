@@ -4,7 +4,9 @@ import { appDbUrl } from 'core/utilities/configs';
 
 export default async function dbStartup() {
   try {
-    return await mongoose.connect(appDbUrl);
+    await mongoose
+      .connect(appDbUrl)
+      .then((v) => logger.info('Connected to db'));
   } catch (err) {
     logger.error('🔴 Error in connecting to db...', err);
   }
