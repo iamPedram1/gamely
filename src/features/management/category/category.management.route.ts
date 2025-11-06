@@ -54,8 +54,8 @@ categoryManagementRouter.post(
 // <----------------   PATCH   ---------------->
 categoryManagementRouter.patch(
   '/:id',
-  validateDocumentExistById(Category),
   validateBody(UpdateCategoryDto),
+  validateDocumentExistById(Category),
   validateUniqueConflict(Category, 'slug'),
   categoryController.update
 );

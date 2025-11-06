@@ -1,11 +1,19 @@
 import { TranslationKeys } from 'core/types/i18n';
-import { NotFoundError, ValidationError } from 'core/utilities/errors';
+import {
+  BadRequestError,
+  NotFoundError,
+  ValidationError,
+} from 'core/utilities/errors';
 import { Request, Response, NextFunction } from 'express';
 import { isValidObjectId, Model } from 'mongoose';
 
 interface ValidateConfigs {
   type?: 'id' | 'idArray' | 'string' | 'stringArray';
   required?: boolean;
+  Error?:
+    | typeof NotFoundError
+    | typeof ValidationError
+    | typeof BadRequestError;
 }
 
 /**
@@ -27,15 +35,13 @@ export function validateParam<T>(
   Model: Model<T>,
   paramKey: string,
   modelKey: keyof T,
-  { required, type = 'string' }: ValidateConfigs = {}
+  { Error = ValidationError, required, type = 'string' }: ValidateConfigs = {}
 ) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const raw = req.params[paramKey];
 
     if (!raw && required)
-      throw new ValidationError(
-        req.t('error.param.required', { param: paramKey })
-      );
+      throw new Error(req.t('error.param.required', { param: paramKey }));
 
     // normalize to array if array type or comma-separated
     const values =
@@ -50,7 +56,13 @@ export function validateParam<T>(
 
     // validate ObjectId if type is id
     if (type.includes('id') && values.some((v) => !isValidObjectId(v)))
-      throw new ValidationError(req.t('error.id_invalid'));
+      throw new Error(
+        req.t('error.id_invalid', {
+          keyname: req.t(
+            `models.${Model.modelName}.singular` as TranslationKeys
+          ),
+        })
+      );
 
     // check existence in DB
     if (type.includes('Array')) {
@@ -58,11 +70,17 @@ export function validateParam<T>(
         [modelKey]: { $in: values },
       } as any);
       if (count !== values.length)
-        throw new NotFoundError(req.t('error.id_invalid'));
+        throw new Error(
+          req.t('error.id_invalid', {
+            keyname: req.t(
+              `models.${Model.modelName}.singular` as TranslationKeys
+            ),
+          })
+        );
     } else {
       const exists = await Model.exists({ [modelKey]: values[0] } as any);
       if (!exists)
-        throw new NotFoundError(
+        throw new Error(
           req.t('error.param.not_found', {
             param: paramKey,
             value: raw,
@@ -96,15 +114,13 @@ export function validateRequestField<T>(
   source: 'params' | 'body' | 'query',
   fieldName: string,
   modelKey: keyof T,
-  { required, type = 'string' }: ValidateConfigs = {}
+  { Error = ValidationError, required, type = 'string' }: ValidateConfigs = {}
 ) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const rawValue = req[source][fieldName];
 
     if (!rawValue && required) {
-      throw new ValidationError(
-        req.t('error.param.required', { param: fieldName })
-      );
+      throw new Error(req.t('error.param.required', { param: fieldName }));
     }
 
     // Normalize value to array if needed
@@ -121,7 +137,13 @@ export function validateRequestField<T>(
 
     // Validate ObjectId if type is id
     if (type.startsWith('id') && values.some((v) => !isValidObjectId(v))) {
-      throw new ValidationError(req.t('error.id_invalid'));
+      throw new Error(
+        req.t('error.id_invalid', {
+          keyname: req.t(
+            `models.${Model.modelName}.singular` as TranslationKeys
+          ),
+        })
+      );
     }
 
     // Check existence in DB
@@ -130,15 +152,23 @@ export function validateRequestField<T>(
         [modelKey]: { $in: values },
       } as any);
       if (count !== values.length)
-        throw new NotFoundError(req.t('error.id_invalid'));
+        throw new Error(
+          req.t('error.id_invalid', {
+            keyname: req.t(
+              `models.${Model.modelName}.singular` as TranslationKeys
+            ),
+          })
+        );
     } else {
       const exists = await Model.exists({ [modelKey]: values[0] } as any);
       if (!exists) {
-        throw new NotFoundError(
+        throw new Error(
           req.t('error.param.not_found', {
             param: fieldName,
             value: rawValue,
-            model: req.t(`models.${Model.modelName}.singular` as any),
+            model: req.t(
+              `models.${Model.modelName}.singular` as TranslationKeys
+            ),
           })
         );
       }

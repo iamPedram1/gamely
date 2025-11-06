@@ -56,8 +56,8 @@ gameManagementRouter.post('/', [
 
 // <----------------   PATCH   ---------------->
 gameManagementRouter.patch('/:id', [
-  validateDocumentExistById(Game),
   validateBody(UpdateGameDto),
+  validateDocumentExistById(Game),
   validateUniqueConflict(Game, 'slug'),
   gameController.update,
 ]);

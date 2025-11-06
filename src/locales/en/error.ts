@@ -21,7 +21,7 @@ const errosTranslations = {
   },
   validation_failed: 'Validation failed',
   id_required: 'The id paramater is required',
-  id_invalid: 'The id paramater is invalid',
+  id_invalid: 'The {{keyname}} id paramater is invalid',
   token_generic_error: 'Access denied, token is invalid or expired',
   uniqueness_error:
     "{{field}} '{{value}}' is already taken by another {{name}}`",

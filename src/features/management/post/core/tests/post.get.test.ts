@@ -1,29 +1,30 @@
-import { container } from 'tsyringe';
-
-// Services
-import TagService from 'features/shared/tag/tag.service';
-
 // Utils
+import { appLanguages } from 'core/startup/i18n';
+import { UserRole } from 'features/shared/user/core/user.types';
+import { adminRoles } from 'features/shared/user/core/user.constant';
 import { expectUnauthorizedError } from 'core/utilities/testHelpers';
+import { generatePostService } from 'features/shared/post/core/post.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  sendCreateTagRequest,
-  sendGetTagRequest,
-} from 'features/management/tag/tests/tag.testUtils';
-import { adminRoles } from 'features/shared/user/core/user.constant';
-import { UserRole } from 'features/shared/user/core/user.types';
+  sendCreatePostRequest,
+  sendGetPostRequest,
+} from 'features/management/post/core/tests/post.testUtils';
 
-describe('GET /management/tags', () => {
+// Dto
+import { PostManagementResponseDto } from 'features/management/post/core/post.management.dto';
+
+describe('GET /management/posts', () => {
   let token: string;
-  const tagService = container.resolve(TagService);
+  const postService = generatePostService();
+  let post: PostManagementResponseDto;
 
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
-    await sendCreateTagRequest({ token });
+    post = (await sendCreatePostRequest({ token })).body.data!;
   });
 
-  const exec = async () => sendGetTagRequest(token);
+  const exec = async () => sendGetPostRequest(token);
 
   it('should return 401 if user does not have token in header', async () => {
     token = '';
@@ -68,9 +69,19 @@ describe('GET /management/tags', () => {
     expect(Array.isArray(response.body.data?.docs)).toBe(true);
     expect(response.body.data?.docs.length).toBeGreaterThan(0);
     expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
+  });
 
-    ['translations', 'slug', 'id'].forEach((key) => {
-      expect(response.body.data?.docs[0]).toHaveProperty(key);
+  it('should not return post content', async () => {
+    const response = await exec();
+
+    expect(response.body.data?.docs.length).toBeGreaterThan(0);
+
+    describe.each(appLanguages)('should not return post content', (lang) => {
+      it(`in translations[${lang}]`, async () => {
+        expect(
+          response.body.data?.docs?.[0].translations?.[lang]?.content
+        ).not.toHaveProperty('');
+      });
     });
   });
 });

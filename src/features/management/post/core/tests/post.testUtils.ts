@@ -26,6 +26,7 @@ import {
   PostManagementResponseDto,
   UpdatePostDto,
 } from 'features/management/post/core/post.management.dto';
+import { WithPagination } from 'core/types/paginate';
 
 const postsURL = prefixManagementBaseUrl('/posts');
 
@@ -43,7 +44,7 @@ export async function generatePostRequirements(token: string) {
   return { tag, game, category, coverImage };
 }
 
-export async function generatePost(token: string) {
+export async function generatePostData(token: string) {
   try {
     const { category, coverImage, game, tag } =
       await generatePostRequirements(token);
@@ -51,19 +52,19 @@ export async function generatePost(token: string) {
     return {
       slug: faker.lorem.slug({ min: 2, max: 3 }),
       category: category.body.data?.id || '',
-      tags: [tag.body.data?.id || ''],
+      tags: [tag.body.data?.id || ''].filter((v) => v),
       coverImage: coverImage.body.data?.id || '',
       game: game.body.data?.id || '',
       readingTime: faker.number.int({ min: 1, max: 20 }),
       translations: {
         en: {
           title: faker.internet.displayName(),
-          abstract: faker.lorem.paragraph(2),
+          abstract: faker.lorem.sentence({ min: 2, max: 4 }),
           content: faker.lorem.paragraph(10),
         },
         fa: {
           title: fakerFA.internet.displayName(),
-          abstract: fakerFA.lorem.paragraph(2),
+          abstract: fakerFA.lorem.sentence({ min: 2, max: 4 }),
           content: fakerFA.lorem.paragraph(10),
         },
       },
@@ -77,7 +78,7 @@ export async function generatePost(token: string) {
 export const sendCreatePostRequest = async (
   options: SendRequestOptions<CreatePostDto> & { token: string }
 ) => {
-  const post = await generatePost(options.token);
+  const post = await generatePostData(options.token);
 
   const res = await sendPostRequest<PostManagementResponseDto>(postsURL, {
     payload: post,
@@ -97,8 +98,11 @@ export const sendPatchPostRequest = async (
   );
 };
 
-export const sendGetPostRequest = async <T = any>(token: string) => {
-  return await sendGetRequest<T>(postsURL, { token });
+export const sendGetPostRequest = async (token: string) => {
+  return await sendGetRequest<WithPagination<PostManagementResponseDto>>(
+    postsURL,
+    { token }
+  );
 };
 
 export const sendDeletePostRequest = async (id: string, token: string) => {
@@ -107,5 +111,5 @@ export const sendDeletePostRequest = async (id: string, token: string) => {
 
 export async function createPost(post?: CreatePostDto) {
   const token = (await registerAndLogin())!.accessToken;
-  return await new Post(post ?? generatePost(token)).save();
+  return await new Post(post ?? generatePostData(token)).save();
 }

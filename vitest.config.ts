@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import path from 'path';
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
@@ -8,10 +9,11 @@ export default defineConfig({
     globals: true,
     hideSkippedTests: true,
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    dir: 'src/features',
+    include: ['**/*.test.ts'],
+    pool: 'threads',
     setupFiles: ['src/core/utilities/vitest.setup.ts'],
     maxWorkers: '100%',
-    maxConcurrency: 5,
     testTimeout: 5000,
   },
 });

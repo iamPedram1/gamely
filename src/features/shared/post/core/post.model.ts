@@ -62,9 +62,9 @@ const postSchema = new Schema<IPostEntity, Model<IPostEntity>>(
       ref: 'Category',
     },
     coverImage: {
-      default: null,
       type: Types.ObjectId,
       ref: 'File',
+      required: true,
     },
     tags: [
       {

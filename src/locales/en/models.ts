@@ -3,6 +3,10 @@ export const modelsTranslations = {
     singular: 'User',
     plural: 'Users',
   },
+  File: {
+    singluar: 'File',
+    plural: 'Files',
+  },
   Category: {
     singular: 'Category',
     plural: 'Categories',

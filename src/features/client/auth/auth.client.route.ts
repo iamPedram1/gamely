@@ -29,26 +29,26 @@ const sessionController = container.resolve(SessionController);
 
 authClientRouter.post('/login', [
   limitier,
-  blockRequestWithToken,
   validateBody(LoginDto),
+  blockRequestWithToken,
   authController.login,
 ]);
 authClientRouter.post('/register', [
   limitier,
-  blockRequestWithToken,
   validateBody(RegisterDto),
+  blockRequestWithToken,
   authController.register,
 ]);
 authClientRouter.post('/recover-password', [
   limitier,
-  blockRequestWithToken,
   validateBody(RecoverPasswordDto),
+  blockRequestWithToken,
   authController.recoverPassword,
 ]);
 authClientRouter.post('/change-password', [
   limitier,
-  blockRequestWithToken,
   validateBody(ChangePasswordDto),
+  blockRequestWithToken,
   authController.changePassword,
 ]);
 authClientRouter.post(
@@ -60,8 +60,8 @@ authClientRouter.post(
 authClientRouter.post(
   '/token/revoke',
   limitier,
-  auth(['user', 'author', 'admin', 'superAdmin']),
   validateBody(RevokeTokenDto),
+  auth(['user', 'author', 'admin', 'superAdmin']),
   sessionController.revokeToken
 );
 

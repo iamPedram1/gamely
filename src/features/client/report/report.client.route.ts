@@ -13,12 +13,11 @@ import { CreateReportDto } from 'features/shared/report/report.dto';
 const reportClientRouter = express.Router();
 const reportClientController = container.resolve(ReportClientController);
 
-const accessMiddleware = auth(['user', 'author', 'admin', 'superAdmin']);
+reportClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 
 // <----------------   POST   ---------------->
 reportClientRouter.post(
   '/',
-  accessMiddleware,
   validateBody(CreateReportDto),
   reportClientController.report
 );

@@ -41,6 +41,7 @@ export const uploadOneFile = ({
     });
   };
 };
+
 export const uploadManyFiles = ({
   fieldName,
   maxFiles = 3,

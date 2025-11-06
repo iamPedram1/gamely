@@ -25,7 +25,7 @@ export const sendUploadFileRequest = async ({
   token: string;
   payload: FileLocationType;
   noFile?: boolean;
-}) => {
+}): Promise<SuperTestResponse<IApiResponse<FileResponseDto>>> => {
   const q = request
     .post(`${uploadURL}/${payload}`)
     .set(jwtAccessTokenName, token);

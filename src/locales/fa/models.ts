@@ -3,6 +3,10 @@ const modelsTranslations = {
     singular: 'کاربر',
     plural: 'کاربران',
   },
+  File: {
+    singluar: 'فایل',
+    plural: 'فایل‌ها',
+  },
   Category: {
     singular: 'دسته‌بندی',
     plural: 'دسته‌بندی‌ها',

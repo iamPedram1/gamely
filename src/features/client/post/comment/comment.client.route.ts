@@ -29,8 +29,8 @@ commentClientRouter.get(
 commentClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 commentClientRouter.post(
   '/',
-  validateDocumentExistById(Post),
   validateBody(CreateCommentDto),
+  validateDocumentExistById(Post),
   commentController.create
 );
 

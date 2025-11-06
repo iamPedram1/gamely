@@ -11,7 +11,7 @@ export type FileLeanDocument = FlattenMaps<IFileEntity>;
 
 export type FileLocationType = 'game' | 'post' | 'user';
 
-export interface IFileEntity extends Omit<Document, 'location'> {
+export interface IFileEntity {
   _id: ObjectId;
   creator: IUser;
   createdAt: Date;

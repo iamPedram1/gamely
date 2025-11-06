@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import supertest, { Agent } from 'supertest';
 import { beforeAll } from 'vitest';
-import type { Server } from 'http';
 import app from 'app';
 
 // Utils
@@ -15,6 +14,12 @@ beforeAll(async () => {
 
   request = supertest(app);
 });
+
+vi.mock('core/utilities/mail', () => ({
+  sendEmail: vi.fn(async (args) => {
+    return { success: true, message: 'Mocked email success 🚀' };
+  }),
+}));
 
 process.on('unhandledRejection', (err) => {
   logger.error('🔴🔴🔴🔴🔴🔴 VITEST SETUP ERROR - unhandledRejection', err);

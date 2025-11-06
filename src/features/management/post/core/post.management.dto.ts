@@ -87,8 +87,19 @@ export class CreatePostDto {
 
 // <----------------   UPDATE   ---------------->
 export class UpdateTranslationDto {
+  @IsOptional()
+  @IsString()
+  @Length(3, 255)
   title: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 150)
   abstract: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
   content: string;
 }
 export class UpdateTranslationsDto extends createTranslationsWrapper(

@@ -31,8 +31,8 @@ commentManagementRouter.get(
 // <----------------   PATCH   ---------------->
 commentManagementRouter.patch(
   '/:id',
-  validateParam(Comment, 'id', '_id', { type: 'id' }),
   validateBody(UpdateCommentDto),
+  validateParam(Comment, 'id', '_id', { type: 'id' }),
   commentController.update
 );
 // <----------------   DELETE   ---------------->

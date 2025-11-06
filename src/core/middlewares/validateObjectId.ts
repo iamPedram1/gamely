@@ -31,7 +31,13 @@ export default function validateObjectId<T>(Model: Model<T>) {
     if (!id) throw new ValidationError(req.t('error.id_required'));
 
     if (!isValidObjectId(id))
-      throw new ValidationError(req.t('error.id_invalid'));
+      throw new NotFoundError(
+        req.t('error.id_invalid', {
+          keyname: req.t(
+            `models.${Model.modelName}.singular` as TranslationKeys
+          ),
+        })
+      );
 
     const count = await Model.exists({ _id: id });
     if (!count)

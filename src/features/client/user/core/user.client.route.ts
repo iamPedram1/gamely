@@ -32,8 +32,8 @@ userClientRouter.get(
 // <----------------   PATCH  ---------------->
 userClientRouter.patch(
   '/profile',
-  accessMiddleware,
   validateBody(UpdateProfileDto),
+  accessMiddleware,
   userClientController.update
 );
 

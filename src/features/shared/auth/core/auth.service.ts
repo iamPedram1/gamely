@@ -17,7 +17,6 @@ import {
 
 // Utilities
 import logger from 'core/utilities/logger';
-import crypto from 'core/utilities/crypto';
 import { sendEmail } from 'core/utilities/mail';
 import { i18nInstance, t } from 'core/utilities/request-context';
 import {

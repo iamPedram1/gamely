@@ -58,8 +58,8 @@ tagManagementRouter.post(
 // <----------------   PATCH  ---------------->
 tagManagementRouter.patch(
   '/:id',
-  validateDocumentExistById(Tag),
   validateBody(UpdateTagDto),
+  validateDocumentExistById(Tag),
   validateUniqueConflict(Tag, 'slug'),
   tagController.update
 );
