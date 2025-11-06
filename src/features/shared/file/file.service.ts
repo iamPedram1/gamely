@@ -20,6 +20,7 @@ import type {
   FileLocationType,
   FileDocument,
 } from 'features/shared/file/file.types';
+import { isTestMode } from 'core/utilities/helperPack';
 
 export type IFileService = InstanceType<typeof FileService>;
 
@@ -70,7 +71,10 @@ class FileService extends BaseService<IFileEntity> {
       throw new BadRequestError(this.t('messages.file.location_invalid'));
 
     // Ensure directory exists
-    const absolutePath = path.join(process.cwd(), uploadPath);
+    const absolutePath = path.join(
+      process.cwd(),
+      isTestMode ? `${uploadPath}/tests` : uploadPath
+    );
     if (!fs.existsSync(absolutePath))
       fs.mkdirSync(absolutePath, { recursive: true });
 

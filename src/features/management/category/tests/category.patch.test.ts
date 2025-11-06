@@ -32,10 +32,10 @@ describe('PATCH /management/categories', () => {
 
     const response = await sendCreateCategoryRequest({ token });
     payload.slug = response.body.data!.slug;
-    payload.parentId = response.body.data!.parentId;
-    payload.translations = response.body.data!.translations;
+    payload.parentId = response.body.data?.parentId;
+    payload.translations = response.body.data?.translations;
 
-    categoryId = response.body.data!.id;
+    categoryId = response.body.data?.id as string;
   });
 
   const exec = async () =>
@@ -90,7 +90,7 @@ describe('PATCH /management/categories', () => {
 
   it('should return 200 if the parentId is valid', async () => {
     const res = await sendCreateCategoryRequest({ token });
-    payload.parentId = res.body.data!.id;
+    payload.parentId = res.body.data?.id as string;
 
     const response = await exec();
     const category = await categoryService.getOneById(categoryId, {

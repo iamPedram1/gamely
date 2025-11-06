@@ -7,7 +7,7 @@ import {
   jwtAccessTokenKey,
   jwtAccessTokenName,
 } from 'features/shared/auth/session/session.constant';
-import type { IToken } from 'features/shared/auth/session/session.types';
+import type { IAccessToken } from 'features/shared/auth/session/session.types';
 
 export const context = (req: Request, res: Response, next: NextFunction) => {
   runWithContext({ user: req.user, i18n: req.i18n, t: req.t }, next);
@@ -31,7 +31,7 @@ export const initializeContext = async (
         token,
         jwtAccessTokenKey,
         req.t('common.token')
-      ) as IToken;
+      ) as IAccessToken;
 
       const user = await User.findOne({ _id: userId })
         .lean()

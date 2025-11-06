@@ -40,7 +40,7 @@ describe('POST /files/:location/batch', () => {
         expect(res.statusCode).toBe(201);
         expect(res.body.data).toBeDefined();
         expect(Array.isArray(res.body.data)).toBe(true);
-        expect(res.body.data!.length).toBe(fileCount);
+        expect(res.body.data?.length).toBe(fileCount);
 
         for (let file of res.body.data || []) {
           expect(await fileService.existsById(file.id)).toBe(true);
@@ -65,7 +65,7 @@ describe('POST /files/:location/batch', () => {
         expect(res.statusCode).toBe(201);
         expect(res.body.data).toBeDefined();
         expect(Array.isArray(res.body.data)).toBe(true);
-        expect(res.body.data!.length).toBe(fileCount);
+        expect(res.body.data?.length).toBe(fileCount);
 
         for (let file of res.body.data || []) {
           expect(await fileService.existsById(file.id)).toBe(true);

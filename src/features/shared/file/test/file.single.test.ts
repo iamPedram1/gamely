@@ -35,11 +35,11 @@ describe('POST /files/:location', () => {
 
         expect(res.statusCode).toBe(201);
         expect(typeof res.body.data).toBe('object');
-        expect(res.body.data!.id).toBeDefined();
-        expect(res.body.data!.location).toBe(locationOption);
-        expect(res.body.data!.url).toBeDefined();
-        expect(res.body.data!.updateDate).toBeNull();
-        expect(res.body.data!.filename).toBeDefined();
+        expect(res.body.data?.id as string).toBeDefined();
+        expect(res.body.data?.location).toBe(locationOption);
+        expect(res.body.data?.url).toBeDefined();
+        expect(res.body.data?.updateDate).toBeNull();
+        expect(res.body.data?.filename).toBeDefined();
       });
     }
   );

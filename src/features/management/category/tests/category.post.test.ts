@@ -79,7 +79,7 @@ describe('POST /management/categories', () => {
 
   it('should return 201 if the parentId is valid', async () => {
     const res = await sendCreateCategoryRequest({ token });
-    payload.parentId = res.body.data!.id;
+    payload.parentId = res.body.data?.id as string;
 
     const response = await exec();
     const category = await categoryService.getOneBySlug(payload.slug, {

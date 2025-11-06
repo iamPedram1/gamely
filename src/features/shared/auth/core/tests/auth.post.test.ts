@@ -218,7 +218,7 @@ describe('auth routes', () => {
       const recoverResponse = await sendRecoverPasswordRequest({
         payload: { email: register.email },
       });
-      payload.recoveryKey = recoverResponse.body.data!.recoveryKey;
+      payload.recoveryKey = recoverResponse.body.data?.recoveryKey || '';
 
       const userPrev = await userService.getUserByEmail(register.email, {
         select: '+recoveryKey +password',
@@ -241,7 +241,7 @@ describe('auth routes', () => {
         payload: { email: register.email },
       });
 
-      payload.recoveryKey = recoverResponse?.body?.data!.recoveryKey;
+      payload.recoveryKey = recoverResponse?.body?.data?.recoveryKey || '';
 
       const response = await exec();
 

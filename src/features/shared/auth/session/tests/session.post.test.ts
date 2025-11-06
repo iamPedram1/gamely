@@ -39,7 +39,7 @@ describe('session routes', () => {
 
       register = generateUser();
       const response = await registerAndLogin({ payload: register });
-      payload = { refreshToken: response!.refreshToken };
+      payload = { refreshToken: response?.refreshToken || '' };
     });
 
     const exec = async () => await sendRefreshTokenRequest(payload, token);
@@ -61,13 +61,13 @@ describe('session routes', () => {
 
       const response = await exec();
       const afterJWT = tokenUtils.decode<IRefreshToken>(
-        response.body.data!.refreshToken
+        response.body.data?.refreshToken || ''
       );
       const sessionAfter = await sessionService.getOneById(afterJWT.sessionId, {
         select: '+refreshToken',
       });
       const isJWTMatch = await crypto.compare(
-        response.body.data!.refreshToken,
+        response.body.data?.refreshToken || '',
         sessionAfter.refreshToken
       );
       expect(isJWTMatch).toBe(true);
@@ -78,8 +78,8 @@ describe('session routes', () => {
       expect(sessionAfter.refreshToken).toBeDefined();
       expect(response.body.data).toHaveProperty('accessToken');
       expect(response.body.data).toHaveProperty('refreshToken');
-      expect(response.body.data!.accessToken.length).toBeGreaterThan(0);
-      expect(response.body.data!.refreshToken.length).toBeGreaterThan(0);
+      expect(response.body.data?.accessToken.length).toBeGreaterThan(0);
+      expect(response.body.data?.refreshToken.length).toBeGreaterThan(0);
     });
   });
 
@@ -94,7 +94,7 @@ describe('session routes', () => {
       register = generateUser();
       const response = await registerAndLogin();
 
-      payload = { refreshToken: response!.refreshToken };
+      payload = { refreshToken: response?.refreshToken || '' };
     });
 
     const exec = async () => await sendRefreshTokenRequest(payload, token);

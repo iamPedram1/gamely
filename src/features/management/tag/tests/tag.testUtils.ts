@@ -26,8 +26,8 @@ export function generateTag() {
   return {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
     translations: {
-      en: { title: faker.internet.displayName() },
-      fa: { title: fakerFA.internet.displayName() },
+      en: { title: faker.internet.displayName().trim() },
+      fa: { title: fakerFA.internet.displayName().trim() },
     },
   } as CreateTagDto;
 }
@@ -40,6 +40,7 @@ export const sendCreateTagRequest = async (
     ...options,
   });
 };
+
 export const sendPatchTagRequest = async (
   id: string,
   options: SendRequestOptions<UpdateTagDto>

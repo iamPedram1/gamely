@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 
 let mongod: MongoMemoryReplSet;
 
-export const connect = async (): Promise<void> => {
+export const connectDatabase = async (): Promise<void> => {
   mongod = await MongoMemoryReplSet.create({
     binary: {
       version: '7.0.24',

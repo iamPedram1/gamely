@@ -1,4 +1,4 @@
-import path from 'path';
+import { Buffer } from 'node:buffer';
 
 // Utilities
 import { prefixBaseUrl } from 'core/utilities/configs';
@@ -11,28 +11,29 @@ import {
   SendRequestOptions,
   SuperTestResponse,
 } from 'core/utilities/supertest';
+import logger from 'core/utilities/logger';
+
+const FAKE_IMG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64'
+);
+export const sendUploadFileRequest = async ({
+  token,
+  payload,
+  noFile = false,
+}: {
+  token: string;
+  payload: FileLocationType;
+  noFile?: boolean;
+}) => {
+  const q = request
+    .post(`${uploadURL}/${payload}`)
+    .set(jwtAccessTokenName, token);
+
+  return noFile ? q : q.attach('image', FAKE_IMG, 'test.png');
+};
 
 const uploadURL = prefixBaseUrl('/upload');
-
-const getSampleImage = (name?: string) => {
-  return path.join(
-    process.cwd(),
-    'public/images/test',
-    name || 'a-way-out.jpg'
-  );
-};
-export const sendUploadFileRequest = async (
-  options: SendRequestOptions<FileLocationType> & {
-    token: string;
-    noFile?: boolean;
-  }
-): Promise<SuperTestResponse<IApiResponse<FileResponseDto>>> => {
-  let q = request
-    .post(`${uploadURL}/${options.payload}`)
-    .set(jwtAccessTokenName, options.token);
-
-  return !options?.noFile ? await q.attach('image', getSampleImage()) : await q;
-};
 
 export const sendMultipleUploadFileRequest = async (
   options: SendRequestOptions<FileLocationType> & {
@@ -40,13 +41,18 @@ export const sendMultipleUploadFileRequest = async (
     count: number;
   }
 ): Promise<SuperTestResponse<IApiResponse<FileResponseDto[]>>> => {
-  const q = request
-    .post(`${uploadURL}/${options.payload}/batch`)
-    .set(jwtAccessTokenName, options.token);
+  try {
+    const q = request
+      .post(`${uploadURL}/${options.payload}/batch`)
+      .set(jwtAccessTokenName, options.token);
 
-  for (let i = 0; i < options.count; i++) {
-    q.attach('image', getSampleImage());
+    for (let i = 0; i < options.count; i++) {
+      q.attach('image', FAKE_IMG, 'test.png');
+    }
+
+    return await q;
+  } catch (error) {
+    logger.error('🔴🔴🔴🔴🔴🔴 UPLOAD MULTIPLE FILE FAILED!');
+    throw error;
   }
-
-  return await q;
 };

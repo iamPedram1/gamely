@@ -32,12 +32,12 @@ export async function generateGame(token?: string) {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
     translations: {
       en: {
-        title: faker.book.title(),
-        description: faker.lorem.paragraph({ min: 4, max: 7 }),
+        title: faker.book.title().trim(),
+        description: faker.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
       fa: {
-        title: fakerFA.book.title(),
-        description: fakerFA.lorem.paragraph({ min: 4, max: 7 }),
+        title: fakerFA.book.title().trim(),
+        description: fakerFA.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
     },
   } as CreateGameDto;

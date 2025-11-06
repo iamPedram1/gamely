@@ -23,10 +23,10 @@ const categoriesURL = prefixManagementBaseUrl('/categories');
 export function generateCategory() {
   return {
     parentId: null,
-    slug: faker.lorem.slug({ min: 2, max: 3 }),
+    slug: faker.lorem.slug({ min: 2, max: 5 }),
     translations: {
-      en: { title: faker.internet.displayName() },
-      fa: { title: fakerFA.internet.displayName() },
+      en: { title: faker.internet.displayName().trim() },
+      fa: { title: fakerFA.internet.displayName().trim() },
     },
   } as CreateCategoryDto;
 }

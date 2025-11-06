@@ -1,16 +1,28 @@
 import 'reflect-metadata';
-import startApp from 'app';
-import { beforeAll, afterAll } from 'vitest';
 import supertest, { Agent } from 'supertest';
-import { Server } from 'http';
+import { beforeAll } from 'vitest';
+import type { Server } from 'http';
+import app from 'app';
 
-let server: Server;
+// Utils
+import logger from 'core/utilities/logger';
+import { connectDatabase } from 'core/tests/database';
+
 let request: Agent;
 
 beforeAll(async () => {
-  server = await startApp();
+  await connectDatabase();
 
-  request = supertest(server);
+  request = supertest(app);
 });
 
-export { server, request };
+process.on('unhandledRejection', (err) => {
+  logger.error('🔴🔴🔴🔴🔴🔴 VITEST SETUP ERROR - unhandledRejection', err);
+  console.log(err);
+});
+process.on('uncaughtException', (err) => {
+  logger.error('🔴🔴🔴🔴🔴🔴 VITEST SETUP ERROR - uncaughtException', err);
+  console.log(err, err?.name, err?.message, err?.cause, err?.stack);
+});
+
+export { request };

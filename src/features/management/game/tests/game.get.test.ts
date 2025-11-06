@@ -51,20 +51,20 @@ describe('GET /management/games', () => {
   it('should return pagination if authorized', async () => {
     const response = await exec();
 
-    expect(response.body.data!.pagination).toBeDefined();
-    expect(response.body.data!.pagination.totalDocs).toBeGreaterThan(0);
+    expect(response.body.data?.pagination).toBeDefined();
+    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
   });
 
   it('should return docs if authorized', async () => {
     const response = await exec();
 
-    expect(response.body.data!.docs).toBeDefined();
-    expect(Array.isArray(response.body.data!.docs)).toBe(true);
-    expect(response.body.data!.docs.length).toBeGreaterThan(0);
-    expect(response.body.data!.pagination.totalDocs).toBeGreaterThan(0);
+    expect(response.body.data?.docs).toBeDefined();
+    expect(Array.isArray(response.body.data?.docs)).toBe(true);
+    expect(response.body.data?.docs.length).toBeGreaterThan(0);
+    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
 
     ['translations', 'slug', 'id'].forEach((key) => {
-      expect(response.body.data!.docs[0]).toHaveProperty(key);
+      expect(response.body.data?.docs[0]).toHaveProperty(key);
     });
   });
 });

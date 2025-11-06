@@ -1,6 +1,6 @@
 import type { FlattenMaps, HydratedDocument, Types } from 'mongoose';
 
-export type IToken = { sessionId: string; userId: string };
+export type IAccessToken = { sessionId: string; userId: string };
 export type IRefreshToken = { sessionId: string; userId: string };
 export type SessionDocument = HydratedDocument<ISessionEntity>;
 export type SessionLeanDocument = FlattenMaps<ISessionEntity>;

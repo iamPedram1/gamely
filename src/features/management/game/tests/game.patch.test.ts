@@ -32,11 +32,11 @@ describe('PATCH /management/games', () => {
 
     const response = await sendCreateGameRequest({ token });
     payload.slug = response.body.data!.slug;
-    payload.translations = response.body.data!.translations;
-    payload.coverImage = response.body.data!.coverImage.id;
-    payload.releaseDate = response.body.data!.releaseDate;
+    payload.translations = response.body.data?.translations;
+    payload.coverImage = response.body.data?.coverImage.id;
+    payload.releaseDate = response.body.data?.releaseDate;
 
-    gameId = response.body.data!.id;
+    gameId = response.body.data?.id as string;
   });
 
   const exec = async () => sendPatchGameRequest(gameId, { payload, token });

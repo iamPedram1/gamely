@@ -11,27 +11,24 @@ import routesStartup from 'core/startup/routes';
 import logger from 'core/utilities/logger';
 import i18nStartup from 'core/startup/i18n';
 import baseStartup from 'core/startup/base';
-import { appPort } from 'core/utilities/configs';
 
 const app = express();
 
-const startApp = async () => {
-  await Promise.all([dbStartup(), i18nStartup(app)]);
+(async () => {
+  await i18nStartup(app);
+  if (process.env.NODE_ENV !== 'test') await dbStartup();
   baseStartup(app);
   routesStartup(app);
-
-  const server = app.listen(appPort, () => {
-    logger.info(`Listening on port ${appPort}`);
-  });
-
-  return server;
-};
-
-if (process.env.NODE_ENV === 'development') startApp();
+})();
 
 process.on('unhandledRejection', (ex) => {
   logger.error(ex);
   throw ex;
 });
 
-export default startApp;
+process.on('uncaughtException', (ex) => {
+  logger.error(ex);
+  throw ex;
+});
+
+export default app;

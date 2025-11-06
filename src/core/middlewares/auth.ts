@@ -3,7 +3,6 @@ import User from 'features/shared/user/core/user.model';
 
 // Middlewares
 import { requestContext, t } from 'core/utilities/request-context';
-import { validateBanStatus } from 'features/management/user/ban/ban.middleware';
 
 // Utilities
 import tokenUtils from 'core/services/token.service';
@@ -16,7 +15,7 @@ import {
 // Types
 import type { Request, Response, NextFunction } from 'express';
 import type { UserRole } from 'features/shared/user/core/user.types';
-import type { IToken } from 'features/shared/auth/session/session.types';
+import type { IAccessToken } from 'features/shared/auth/session/session.types';
 
 export default function auth(roles: UserRole[]) {
   return async function (req: Request, res: Response, next: NextFunction) {
@@ -30,7 +29,7 @@ export default function auth(roles: UserRole[]) {
     }
 
     // Check JWT
-    const { userId, sessionId } = tokenUtils.verify<IToken>(
+    const { userId, sessionId } = tokenUtils.verify<IAccessToken>(
       token,
       jwtAccessTokenKey,
       t('common.token')

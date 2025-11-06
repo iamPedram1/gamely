@@ -17,7 +17,6 @@ export const uploadOneFile = ({
     storage: multer.memoryStorage(),
     limits: { fileSize: maxSize },
   });
-
   return (req: Request, res: Response, next: NextFunction) => {
     upload.single(fieldName)(req, res, (err: any) => {
       if (err instanceof MulterError) {

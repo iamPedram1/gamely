@@ -37,6 +37,7 @@ describe('POST /management/games', () => {
 
   it('should return 400 if the slug is already taken', async () => {
     const game = await sendCreateGameRequest({ token });
+
     payload.slug = game.body.data!.slug;
 
     const response = await exec();

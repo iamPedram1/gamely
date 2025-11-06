@@ -24,7 +24,7 @@ describe('DELETE /management/tags', () => {
 
     const response = await sendCreateTagRequest({ token });
 
-    payload = { tagId: response.body.data!.id };
+    payload = { tagId: response.body.data?.id as string };
   });
 
   const exec = async () => sendDeleteTagRequest(payload.tagId, token);
@@ -58,7 +58,8 @@ describe('DELETE /management/tags', () => {
   it('should return 200 if role is author and you own the tag', async () => {
     token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-    payload.tagId = (await sendCreateTagRequest({ token })).body.data!.id;
+    payload.tagId = (await sendCreateTagRequest({ token })).body.data
+      ?.id as string;
 
     const response = await exec();
 

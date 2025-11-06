@@ -58,3 +58,9 @@ export function flattenValidationErrors(errors: ValidationError[]): string[] {
 export function includeIf<T>(condition: boolean | any, value: T): T[] {
   return condition ? [value] : [];
 }
+
+export async function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+export const isTestMode = process.env.NODE_ENV === 'test';

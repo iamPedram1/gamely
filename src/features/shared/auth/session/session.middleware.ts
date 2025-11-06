@@ -13,7 +13,7 @@ import {
 } from 'features/shared/auth/session/session.constant';
 
 // Types
-import type { IToken } from 'features/shared/auth/session/session.types';
+import type { IAccessToken } from 'features/shared/auth/session/session.types';
 import { request } from 'core/utilities/vitest.setup';
 
 export async function updateSessionActivity(
@@ -25,7 +25,7 @@ export async function updateSessionActivity(
     const token = req.header(jwtAccessTokenName);
     if (!token) return;
 
-    const { sessionId } = tokenUtils.verify<IToken>(
+    const { sessionId } = tokenUtils.verify<IAccessToken>(
       token,
       jwtAccessTokenKey,
       t('common.token')

@@ -24,7 +24,7 @@ describe('DELETE /management/categories', () => {
 
     const response = await sendCreateCategoryRequest({ token });
 
-    payload = { categoryId: response.body.data!.id };
+    payload = { categoryId: response.body.data?.id as string };
   });
 
   const exec = async () => sendDeleteCategoryRequest(payload.categoryId, token);
@@ -58,9 +58,8 @@ describe('DELETE /management/categories', () => {
   it('should return 200 if role is author and you own the category', async () => {
     token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-    payload.categoryId = (
-      await sendCreateCategoryRequest({ token })
-    ).body.data!.id;
+    payload.categoryId = (await sendCreateCategoryRequest({ token })).body.data
+      ?.id as string;
 
     const response = await exec();
 

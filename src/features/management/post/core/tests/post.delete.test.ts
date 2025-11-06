@@ -2,32 +2,32 @@ import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
 // Services
-import GameService from 'features/shared/game/core/game.service';
+import PostService from 'features/shared/post/core/post.service';
 
 // Utils
 import { adminRoles } from 'features/shared/user/core/user.constant';
 import { expectUnauthorizedError } from 'core/utilities/testHelpers';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  sendCreateGameRequest,
-  sendDeleteGameRequest,
-} from 'features/management/game/tests/game.testUtils';
+  sendCreatePostRequest,
+  sendDeletePostRequest,
+} from 'features/management/post/core/tests/post.testUtils';
 
-describe('DELETE /management/games', () => {
-  const gameService = container.resolve(GameService);
+describe('DELETE /management/posts', () => {
+  const postService = container.resolve(PostService);
 
   let token: string;
-  let payload: { gameId: string };
+  let payload: { postId: string };
 
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
-    const response = await sendCreateGameRequest({ token });
+    const res = await sendCreatePostRequest({ token });
 
-    payload = { gameId: response.body.data?.id as string };
+    payload = { postId: res.body.data?.id || '' };
   });
 
-  const exec = async () => sendDeleteGameRequest(payload.gameId, token);
+  const exec = async () => sendDeletePostRequest(payload.postId, token);
 
   it('should return 401 if user does not have token in header', async () => {
     token = '';
@@ -45,7 +45,7 @@ describe('DELETE /management/games', () => {
     expect(response.status).toBe(403);
   });
 
-  it('should return 400 if role is author but you dont own the game', async () => {
+  it('should return 400 if role is author but you dont own the post', async () => {
     token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
     const response = await exec();
@@ -55,10 +55,10 @@ describe('DELETE /management/games', () => {
     expect(response.body.message).toMatch(/you didn't/i);
   });
 
-  it('should return 200 if role is author and you own the game', async () => {
+  it('should return 200 if role is author and you own the post', async () => {
     token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-    payload.gameId = (await sendCreateGameRequest({ token })).body.data
+    payload.postId = (await sendCreatePostRequest({ token })).body.data
       ?.id as string;
 
     const response = await exec();
@@ -69,28 +69,27 @@ describe('DELETE /management/games', () => {
   });
 
   describe.each(adminRoles)(
-    'should return 200 and delete game if',
+    'should return 200 and delete post if',
     async (role) => {
       it(`role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
-        const game = await gameService.getOneById(payload.gameId, {
+        const post = await postService.getOneById(payload.postId, {
           throwError: false,
         });
 
         expect(response.status).toBe(200);
-        expect(game).toBeNull();
+        expect(post).toBeNull();
         expect(response.body.isSuccess).toBe(true);
       });
     }
   );
 
-  it('should return 404 if game does not exist', async () => {
-    payload.gameId = faker.database.mongodbObjectId();
+  it('should return 404 if post does not exist', async () => {
+    payload.postId = faker.database.mongodbObjectId();
 
     const response = await exec();
-
     expect(response.status).toBe(404);
     expect(response.body.isSuccess).toBe(false);
   });
