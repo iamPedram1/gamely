@@ -7,6 +7,7 @@ import User from 'features/shared/user/core/user.model';
 import tokenUtils from 'core/services/token.service';
 import { prefixBaseUrl } from 'core/utilities/configs';
 import { expectBadRequest } from 'core/utilities/testHelpers';
+import { normalizeUsername } from 'core/utilities/helperPack';
 import { sendPostRequest, SendRequestOptions } from 'core/utilities/supertest';
 import {
   ChangePasswordDto,
@@ -27,14 +28,7 @@ const changePasswordURL = prefixBaseUrl('/auth/change-password');
 
 export function generateUser() {
   return {
-    username: faker.internet
-      .username()
-      .replace(/\.\./g, '.')
-      .replace(/__+/g, '_')
-      .replace(/-/g, '_')
-      .toLowerCase()
-      .slice(0, 30)
-      .padEnd(3, 'a'),
+    username: normalizeUsername(faker.internet.username()),
     password: faker.internet.password(),
     email: faker.internet.email(),
     bio: faker.person.bio(),

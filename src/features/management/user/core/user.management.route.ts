@@ -1,13 +1,21 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
+// Models
+import User from 'features/shared/user/core/user.model';
+
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
+import { validateParam } from 'core/middlewares/validations';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
+import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Controller
 import UserManagementController from 'features/management/user/core/user.management.controller';
+
+// Utilities
+import { NotFoundError } from 'core/utilities/errors';
 
 // DTO
 import {
@@ -27,12 +35,18 @@ userManagementRouter.get(
   userController.getAll
 );
 userManagementRouter.get('/summaries', userController.getSummaries);
-userManagementRouter.get('/:id', userController.getOne);
+userManagementRouter.get(
+  '/:id',
+  validateParam(User, 'id', '_id', { type: 'id', Error: NotFoundError }),
+  userController.getOne
+);
 
 // <----------------   PATCH  ---------------->
 userManagementRouter.patch(
   '/:id',
   validateBody(UpdateUserDto),
+  validateParam(User, 'id', '_id', { type: 'id', Error: NotFoundError }),
+  validateUniqueConflict(User, 'username', 'username', 'id'),
   userController.update
 );
 

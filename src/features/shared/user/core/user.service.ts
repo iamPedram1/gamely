@@ -1,5 +1,5 @@
 import { delay, inject, injectable } from 'tsyringe';
-import type { ClientSession, Types } from 'mongoose';
+import type { Types } from 'mongoose';
 
 // Model
 import User from 'features/shared/user/core/user.model';
@@ -15,6 +15,7 @@ import { UpdateProfileDto } from 'features/client/user/core/user.client.dto';
 import { UpdateUserDto } from 'features/management/user/core/user.management.dto';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { IUserEntity } from 'features/shared/user/core/user.types';
 import type {
   UserDocument,
@@ -25,12 +26,10 @@ import {
   ForbiddenError,
   ValidationError,
 } from 'core/utilities/errors';
-
 import type {
   BaseMutateOptions,
   BaseQueryOptions,
 } from 'core/types/base.service.type';
-import type { DocumentId } from 'core/types/common';
 
 export type IUserService = InstanceType<typeof UserService>;
 
@@ -45,13 +44,6 @@ export default class UserService extends BaseService<IUserEntity> {
     private blockService: BlockService
   ) {
     super(User);
-  }
-
-  async mutateWithTransaction<T>(
-    fn: (session: ClientSession) => Promise<T>,
-    exisitingSession?: ClientSession
-  ) {
-    return await this.withTransaction(fn, exisitingSession);
   }
 
   async getSelfProfile() {
@@ -116,6 +108,7 @@ export default class UserService extends BaseService<IUserEntity> {
 
     if (this.currentUser.isNot(['admin', 'superAdmin']) && !isUpdatingSelf)
       throw new ForbiddenError();
+
     return await this.withTransaction(async (session) => {
       if (isBlocking)
         await this.sessionService.deleteManyByKey('user', userId, { session });
@@ -214,11 +207,11 @@ export default class UserService extends BaseService<IUserEntity> {
       throw new BadRequestError(this.t('error.user.self_block'));
 
     if (this.currentUser.is('admin') && targetIsAdmin)
-      throw new ValidationError(this.t('error.user.forbidden_block'));
+      throw new ForbiddenError(this.t('error.user.forbidden_block'));
   }
 
   private validateUpdatingRole() {
     if (this.currentUser.isNot('superAdmin'))
-      throw new ValidationError(this.t('error.user.update_role'));
+      throw new ForbiddenError(this.t('error.user.update_role'));
   }
 }

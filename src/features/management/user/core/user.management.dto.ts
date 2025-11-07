@@ -1,9 +1,14 @@
 import { Expose, Type } from 'class-transformer';
-import { IsIn, IsOptional, IsString } from 'core/utilities/validation';
+import {
+  IsIn,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  Length,
+} from 'core/utilities/validation';
 
 // DTO
 import { BaseQueryDto } from 'core/dto/query';
-import { BaseUserUpdate } from 'features/shared/user/core/user.dto';
 import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
@@ -18,21 +23,24 @@ import type {
 } from 'features/shared/user/core/user.types';
 
 // <----------------   UPDATE   ---------------->
-export class UpdateUserDto extends BaseUserUpdate {
+export class UpdateUserDto {
+  @IsOptional()
+  @IsMongoId()
   avatar: Types.ObjectId;
+
+  @IsOptional()
+  @Length(3, 255)
   bio: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(3, 30)
   username: string;
-  password: string;
 
   @IsOptional()
   @IsString()
   @IsIn(userRoles)
   role: UserRole;
-
-  @IsOptional()
-  @IsString()
-  @IsIn(userStatus)
-  status: UserStatus;
 }
 
 // <----------------   RESPONSE   ---------------->
@@ -42,9 +50,6 @@ export class UserManagementResponseDto extends BaseResponseDto {
 
   @Expose()
   role: UserRole;
-
-  @Expose()
-  status: UserStatus;
 
   @Expose()
   bio: string;

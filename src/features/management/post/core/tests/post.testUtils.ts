@@ -44,7 +44,7 @@ export async function generatePostRequirements(token: string) {
   return { tag, game, category, coverImage };
 }
 
-export async function generatePostData(token: string) {
+export async function generatePostData(token: string): Promise<CreatePostDto> {
   try {
     const { category, coverImage, game, tag } =
       await generatePostRequirements(token);
@@ -68,7 +68,7 @@ export async function generatePostData(token: string) {
           content: fakerFA.lorem.paragraph(10),
         },
       },
-    } as CreatePostDto;
+    };
   } catch (error) {
     logger.error('🔴🔴🔴🔴🔴🔴 GENERATE POST FAILED!');
     throw error;

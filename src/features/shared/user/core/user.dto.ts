@@ -15,10 +15,6 @@ export abstract class BaseUserUpdate {
   abstract bio: string;
 
   @IsOptional()
-  @Length(8, 255)
-  abstract password: string;
-
-  @IsOptional()
   @IsMongoId()
   abstract avatar: Types.ObjectId;
 }

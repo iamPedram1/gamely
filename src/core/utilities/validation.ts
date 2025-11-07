@@ -1,7 +1,3 @@
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const MIN_LENGTH = 3;
-const MAX_LENGTH = 255;
-
 import type { CountryCode } from 'libphonenumber-js/max';
 import {
   IsString as CVIsString,

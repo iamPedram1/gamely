@@ -5,7 +5,9 @@ import {
   IsNotEmpty,
   IsString,
   Length,
+  Matches,
 } from 'core/utilities/validation';
+import { usernameRegex } from 'features/shared/user/core/user.constant';
 
 export class RecoverPasswordDto {
   @IsNotEmpty()
@@ -27,7 +29,8 @@ export class ChangePasswordDto {
 export class RegisterDto {
   @IsNotEmpty()
   @IsString()
-  @Length(3, 30)
+  @Matches(usernameRegex)
+  @Length(3, 255)
   username: string;
 
   @IsNotEmpty()

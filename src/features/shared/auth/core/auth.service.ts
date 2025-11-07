@@ -18,6 +18,7 @@ import {
 // Utilities
 import logger from 'core/utilities/logger';
 import { sendEmail } from 'core/utilities/mail';
+import { withTransaction } from 'core/utilities/mongoose';
 import { i18nInstance, t } from 'core/utilities/request-context';
 import {
   recoveryEnglishHtml,
@@ -84,8 +85,7 @@ export default class AuthService {
         });
       }
     }
-
-    return await this.userService.mutateWithTransaction(async (session) => {
+    return await withTransaction(async (session) => {
       const key = this.generatePasswordRecoveryKey(user._id.toHexString());
       await user.set('recoveryKey', key).save({ session, ...options });
       const result = await this.sendRecoveryEmail(user, key);
@@ -104,7 +104,7 @@ export default class AuthService {
     });
     const userId = user._id.toHexString();
 
-    return await this.userService.mutateWithTransaction(async (session) => {
+    return await withTransaction(async (session) => {
       user.recoveryKey = null;
       user.password = data.password;
       await Promise.all([

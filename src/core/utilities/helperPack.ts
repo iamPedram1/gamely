@@ -64,3 +64,13 @@ export async function sleep(ms: number) {
 }
 
 export const isTestMode = process.env.NODE_ENV === 'test';
+
+export const normalizeUsername = (str: string) => {
+  return str
+    .replace(/\.\./g, '.')
+    .replace(/__+/g, '_')
+    .replace(/-/g, '_')
+    .toLowerCase()
+    .slice(0, 30)
+    .padEnd(3, 'a');
+};

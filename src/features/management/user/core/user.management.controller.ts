@@ -33,7 +33,7 @@ export default class UserManagementController {
       lean: true,
     });
 
-    // user.isBanned = Boolean(await this.banService.getUserBan(user._id));
+    user.isBanned = Boolean(await this.banService.getUserBan(user._id));
 
     sendResponse(res, 200, {
       httpMethod: 'GET',
@@ -58,11 +58,11 @@ export default class UserManagementController {
       lean: true,
     });
 
-    // await Promise.all(
-    //   users.docs.map(async (user) => {
-    //     user.isBanned = await this.banService.checkIsBanned(user._id);
-    //   })
-    // );
+    await Promise.all(
+      users.docs.map(async (user) => {
+        user.isBanned = await this.banService.checkIsBanned(user._id);
+      })
+    );
 
     sendResponse(res, 200, {
       httpMethod: 'GET',

@@ -22,15 +22,19 @@ export default function validateUniqueConflict<T>(
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const value = req.body?.[bodyFieldKey];
-      if (value === undefined || value === null) return next();
+      if (!value) return next();
 
       const excludeId = req.params?.[paramIdKey];
 
       const conflict = await model.exists({
         [fieldName]: value,
-        ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+        ...(excludeId && { _id: { $ne: excludeId } }),
       });
 
+      console.log(
+        { conflict, excludeId, value, body: req.body, params: req.params },
+        await model.find({}).lean()
+      );
       if (conflict) {
         next(
           new ValidationError(

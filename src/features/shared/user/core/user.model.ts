@@ -6,7 +6,6 @@ import crypto from 'core/utilities/crypto';
 import {
   usernameRegex,
   userRoles,
-  userStatus,
 } from 'features/shared/user/core/user.constant';
 
 // Types
