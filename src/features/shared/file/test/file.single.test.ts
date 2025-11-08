@@ -17,9 +17,9 @@ describe('POST /files/:location', () => {
     fileCount = 1;
   });
 
-  const exec = async () =>
+  const exec = async (overwriteToken?: string) =>
     sendUploadFileRequest({
-      token,
+      token: overwriteToken ?? token,
       payload: location,
       noFile: fileCount === 0,
     });

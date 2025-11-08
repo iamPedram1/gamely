@@ -1,5 +1,7 @@
 import config from 'config';
 import dotenv from 'dotenv';
+import SessionService from 'features/shared/auth/session/session.service';
+import { container } from 'tsyringe';
 dotenv.config({ quiet: true });
 
 const env = process.env;
@@ -17,3 +19,5 @@ export const jwtAccessTokenName = config.get('JWT_Token_Name') as string;
 export const jwtRefreshTokenName = config.get(
   'JWT_RefreshToken_Name'
 ) as string;
+
+export const generateSessionService = () => container.resolve(SessionService);

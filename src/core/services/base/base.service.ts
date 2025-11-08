@@ -630,12 +630,22 @@ export default abstract class BaseService<
    * @returns {Promise<import('mongoose').DeleteResult>} - The result of the delete operation.
    * @throws {Error} - If throwError is true and no documents match the conditions.
    */
-
   async deleteManyWithConditions<TThrowError extends boolean = false>(
     conditions: OrAndFilter<TSchema> | FilterQuery<TSchema>,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<DeleteResult> {
     return await this.mutations.deleteManyWithConditions(conditions, options);
+  }
+
+  /**
+   * Deletes every document in collection.
+   *
+   * @param {BaseMutateOptions} [options] - Optional settings (e.g., session, throwError).
+   * @returns {Promise<import('mongoose').DeleteResult>} - The result of the delete operation.
+   * @throws {Error} - If throwError is true and no documents match the conditions.
+   */
+  async clearCollection(options?: BaseMutateOptions): Promise<DeleteResult> {
+    return await this.mutations.clearCollection(options);
   }
 
   // =====================

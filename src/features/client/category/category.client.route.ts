@@ -2,7 +2,7 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import validateDocumentExistById from 'core/middlewares/validateObjectId';
+import validateObjectId from 'core/middlewares/validateObjectId';
 
 // Model
 import Category from 'features/shared/category/category.model';
@@ -17,7 +17,7 @@ const categoryController = container.resolve(CategoryClientController);
 categoryClientRouter.get('/nested', categoryController.getAllNested);
 categoryClientRouter.get(
   '/:id',
-  validateDocumentExistById(Category),
+  validateObjectId(Category),
   categoryController.getOne
 );
 

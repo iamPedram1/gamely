@@ -31,10 +31,6 @@ export default function validateUniqueConflict<T>(
         ...(excludeId && { _id: { $ne: excludeId } }),
       });
 
-      console.log(
-        { conflict, excludeId, value, body: req.body, params: req.params },
-        await model.find({}).lean()
-      );
       if (conflict) {
         next(
           new ValidationError(

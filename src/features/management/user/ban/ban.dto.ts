@@ -1,15 +1,20 @@
 import { Expose, Type } from 'class-transformer';
-import { ValidateIf } from 'class-validator';
+import { MinDate, Validate, ValidateIf } from 'class-validator';
 import { BaseQueryDto } from 'core/dto/query';
 import { BaseSummaryResponseDto } from 'core/dto/response';
 import {
+  IsDate,
   IsIn,
   IsISO8601,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsMinDateNow,
+  IsDateAfter,
+  IsDateBefore,
 } from 'core/utilities/validation';
+import dayjs from 'dayjs';
 
 import { banStatus, banType } from 'features/management/user/ban/ban.constant';
 import {
@@ -27,12 +32,16 @@ export class CreateBanDto {
 
   @IsNotEmpty()
   @IsISO8601()
+  @IsMinDateNow()
+  @ValidateIf((obj: IBanEntity) => obj.type === 'temporary')
+  @IsDateBefore('endAt')
   startAt: string;
 
   @ValidateIf((obj: IBanEntity) => obj.type === 'temporary')
   @IsNotEmpty()
   @IsISO8601()
-  endAt: string;
+  @IsDateAfter('startAt')
+  endAt?: string;
 }
 
 export class BanResponseDto extends BaseSummaryResponseDto {

@@ -37,7 +37,7 @@ userManagementRouter.get(
 userManagementRouter.get('/summaries', userController.getSummaries);
 userManagementRouter.get(
   '/:id',
-  validateParam(User, 'id', '_id', { type: 'id', Error: NotFoundError }),
+  validateParam(User, 'id', '_id', { type: 'id' }),
   userController.getOne
 );
 
@@ -45,7 +45,7 @@ userManagementRouter.get(
 userManagementRouter.patch(
   '/:id',
   validateBody(UpdateUserDto),
-  validateParam(User, 'id', '_id', { type: 'id', Error: NotFoundError }),
+  validateParam(User, 'id', '_id', { type: 'id' }),
   validateUniqueConflict(User, 'username', 'username', 'id'),
   userController.update
 );

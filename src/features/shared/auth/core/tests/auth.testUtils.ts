@@ -20,6 +20,7 @@ import {
 
 // Types
 import type { UserRole } from 'features/shared/user/core/user.types';
+import { IAccessToken } from 'features/shared/auth/session/session.types';
 
 const registerURL = prefixBaseUrl('/auth/register');
 const loginURL = prefixBaseUrl('/auth/login');
@@ -47,7 +48,9 @@ export async function createUser(user: RegisterDto = generateUser()) {
 
 export async function registerAndLogin(
   options?: SendRequestOptions<RegisterDto> & { role?: UserRole }
-) {
+): Promise<
+  (RegisterResponseDto & { userId: string; sessionId: string }) | null
+> {
   const payload = options?.payload ?? generateUser();
 
   await sendRegisterRequest({
@@ -62,8 +65,18 @@ export async function registerAndLogin(
     );
 
   const res = await sendLoginRequest({ payload });
+  let userId = '';
+  let sessionId = '';
 
-  return res?.body?.data || null;
+  if (res.body.data?.accessToken) {
+    const decoded = tokenUtils.decode<IAccessToken>(
+      res.body.data?.accessToken!
+    );
+    userId = decoded.userId;
+    sessionId = decoded.sessionId;
+  }
+
+  return res?.body?.data ? { ...res.body.data, userId, sessionId } : null;
 }
 
 export const sendRegisterRequest = async (

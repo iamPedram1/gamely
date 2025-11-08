@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import { validateQuery } from 'core/middlewares/validateQuery';
-import validateDocumentExistById from 'core/middlewares/validateObjectId';
+import validateObjectId from 'core/middlewares/validateObjectId';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
 // Model
@@ -33,19 +33,11 @@ tagManagementRouter.get(
   tagController.getAllSummaries
 );
 tagManagementRouter.get('/', validateQuery(BaseQueryDto), tagController.getAll);
-tagManagementRouter.get(
-  '/:id',
-  validateDocumentExistById(Tag),
-  tagController.getOne
-);
+tagManagementRouter.get('/:id', validateObjectId(Tag), tagController.getOne);
 
 // <----------------   DELETE   ---------------->
 tagManagementRouter.delete('/batch/delete', tagController.batchDelete);
-tagManagementRouter.delete(
-  '/:id',
-  validateDocumentExistById(Tag),
-  tagController.delete
-);
+tagManagementRouter.delete('/:id', validateObjectId(Tag), tagController.delete);
 
 // <----------------   POST   ---------------->
 tagManagementRouter.post(
@@ -59,7 +51,7 @@ tagManagementRouter.post(
 tagManagementRouter.patch(
   '/:id',
   validateBody(UpdateTagDto),
-  validateDocumentExistById(Tag),
+  validateObjectId(Tag),
   validateUniqueConflict(Tag, 'slug'),
   tagController.update
 );

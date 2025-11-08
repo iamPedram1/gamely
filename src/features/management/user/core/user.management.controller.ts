@@ -5,7 +5,7 @@ import sendResponse from 'core/utilities/response';
 
 // Service
 import UserService from 'features/shared/user/core/user.service';
-import UserBanService from 'features/management/user/ban/ban.service';
+import BanService from 'features/management/user/ban/ban.service';
 
 // DTO
 import {
@@ -23,7 +23,7 @@ import type { RequestHandler } from 'express';
 export default class UserManagementController {
   constructor(
     @inject(delay(() => UserService)) private userService: UserService,
-    @inject(delay(() => UserBanService)) private banService: UserBanService,
+    @inject(delay(() => BanService)) private banService: BanService,
     @inject(delay(() => UserMapper)) private userMapper: UserMapper
   ) {}
 

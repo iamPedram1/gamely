@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import validateDocumentExistById from 'core/middlewares/validateObjectId';
+import validateObjectId from 'core/middlewares/validateObjectId';
 import { validateQuery } from 'core/middlewares/validateQuery';
 import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
 
@@ -20,6 +20,7 @@ import {
   CreateGameDto,
   UpdateGameDto,
 } from 'features/management/game/game.management.dto';
+import { validateParam } from 'core/middlewares/validations';
 
 const gameManagementRouter = express.Router();
 const gameController = container.resolve(GameManagementController);
@@ -36,14 +37,14 @@ gameManagementRouter.get('/summaries', [
   gameController.getAllSummaries,
 ]);
 gameManagementRouter.get('/:id', [
-  validateDocumentExistById(Game),
+  validateObjectId(Game),
   gameController.getOne,
 ]);
 
 // <----------------   DELETE   ---------------->
 gameManagementRouter.delete('/batch/delete', gameController.batchDelete);
 gameManagementRouter.delete('/:id', [
-  validateDocumentExistById(Game),
+  validateObjectId(Game),
   gameController.delete,
 ]);
 
@@ -57,7 +58,7 @@ gameManagementRouter.post('/', [
 // <----------------   PATCH   ---------------->
 gameManagementRouter.patch('/:id', [
   validateBody(UpdateGameDto),
-  validateDocumentExistById(Game),
+  validateParam(Game, 'id', '_id', { type: 'id' }),
   validateUniqueConflict(Game, 'slug'),
   gameController.update,
 ]);

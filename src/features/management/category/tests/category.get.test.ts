@@ -4,12 +4,24 @@ import { container } from 'tsyringe';
 import CategoryService from 'features/shared/category/category.service';
 
 // Utils
-import { expectUnauthorizedError } from 'core/utilities/testHelpers';
+import {
+  describe200,
+  describe401,
+  describe403,
+  expectSuccess,
+  itShouldRequireToken,
+  itShouldRequireManagementRole,
+  itShouldReturnsPaginatedDocs,
+} from 'core/utilities/testHelpers';
+import { adminRoles } from 'features/shared/user/core/user.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
   sendCreateCategoryRequest,
   sendGetCategoryRequest,
 } from 'features/management/category/tests/category.testUtilts';
+
+// Types
+import type { UserRole } from 'features/shared/user/core/user.types';
 
 describe('GET /management/categories', () => {
   let token: string;
@@ -21,55 +33,28 @@ describe('GET /management/categories', () => {
     await sendCreateCategoryRequest({ token });
   });
 
-  const exec = async () => sendGetCategoryRequest(token);
+  const exec = async (overwriteToken?: string) =>
+    sendGetCategoryRequest(overwriteToken ?? token);
 
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
-
-    const response = await exec();
-
-    expectUnauthorizedError(response);
+  describe401(() => {
+    itShouldRequireToken(exec);
   });
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
-
-    const response = await exec();
-
-    expect(response.status).toBe(403);
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
   });
 
-  it('should return 200 if role is author', async () => {
-    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
+  describe200(() => {
+    (['author', ...adminRoles] as UserRole[]).forEach((role) => {
+      it(`if role is ${role}`, async () => {
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
-    const response = await exec();
+        const res = await exec();
 
-    expect(response.status).toBe(200);
-  });
-
-  it('should return 200 if role is [admin,superAdmin]', async () => {
-    const response = await exec();
-
-    expect(response.status).toBe(200);
-  });
-
-  it('should return pagination if authorized', async () => {
-    const response = await exec();
-
-    expect(response.body.data?.pagination).toBeDefined();
-    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
-  });
-
-  it('should return docs if authorized', async () => {
-    const response = await exec();
-
-    expect(response.body.data?.docs).toBeDefined();
-    expect(Array.isArray(response.body.data?.docs)).toBe(true);
-    expect(response.body.data?.docs.length).toBeGreaterThan(0);
-    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
-
-    ['translations', 'slug', 'id'].forEach((key) => {
-      expect(response.body.data?.docs[0]).toHaveProperty(key);
+        expectSuccess(res);
+      });
     });
+
+    itShouldReturnsPaginatedDocs(exec);
   });
 });

@@ -1,15 +1,19 @@
 import { faker } from '@faker-js/faker';
-import { container } from 'tsyringe';
-
-// Services
-import GameService from 'features/shared/game/core/game.service';
 
 // Utils
 import { appLanguages } from 'core/startup/i18n';
+import { generateGameService } from 'features/shared/game/core/game.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
+  describe200,
+  describe400,
+  describe401,
+  describe403,
+  describe404,
   expectBadRequest,
-  expectUnauthorizedError,
+  expectNotFoundError,
+  itShouldRequireManagementRole,
+  itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 import {
   sendCreateGameRequest,
@@ -25,7 +29,7 @@ describe('PATCH /management/games', () => {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
   };
   let gameId: string;
-  const gameService = container.resolve(GameService);
+  const gameService = generateGameService();
 
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
@@ -39,37 +43,52 @@ describe('PATCH /management/games', () => {
     gameId = response.body.data?.id as string;
   });
 
-  const exec = async () => sendPatchGameRequest(gameId, { payload, token });
+  const exec = async (overwriteToken?: string) =>
+    sendPatchGameRequest(gameId, { payload, token: overwriteToken ?? token });
 
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
+  describe200(() => {
+    it('if slug update is valid', async () => {
+      delete payload.slug;
+      delete payload.releaseDate;
+      delete payload.translations;
 
-    const response = await exec();
+      payload.slug = faker.lorem.slug({ min: 2, max: 4 });
 
-    expectUnauthorizedError(response);
+      const response = await exec();
+      const game = await gameService.getOneById(gameId, {
+        lean: true,
+      });
+
+      expect(response.status).toBe(200);
+      expect(game).toBeDefined();
+      if (payload.slug) expect(game.slug).toBe(payload.slug);
+      if (payload.releaseDate)
+        expect(game.releaseDate.toISOString()).toBe(payload.releaseDate);
+      if (payload.coverImage)
+        expect(String(game.coverImage?._id)).toBe(payload.coverImage);
+      if (payload.translations)
+        expect(game.translations).toMatchObject(payload.translations);
+    });
+
+    it('even on empty object', async () => {
+      payload = {};
+      const response = await exec();
+      expect(response.status).toBe(200);
+    });
   });
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
+  describe400(() => {
+    it('if the slug is already taken', async () => {
+      const game = await sendCreateGameRequest({ token });
+      payload.slug = game.body.data!.slug;
 
-    const response = await exec();
+      const response = await exec();
 
-    expect(response.status).toBe(403);
-  });
+      expectBadRequest(response, /taken/i);
+    });
 
-  it('should return 400 if the slug is already taken', async () => {
-    const game = await sendCreateGameRequest({ token });
-    payload.slug = game.body.data!.slug;
-
-    const response = await exec();
-
-    expectBadRequest(response, /taken/i);
-  });
-
-  describe.each(appLanguages)(
-    'should return 400 if translations.%s.title is not valid',
-    (lang) => {
-      it(`fails for ${lang}`, async () => {
+    appLanguages.forEach((lang) => {
+      it(`if translations.${lang}.title is not valid`, async () => {
         payload.translations![lang] = { title: 'ab' };
         delete payload.slug;
         delete payload.releaseDate;
@@ -77,47 +96,30 @@ describe('PATCH /management/games', () => {
         const response = await exec();
         expectBadRequest(response, /title/i);
       });
-    }
-  );
-
-  describe.each(appLanguages)(
-    'should return 400 if translations.%s.description is not valid',
-    (lang) => {
-      it(`fails for ${lang}`, async () => {
+      it(`if translations.${lang}.description is not valid`, async () => {
         payload.translations![lang] = { description: 'a' };
         delete payload.slug;
         const response = await exec();
         expectBadRequest(response, /description/i);
       });
-    }
-  );
-
-  it('should return 200 if slug update is valid', async () => {
-    delete payload.slug;
-    delete payload.releaseDate;
-    delete payload.translations;
-
-    payload.slug = faker.lorem.slug({ min: 2, max: 4 });
-
-    const response = await exec();
-    const game = await gameService.getOneById(gameId, {
-      lean: true,
     });
-
-    expect(response.status).toBe(200);
-    expect(game).toBeDefined();
-    if (payload.slug) expect(game.slug).toBe(payload.slug);
-    if (payload.releaseDate)
-      expect(game.releaseDate.toISOString()).toBe(payload.releaseDate);
-    if (payload.coverImage)
-      expect(String(game.coverImage?._id)).toBe(payload.coverImage);
-    if (payload.translations)
-      expect(game.translations).toMatchObject(payload.translations);
   });
 
-  it('should return 200 even on empty object', async () => {
-    payload = {};
-    const response = await exec();
-    expect(response.status).toBe(200);
+  describe401(() => {
+    itShouldRequireToken(exec);
+  });
+
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
+  });
+
+  describe404(() => {
+    it('if game id is not valid', async () => {
+      gameId = faker.database.mongodbObjectId();
+
+      const res = await exec();
+
+      expectNotFoundError(res);
+    });
   });
 });

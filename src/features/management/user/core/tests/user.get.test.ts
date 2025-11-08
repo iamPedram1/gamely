@@ -1,24 +1,32 @@
 import { faker } from '@faker-js/faker';
 
+// Models
+import User from 'features/shared/user/core/user.model';
+import Session from 'features/shared/auth/session/session.model';
+
 // Utils
-import tokenUtils from 'core/services/token.service';
 import { UserRole } from 'features/shared/user/core/user.types';
 import { adminRoles } from 'features/shared/user/core/user.constant';
 import { generateUserService } from 'features/shared/user/core/user.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import { sendGetUserRequest } from 'features/management/user/core/tests/user.testUtils';
 import {
+  clearDbAfterEach,
+  describe200,
+  describe401,
+  describe403,
+  describe404,
   expectKeysExist,
   expectNotFoundError,
-  expectSuccessGET,
-  expectUnauthorizedError,
+  expectSuccess,
+  itShouldRequireToken,
+  itShouldReturnsPaginatedDocs,
 } from 'core/utilities/testHelpers';
 
 // Dto
 import { UserManagementResponseDto } from 'features/management/user/core/user.management.dto';
 
 // Types
-import type { IAccessToken } from 'features/shared/auth/session/session.types';
 import type { WithPagination } from 'core/types/paginate';
 
 describe('GET /management/users', () => {
@@ -29,22 +37,47 @@ describe('GET /management/users', () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
   });
 
-  afterEach(async () => {
-    await userService.deleteManyWithConditions({});
+  clearDbAfterEach(User, Session);
+
+  const exec = async (overwriteToken?: string) =>
+    sendGetUserRequest<WithPagination<UserManagementResponseDto>>(
+      overwriteToken ?? token
+    );
+
+  describe200(() => {
+    for (let role of adminRoles) {
+      it(`if role is ${role}`, async () => {
+        token = (await registerAndLogin({ role }))?.accessToken || '';
+
+        const response = await exec();
+
+        expect(response.status).toBe(200);
+      });
+    }
+
+    itShouldReturnsPaginatedDocs(exec);
+
+    it('and return user object', async () => {
+      const res = await exec();
+
+      const keys: Array<keyof UserManagementResponseDto> = [
+        'username',
+        'email',
+        'role',
+        'avatar',
+      ];
+
+      expect(Object.keys(res.body.data!.docs[0]!)).toEqual(
+        expect.arrayContaining(keys)
+      );
+    });
   });
 
-  const exec = async () =>
-    sendGetUserRequest<WithPagination<UserManagementResponseDto>>(token);
-
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
-
-    const response = await exec();
-
-    expectUnauthorizedError(response);
+  describe401(() => {
+    itShouldRequireToken(exec);
   });
 
-  describe('should return 403 if', () => {
+  describe403(() => {
     for (let role of ['user', 'author'] as UserRole[]) {
       it(`role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
@@ -54,42 +87,6 @@ describe('GET /management/users', () => {
         expect(response.status).toBe(403);
       });
     }
-  });
-
-  describe('should return 200 if', async () => {
-    for (let role of adminRoles) {
-      it(`role is ${role}`, async () => {
-        token = (await registerAndLogin({ role }))?.accessToken || '';
-
-        const response = await exec();
-
-        expect(response.status).toBe(200);
-      });
-    }
-  });
-
-  it('should return paginated user docs if authorized', async () => {
-    const res = await exec();
-    const { data } = res.body;
-
-    expect(data?.pagination?.totalDocs).toBeGreaterThan(0);
-    expect(Array.isArray(data?.docs)).toBe(true);
-    expect(data?.docs.length).toBeGreaterThan(0);
-  });
-
-  it('should return user object in success response', async () => {
-    const res = await exec();
-
-    const keys: Array<keyof UserManagementResponseDto> = [
-      'username',
-      'email',
-      'role',
-      'avatar',
-    ];
-
-    expect(Object.keys(res.body.data!.docs[0]!)).toEqual(
-      expect.arrayContaining(keys)
-    );
   });
 });
 
@@ -101,26 +98,19 @@ describe('GET /management/users/:id', () => {
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
-    const userToken = (await registerAndLogin())?.accessToken || '';
-
-    userId = tokenUtils.decode<IAccessToken>(userToken).userId;
+    userId = (await registerAndLogin())?.userId || '';
   });
 
-  afterEach(async () => {
-    await userService.deleteManyWithConditions({});
+  clearDbAfterEach(User, Session);
+
+  const exec = async (overwriteToken?: string) =>
+    sendGetUserRequest(overwriteToken ?? token, userId);
+
+  describe401(() => {
+    itShouldRequireToken(exec);
   });
 
-  const exec = async () => sendGetUserRequest(token, userId);
-
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
-
-    const response = await exec();
-
-    expectUnauthorizedError(response);
-  });
-
-  describe('should return 403', () => {
+  describe403(() => {
     for (let role of ['user', 'author'] as UserRole[]) {
       it(`if role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
@@ -132,7 +122,7 @@ describe('GET /management/users/:id', () => {
     }
   });
 
-  describe('should return 404', () => {
+  describe404(() => {
     it('if userId is invalid', async () => {
       userId = 'aseqwjequhu3h12ui31qm2da';
 
@@ -149,11 +139,27 @@ describe('GET /management/users/:id', () => {
     });
   });
 
-  describe('should return 200', async () => {
+  describe200(() => {
     it('if userId exist in database', async () => {
       const res = await exec();
 
-      expectSuccessGET(res);
+      expectSuccess(res);
+    });
+
+    it('and return user object', async () => {
+      const res = await exec();
+
+      const keys: Array<keyof UserManagementResponseDto> = [
+        'username',
+        'email',
+        'role',
+        'avatar',
+        'isBanned',
+        'createDate',
+        'updateDate',
+      ];
+      expectSuccess(res);
+      expectKeysExist(res.body.data!, keys);
     });
 
     for (let role of adminRoles) {
@@ -162,24 +168,8 @@ describe('GET /management/users/:id', () => {
 
         const res = await exec();
 
-        expectSuccessGET(res);
+        expectSuccess(res);
       });
     }
-  });
-
-  it('should return user object in success response', async () => {
-    const res = await exec();
-
-    const keys: Array<keyof UserManagementResponseDto> = [
-      'username',
-      'email',
-      'role',
-      'avatar',
-      'isBanned',
-      'createDate',
-      'updateDate',
-    ];
-    expectSuccessGET(res);
-    expectKeysExist(res.body.data!, keys);
   });
 });

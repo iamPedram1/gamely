@@ -249,6 +249,10 @@ class BaseMutateService<
     return result;
   }
 
+  async clearCollection(options?: BaseMutateOptions) {
+    return await this.deleteManyWithConditions({}, options);
+  }
+
   async batchDelete(
     ids: string[],
     options?: BaseMutateOptions & { additionalFilter?: FilterQuery<TSchema> }

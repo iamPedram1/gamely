@@ -1,23 +1,25 @@
-import { container } from 'tsyringe';
-
-// Services
-import GameService from 'features/shared/game/core/game.service';
-
 // Utils
 import { adminRoles } from 'features/shared/user/core/user.constant';
+import { generateGameService } from 'features/shared/game/core/game.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
   sendCreateGameRequest,
   sendGetGameRequest,
 } from 'features/management/game/tests/game.testUtils';
+import {
+  describe200,
+  describe403,
+  itShouldRequireManagementRole,
+  itShouldReturnsPaginatedDocs,
+} from 'core/utilities/testHelpers';
 
 // Types
-import { UserRole } from 'features/shared/user/core/user.types';
+import type { UserRole } from 'features/shared/user/core/user.types';
 
 describe('GET /management/games', () => {
   let token: string;
 
-  const gameService = container.resolve(GameService);
+  const gameService = generateGameService();
 
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
@@ -25,19 +27,13 @@ describe('GET /management/games', () => {
     await sendCreateGameRequest({ token });
   });
 
-  const exec = async () => sendGetGameRequest(token);
+  const exec = async (overwriteToken?: string) =>
+    sendGetGameRequest(overwriteToken ?? token);
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
+  describe200(() => {
+    itShouldReturnsPaginatedDocs(exec);
 
-    const response = await exec();
-
-    expect(response.status).toBe(403);
-  });
-
-  describe.each(['author', ...adminRoles] as Exclude<UserRole, 'user'>[])(
-    'should return 200',
-    (role) => {
+    (['author', ...adminRoles] as UserRole[]).forEach((role) => {
       it(`if role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
 
@@ -45,26 +41,18 @@ describe('GET /management/games', () => {
 
         expect(response.status).toBe(200);
       });
-    }
-  );
+    });
 
-  it('should return pagination if authorized', async () => {
-    const response = await exec();
+    it('and return game object', async () => {
+      const res = await exec();
 
-    expect(response.body.data?.pagination).toBeDefined();
-    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
+      ['translations', 'slug', 'id'].forEach((key) => {
+        expect(res.body.data?.docs[0]).toHaveProperty(key);
+      });
+    });
   });
 
-  it('should return docs if authorized', async () => {
-    const response = await exec();
-
-    expect(response.body.data?.docs).toBeDefined();
-    expect(Array.isArray(response.body.data?.docs)).toBe(true);
-    expect(response.body.data?.docs.length).toBeGreaterThan(0);
-    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
-
-    ['translations', 'slug', 'id'].forEach((key) => {
-      expect(response.body.data?.docs[0]).toHaveProperty(key);
-    });
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
   });
 });

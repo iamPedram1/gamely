@@ -4,9 +4,6 @@ import { faker, fakerFA } from '@faker-js/faker';
 import { appLanguages } from 'core/startup/i18n';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import { generatePostService } from 'features/shared/post/core/post.constant';
-import { sendCreateTagRequest } from 'features/management/tag/tests/tag.testUtils';
-import { sendCreateGameRequest } from 'features/management/game/tests/game.testUtils';
-import { sendCreateCategoryRequest } from 'features/management/category/tests/category.testUtilts';
 import {
   generatePostData,
   generatePostRequirements,
@@ -14,9 +11,15 @@ import {
   sendPatchPostRequest,
 } from 'features/management/post/core/tests/post.testUtils';
 import {
+  describe200,
+  describe400,
+  describe401,
+  describe403,
+  describe404,
   expectBadRequest,
   expectNotFoundError,
-  expectUnauthorizedError,
+  itShouldRequireManagementRole,
+  itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 
 // DTO
@@ -61,36 +64,81 @@ describe('PATCH /management/posts', () => {
     ++payload.readingTime;
   });
 
-  const exec = async () => sendPatchPostRequest(id, { payload, token });
+  const exec = async (overwriteToken?: string) =>
+    sendPatchPostRequest(id, { payload, token: overwriteToken ?? token });
 
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
+  describe200(() => {
+    it('if payload is valid', async () => {
+      const before = await postService.getOneBySlug(payload.slug, {
+        lean: true,
+      });
+      const response = await exec();
+      const after = await postService.getOneBySlug(payload.slug, {
+        lean: true,
+      });
 
-    const response = await exec();
+      expect(response.status).toBe(200);
+      expect(after).toBeDefined();
+      expect(after.readingTime).toBe(payload.readingTime);
 
-    expectUnauthorizedError(response);
+      describe.each(appLanguages)('check translations update', (lang) => {
+        it(`in ${lang}`, async () => {
+          expect(after.translations[lang]).toMatchObject(
+            payload.translations[lang]
+          );
+          expect(before.translations[lang]).not.toMatchObject(
+            after.translations[lang]
+          );
+        });
+      });
+
+      describe.each(['game', 'category', 'tags', 'coverImage'] as const)(
+        'check updates',
+        (key) => {
+          it(`in ${key}`, async () => {
+            expect(after[key]).not.toEqual(before[key]);
+          });
+        }
+      );
+    });
   });
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
-
-    const response = await exec();
-
-    expect(response.status).toBe(403);
+  describe401(() => {
+    itShouldRequireToken(exec);
   });
 
-  it('should return 404 if slug is already taken', async () => {
-    const post = await sendCreatePostRequest({ token });
-    payload.slug = post.body.data!.slug;
-
-    const response = await exec();
-
-    expectBadRequest(response, /taken/i);
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
   });
 
-  describe('should return 404 if', () => {
+  describe400(() => {
+    it('if slug is already taken', async () => {
+      const post = await sendCreatePostRequest({ token });
+      payload.slug = post.body.data!.slug;
+
+      const response = await exec();
+
+      expectBadRequest(response, /taken/i);
+    });
+
+    (['title', 'abstract', 'content'] as const).forEach((key) => {
+      for (let lang of appLanguages) {
+        it(`if translations.${lang}.${key} is invalid`, async () => {
+          payload.translations[lang][key] = '';
+
+          const response = await sendPatchPostRequest(id, {
+            payload: payload,
+            token,
+          });
+          expectBadRequest(response, new RegExp(key, 'i'));
+        });
+      }
+    });
+  });
+
+  describe404(() => {
     (['game', 'coverImage', 'category', 'tags'] as const).forEach((key) => {
-      it(`${key} is not valid`, async () => {
+      it(`if ${key} does not exist`, async () => {
         if (key === 'tags') payload[key] = [faker.database.mongodbObjectId()];
         else payload[key] = faker.database.mongodbObjectId();
 
@@ -102,56 +150,5 @@ describe('PATCH /management/posts', () => {
         );
       });
     });
-  });
-
-  describe.each(['title', 'abstract', 'content'] as const)(
-    'should return 400 if %s is invalid',
-    (key) => {
-      for (let lang of appLanguages) {
-        it(`in ${lang}`, async () => {
-          payload.translations[lang][key] = '';
-
-          const response = await sendPatchPostRequest(id, {
-            payload: payload,
-            token,
-          });
-          expectBadRequest(response, new RegExp(key, 'i'));
-        });
-      }
-    }
-  );
-
-  it('should return 200 if payload is valid', async () => {
-    const before = await postService.getOneBySlug(payload.slug, {
-      lean: true,
-    });
-    const response = await exec();
-    const after = await postService.getOneBySlug(payload.slug, {
-      lean: true,
-    });
-
-    expect(response.status).toBe(200);
-    expect(after).toBeDefined();
-    expect(after.readingTime).toBe(payload.readingTime);
-
-    describe.each(appLanguages)('check translations update', (lang) => {
-      it(`in ${lang}`, async () => {
-        expect(after.translations[lang]).toMatchObject(
-          payload.translations[lang]
-        );
-        expect(before.translations[lang]).not.toMatchObject(
-          after.translations[lang]
-        );
-      });
-    });
-
-    describe.each(['game', 'category', 'tags', 'coverImage'] as const)(
-      'check updates',
-      (key) => {
-        it(`in ${key}`, async () => {
-          expect(after[key]).not.toEqual(before[key]);
-        });
-      }
-    );
   });
 });

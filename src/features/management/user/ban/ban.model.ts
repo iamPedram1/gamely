@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { model, Schema, Model } from 'mongoose';
 
 // Utilities
@@ -5,7 +6,6 @@ import { banStatus, banType } from 'features/management/user/ban/ban.constant';
 
 // Types
 import type { IBanEntity } from 'features/management/user/ban/ban.types';
-import dayjs from 'dayjs';
 
 const userBanSchema = new Schema<IBanEntity, Model<IBanEntity>>(
   {

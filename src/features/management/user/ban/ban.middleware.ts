@@ -2,12 +2,12 @@ import { container } from 'tsyringe';
 import type { Request, Response, NextFunction } from 'express';
 
 // Model
-import UserBanService from 'features/management/user/ban/ban.service';
+import BanService from 'features/management/user/ban/ban.service';
 
 // Utilities
 import { AnonymousError, ForbiddenError } from 'core/utilities/errors';
 
-const banService = container.resolve(UserBanService);
+const banService = container.resolve(BanService);
 
 export async function validateBanStatus(
   req: Request,

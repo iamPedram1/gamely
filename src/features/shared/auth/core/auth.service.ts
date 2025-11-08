@@ -4,7 +4,7 @@ import { delay, inject, injectable } from 'tsyringe';
 // Service
 import tokenUtils from 'core/services/token.service';
 import UserService from 'features/shared/user/core/user.service';
-import UserBanService from 'features/management/user/ban/ban.service';
+import BanService from 'features/management/user/ban/ban.service';
 import SessionService from 'features/shared/auth/session/session.service';
 
 // DTO
@@ -48,7 +48,7 @@ import type { BaseMutateOptions } from 'core/types/base.service.type';
 export default class AuthService {
   constructor(
     @inject(delay(() => UserService)) private userService: UserService,
-    @inject(delay(() => UserBanService)) private banService: UserBanService,
+    @inject(delay(() => BanService)) private banService: BanService,
     @inject(delay(() => SessionService)) private sessionService: SessionService
   ) {}
 

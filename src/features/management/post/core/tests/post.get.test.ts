@@ -1,10 +1,16 @@
 // Utils
 import { appLanguages } from 'core/startup/i18n';
-import { UserRole } from 'features/shared/user/core/user.types';
 import { adminRoles } from 'features/shared/user/core/user.constant';
-import { expectUnauthorizedError } from 'core/utilities/testHelpers';
 import { generatePostService } from 'features/shared/post/core/post.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
+import {
+  describe200,
+  describe401,
+  describe403,
+  itShouldRequireManagementRole,
+  itShouldRequireToken,
+  itShouldReturnsPaginatedDocs,
+} from 'core/utilities/testHelpers';
 import {
   sendCreatePostRequest,
   sendGetPostRequest,
@@ -12,6 +18,9 @@ import {
 
 // Dto
 import { PostManagementResponseDto } from 'features/management/post/core/post.management.dto';
+
+// Types
+import type { UserRole } from 'features/shared/user/core/user.types';
 
 describe('GET /management/posts', () => {
   let token: string;
@@ -24,27 +33,21 @@ describe('GET /management/posts', () => {
     post = (await sendCreatePostRequest({ token })).body.data!;
   });
 
-  const exec = async () => sendGetPostRequest(token);
+  const exec = async (overwriteToken?: string) =>
+    sendGetPostRequest(overwriteToken ?? token);
 
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
-
-    const response = await exec();
-
-    expectUnauthorizedError(response);
+  describe401(() => {
+    itShouldRequireToken(exec);
   });
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
-
-    const response = await exec();
-
-    expect(response.status).toBe(403);
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
   });
 
-  describe.each(['author', ...adminRoles] as UserRole[])(
-    'should return 200',
-    async (role) => {
+  describe200(() => {
+    itShouldReturnsPaginatedDocs(exec);
+
+    (['author', ...adminRoles] as UserRole[]).forEach((role) => {
       it(`if role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
 
@@ -52,35 +55,19 @@ describe('GET /management/posts', () => {
 
         expect(response.status).toBe(200);
       });
-    }
-  );
+    });
 
-  it('should return pagination if authorized', async () => {
-    const response = await exec();
+    it('should not return post content', async () => {
+      const response = await exec();
 
-    expect(response.body.data?.pagination).toBeDefined();
-    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
-  });
+      expect(response.body.data?.docs.length).toBeGreaterThan(0);
 
-  it('should return docs if authorized', async () => {
-    const response = await exec();
-
-    expect(response.body.data?.docs).toBeDefined();
-    expect(Array.isArray(response.body.data?.docs)).toBe(true);
-    expect(response.body.data?.docs.length).toBeGreaterThan(0);
-    expect(response.body.data?.pagination.totalDocs).toBeGreaterThan(0);
-  });
-
-  it('should not return post content', async () => {
-    const response = await exec();
-
-    expect(response.body.data?.docs.length).toBeGreaterThan(0);
-
-    describe.each(appLanguages)('should not return post content', (lang) => {
-      it(`in translations[${lang}]`, async () => {
-        expect(
-          response.body.data?.docs?.[0].translations?.[lang]?.content
-        ).not.toHaveProperty('');
+      describe.each(appLanguages)('should not return post content', (lang) => {
+        it(`in translations[${lang}]`, async () => {
+          expect(
+            response.body.data?.docs?.[0].translations?.[lang]?.content
+          ).not.toHaveProperty('');
+        });
       });
     });
   });

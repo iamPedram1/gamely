@@ -5,14 +5,29 @@ import app from 'app';
 
 // Utils
 import logger from 'core/utilities/logger';
-import { connectDatabase } from 'core/tests/database';
+import {
+  clearDatabase,
+  closeDatabase,
+  connectDatabase,
+} from 'core/tests/database';
+import { Server } from 'http';
 
 let request: Agent;
+let server: Server;
 
 beforeAll(async () => {
   await connectDatabase();
+  server = app.listen(0);
+  request = supertest(server);
+});
 
-  request = supertest(app);
+afterAll(async () => {
+  await closeDatabase();
+  server.close();
+});
+
+beforeEach(async () => {
+  await clearDatabase();
 });
 
 vi.mock('core/utilities/mail', () => ({

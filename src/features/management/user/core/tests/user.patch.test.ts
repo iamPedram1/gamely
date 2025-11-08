@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker';
 
+// Models
+import User from 'features/shared/user/core/user.model';
+import Session from 'features/shared/auth/session/session.model';
+
 // Utils
-import tokenUtils from 'core/services/token.service';
 import { normalizeUsername } from 'core/utilities/helperPack';
 import { sendPatchUserRequest } from 'features/management/user/core/tests/user.testUtils';
 import {
@@ -13,6 +16,11 @@ import {
   registerAndLogin,
 } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
+  clearDbAfterEach,
+  describe200,
+  describe400,
+  describe401,
+  describe403,
   expectBadRequest,
   expectUnauthorizedError,
 } from 'core/utilities/testHelpers';
@@ -21,7 +29,6 @@ import {
 import { UpdateUserDto } from 'features/management/user/core/user.management.dto';
 
 // Types
-import type { IAccessToken } from 'features/shared/auth/session/session.types';
 import type {
   UserLeanDocument,
   UserRole,
@@ -46,12 +53,10 @@ describe('PATCH /management/users', () => {
     superAdminToken = superAdmin?.accessToken || '';
     adminToken = admin?.accessToken || '';
     userToken = user!.accessToken;
-    userId = tokenUtils.decode<IAccessToken>(user!.accessToken).userId;
+    userId = user!.userId;
   });
 
-  afterEach(async () => {
-    await userService.deleteManyWithConditions({});
-  });
+  clearDbAfterEach(User, Session);
 
   const exec = async (token: string) => {
     before = await userService.getOneById(userId, {
@@ -66,43 +71,7 @@ describe('PATCH /management/users', () => {
     return res;
   };
 
-  it('should return 401 if user does not have token in header', async () => {
-    const response = await exec('');
-
-    expectUnauthorizedError(response);
-  });
-
-  describe('should return 403', () => {
-    it('if role is not [admin,superAdmin]', async () => {
-      superAdminToken = (await registerAndLogin())?.accessToken || '';
-
-      const response = await exec(userToken);
-
-      expect(response.status).toBe(403);
-    });
-
-    it('admin is trying to update someones role', async () => {
-      payload.role = 'admin';
-
-      const response = await exec(adminToken);
-
-      expect(response.status).toBe(403);
-    });
-  });
-
-  describe('should return 400', () => {
-    it('if username is already taken', async () => {
-      const newPayload = generateUser();
-      await registerAndLogin({ payload: newPayload });
-      payload.username = newPayload.username;
-
-      const response = await exec(superAdminToken);
-
-      expectBadRequest(response, /taken/i);
-    });
-  });
-
-  describe('it should return 200', () => {
+  describe200(() => {
     it('even on empty object as payload', async () => {
       payload = {};
       const response = await exec(superAdminToken);
@@ -127,6 +96,44 @@ describe('PATCH /management/users', () => {
       expect(response.status).toBe(200);
       expect(after.role).not.toBe(before.role);
       expect(after.role).toBe(payload.role);
+    });
+  });
+
+  describe400(() => {
+    it('if username is already taken', async () => {
+      const newPayload = generateUser();
+      await registerAndLogin({ payload: newPayload });
+      payload.username = newPayload.username;
+
+      const response = await exec(superAdminToken);
+
+      expectBadRequest(response, /taken/i);
+    });
+  });
+
+  describe401(() => {
+    it('if user does not have token in header', async () => {
+      const response = await exec('');
+
+      expectUnauthorizedError(response);
+    });
+  });
+
+  describe403(() => {
+    it('if role is not [admin,superAdmin]', async () => {
+      superAdminToken = (await registerAndLogin())?.accessToken || '';
+
+      const response = await exec(userToken);
+
+      expect(response.status).toBe(403);
+    });
+
+    it('if admin is trying to update someones role', async () => {
+      payload.role = 'admin';
+
+      const response = await exec(adminToken);
+
+      expect(response.status).toBe(403);
     });
   });
 

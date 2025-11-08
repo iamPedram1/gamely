@@ -7,14 +7,28 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import { isValidObjectId, Model } from 'mongoose';
 
+type ErrorNameType = 'NotFoundError' | 'ValidationError' | 'BadRequestError';
 interface ValidateConfigs {
   type?: 'id' | 'idArray' | 'string' | 'stringArray';
   required?: boolean;
-  Error?:
-    | typeof NotFoundError
-    | typeof ValidationError
-    | typeof BadRequestError;
+  error?: ErrorNameType;
 }
+
+const getErrorClass = (name: ErrorNameType) => {
+  switch (name) {
+    case 'BadRequestError':
+      return BadRequestError;
+
+    case 'ValidationError':
+      return ValidationError;
+
+    case 'NotFoundError':
+      return NotFoundError;
+
+    default:
+      return Error;
+  }
+};
 
 /**
  * Middleware to validate a route parameter (`req.params`) and optionally check its existence in the database.
@@ -35,13 +49,15 @@ export function validateParam<T>(
   Model: Model<T>,
   paramKey: string,
   modelKey: keyof T,
-  { Error = ValidationError, required, type = 'string' }: ValidateConfigs = {}
+  { error = 'NotFoundError', required, type = 'string' }: ValidateConfigs = {}
 ) {
+  const ErrorClass = getErrorClass(error);
+
   return async (req: Request, _res: Response, next: NextFunction) => {
     const raw = req.params[paramKey];
 
     if (!raw && required)
-      throw new Error(req.t('error.param.required', { param: paramKey }));
+      throw new ErrorClass(req.t('error.param.required', { param: paramKey }));
 
     // normalize to array if array type or comma-separated
     const values =
@@ -56,7 +72,7 @@ export function validateParam<T>(
 
     // validate ObjectId if type is id
     if (type.includes('id') && values.some((v) => !isValidObjectId(v)))
-      throw new Error(
+      throw new ErrorClass(
         req.t('error.id_invalid', {
           keyname: req.t(
             `models.${Model.modelName}.singular` as TranslationKeys
@@ -70,7 +86,7 @@ export function validateParam<T>(
         [modelKey]: { $in: values },
       } as any);
       if (count !== values.length)
-        throw new Error(
+        throw new ErrorClass(
           req.t('error.id_invalid', {
             keyname: req.t(
               `models.${Model.modelName}.singular` as TranslationKeys
@@ -80,7 +96,7 @@ export function validateParam<T>(
     } else {
       const exists = await Model.exists({ [modelKey]: values[0] } as any);
       if (!exists)
-        throw new Error(
+        throw new ErrorClass(
           req.t('error.param.not_found', {
             param: paramKey,
             value: raw,
@@ -114,13 +130,15 @@ export function validateRequestField<T>(
   source: 'params' | 'body' | 'query',
   fieldName: string,
   modelKey: keyof T,
-  { Error = ValidationError, required, type = 'string' }: ValidateConfigs = {}
+  { error = 'NotFoundError', required, type = 'string' }: ValidateConfigs = {}
 ) {
+  const ErrorClass = getErrorClass(error);
+
   return async (req: Request, _res: Response, next: NextFunction) => {
     const rawValue = req[source][fieldName];
 
     if (!rawValue && required) {
-      throw new Error(req.t('error.param.required', { param: fieldName }));
+      throw new ErrorClass(req.t('error.param.required', { param: fieldName }));
     }
 
     // Normalize value to array if needed
@@ -137,7 +155,7 @@ export function validateRequestField<T>(
 
     // Validate ObjectId if type is id
     if (type.startsWith('id') && values.some((v) => !isValidObjectId(v))) {
-      throw new Error(
+      throw new ErrorClass(
         req.t('error.id_invalid', {
           keyname: req.t(
             `models.${Model.modelName}.singular` as TranslationKeys
@@ -152,7 +170,7 @@ export function validateRequestField<T>(
         [modelKey]: { $in: values },
       } as any);
       if (count !== values.length)
-        throw new Error(
+        throw new ErrorClass(
           req.t('error.id_invalid', {
             keyname: req.t(
               `models.${Model.modelName}.singular` as TranslationKeys
@@ -162,7 +180,7 @@ export function validateRequestField<T>(
     } else {
       const exists = await Model.exists({ [modelKey]: values[0] } as any);
       if (!exists) {
-        throw new Error(
+        throw new ErrorClass(
           req.t('error.param.not_found', {
             param: fieldName,
             value: rawValue,

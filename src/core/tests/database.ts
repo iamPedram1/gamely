@@ -8,6 +8,7 @@ export const connectDatabase = async (): Promise<void> => {
     binary: {
       version: '7.0.24',
       downloadDir: 'C:/Users/Pedi/Downloads/Programs',
+      checkMD5: false,
     },
     replSet: { count: 1 },
   });

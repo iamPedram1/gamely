@@ -12,8 +12,13 @@ import {
   sendPatchCategoryRequest,
 } from 'features/management/category/tests/category.testUtilts';
 import {
+  describe200,
+  describe400,
+  describe401,
+  describe403,
   expectBadRequest,
-  expectUnauthorizedError,
+  itShouldRequireToken,
+  itShouldRequireManagementRole,
 } from 'core/utilities/testHelpers';
 
 // DTO
@@ -38,95 +43,91 @@ describe('PATCH /management/categories', () => {
     categoryId = response.body.data?.id as string;
   });
 
-  const exec = async () =>
-    sendPatchCategoryRequest(categoryId, { payload, token });
+  const exec = async (overwriteToken?: string) =>
+    sendPatchCategoryRequest(categoryId, {
+      payload,
+      token: overwriteToken ?? token,
+    });
 
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
+  describe200(() => {
+    it('if the parentId is valid', async () => {
+      const res = await sendCreateCategoryRequest({ token });
+      payload.parentId = res.body.data?.id as string;
 
-    const response = await exec();
+      const response = await exec();
+      const category = await categoryService.getOneById(categoryId, {
+        lean: true,
+      });
 
-    expectUnauthorizedError(response);
+      expect(response.status).toBe(200);
+      if (payload.slug) expect(category.slug).toBe(payload.slug);
+      if (payload.parentId)
+        expect(category.parentId?.toHexString()).toBe(payload.parentId);
+      if (payload.translations)
+        expect(category.translations).toMatchObject(payload.translations);
+    });
+
+    it('if slug update is valid', async () => {
+      delete payload.parentId;
+      delete payload.translations;
+      payload.slug = faker.lorem.slug({ min: 2, max: 4 });
+
+      const response = await exec();
+      const category = await categoryService.getOneById(categoryId, {
+        lean: true,
+      });
+
+      expect(response.status).toBe(200);
+      expect(category).toBeDefined();
+      if (payload.slug) expect(category.slug).toBe(payload.slug);
+      if (payload.parentId)
+        expect(String(category.parentId)).toBe(payload.parentId);
+      if (payload.translations)
+        expect(category.translations).toMatchObject(payload.translations);
+    });
+
+    it('even on empty object', async () => {
+      payload = {};
+      const response = await exec();
+      expect(response.status).toBe(200);
+    });
   });
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
+  describe400(() => {
+    it('if the slug is already taken', async () => {
+      const category = await sendCreateCategoryRequest({ token });
+      payload.slug = category.body.data!.slug;
 
-    const response = await exec();
+      const response = await exec();
 
-    expect(response.status).toBe(403);
-  });
+      expectBadRequest(response, /taken/i);
+    });
 
-  it('should return 400 if the slug is already taken', async () => {
-    const category = await sendCreateCategoryRequest({ token });
-    payload.slug = category.body.data!.slug;
+    it('if the parentId does not exist', async () => {
+      payload.parentId = faker.internet.jwt();
 
-    const response = await exec();
+      const response = await exec();
 
-    expectBadRequest(response, /taken/i);
-  });
+      expect(response.status).toBe(400);
+      expect(response.body.message).toMatch(/parent/i);
+    });
 
-  describe.each(appLanguages)(
-    'should return 400 if translations.%s.title is not valid',
-    (lang) => {
-      it(`fails for ${lang}`, async () => {
+    appLanguages.forEach((lang) => {
+      it(`if translations.${lang}.title is not valid`, async () => {
         payload.translations![lang] = { title: 'ab' };
         delete payload.parentId;
         delete payload.slug;
         const response = await exec();
         expectBadRequest(response, /title/i);
       });
-    }
-  );
-
-  it('should return 400 if the parentId does not exist', async () => {
-    payload.parentId = faker.internet.jwt();
-
-    const response = await exec();
-
-    expect(response.status).toBe(400);
-    expect(response.body.message).toMatch(/parent/i);
-  });
-
-  it('should return 200 if the parentId is valid', async () => {
-    const res = await sendCreateCategoryRequest({ token });
-    payload.parentId = res.body.data?.id as string;
-
-    const response = await exec();
-    const category = await categoryService.getOneById(categoryId, {
-      lean: true,
     });
-
-    expect(response.status).toBe(200);
-    if (payload.slug) expect(category.slug).toBe(payload.slug);
-    if (payload.parentId)
-      expect(category.parentId?.toHexString()).toBe(payload.parentId);
-    if (payload.translations)
-      expect(category.translations).toMatchObject(payload.translations);
   });
 
-  it('should return 200 if slug update is valid', async () => {
-    delete payload.parentId;
-    delete payload.translations;
-    payload.slug = faker.lorem.slug({ min: 2, max: 4 });
-
-    const response = await exec();
-    const category = await categoryService.getOneById(categoryId, {
-      lean: true,
-    });
-
-    expect(response.status).toBe(200);
-    expect(category).toBeDefined();
-    if (payload.slug) expect(category.slug).toBe(payload.slug);
-    if (payload.parentId)
-      expect(String(category.parentId)).toBe(payload.parentId);
-    if (payload.translations)
-      expect(category.translations).toMatchObject(payload.translations);
+  describe401(() => {
+    itShouldRequireToken(exec);
   });
 
-  it('should return 200 even on empty object', async () => {
-    payload = {};
-    const response = await exec();
-    expect(response.status).toBe(200);
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
   });
 });

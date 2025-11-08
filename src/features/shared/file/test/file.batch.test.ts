@@ -23,11 +23,11 @@ describe('POST /files/:location/batch', () => {
     fileCount = 2;
   });
 
-  const exec = async () =>
+  const exec = async (overwriteToken?: string) =>
     sendMultipleUploadFileRequest({
       count: fileCount,
       payload: location,
-      token,
+      token: overwriteToken ?? token,
     });
 
   describe.each(fileLocations)(

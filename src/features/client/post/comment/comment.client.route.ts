@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 // Middlewares
 import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
-import validateDocumentExistById from 'core/middlewares/validateObjectId';
+import validateObjectId from 'core/middlewares/validateObjectId';
 
 // Model
 import Post from 'features/shared/post/core/post.model';
@@ -21,7 +21,7 @@ const commentController = container.resolve(CommentClientController);
 // <----------------   GET   ---------------->
 commentClientRouter.get(
   '/',
-  validateDocumentExistById(Post),
+  validateObjectId(Post),
   commentController.getComments
 );
 
@@ -30,7 +30,7 @@ commentClientRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 commentClientRouter.post(
   '/',
   validateBody(CreateCommentDto),
-  validateDocumentExistById(Post),
+  validateObjectId(Post),
   commentController.create
 );
 

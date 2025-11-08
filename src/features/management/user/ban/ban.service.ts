@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { delay, inject, injectable } from 'tsyringe';
 
 // Models
@@ -21,14 +22,17 @@ import type {
   BaseQueryOptions,
   FindResult,
 } from 'core/types/base.service.type';
+import SessionService from 'features/shared/auth/session/session.service';
 
-export type IUserBanService = InstanceType<typeof UserBanService>;
+export type IBanService = InstanceType<typeof BanService>;
 
 @injectable()
-class UserBanService extends BaseService<IBanEntity> {
+class BanService extends BaseService<IBanEntity> {
   constructor(
     @inject(delay(() => UserService))
-    private userService: UserService
+    private userService: UserService,
+    @inject(delay(() => SessionService))
+    private sessionService: SessionService
   ) {
     super(Ban);
   }
@@ -46,7 +50,13 @@ class UserBanService extends BaseService<IBanEntity> {
       ['superAdmin', 'admin'].includes(targetUser.role) &&
       this.currentUser.isNot('superAdmin')
     )
-      throw new ForbiddenError();
+      throw new ForbiddenError(
+        this.t(
+          targetUser.role === 'superAdmin'
+            ? 'error.ban.ban_superAdmin'
+            : 'error.ban.ban_admin'
+        )
+      );
 
     if (this.currentUser.id === targetId)
       throw new ValidationError(this.t('error.ban.ban_self'));
@@ -54,13 +64,32 @@ class UserBanService extends BaseService<IBanEntity> {
     if (await this.checkIsBanned(targetId))
       throw new ValidationError(this.t('error.ban.already_banned'));
 
-    this.create(
-      { ...data, status: 'active', user: targetId, actor: this.currentUser.id },
-      options
-    );
+    await this.withTransaction(async (session) => {
+      await Promise.all([
+        this.sessionService.deleteManyByKey('user', targetId, { session }),
+        this.userService.updateOneById(targetId, { role: 'user' }, { session }),
+        this.create(
+          {
+            ...data,
+            status: 'active',
+            user: targetId,
+            actor: this.currentUser.id,
+          },
+          { ...options, session }
+        ),
+      ]);
+    }, options?.session);
   }
 
   async unban(targetId: string, options?: BaseMutateOptions): Promise<void> {
+    const targetUser = await this.userService.getOneById(targetId, {
+      lean: true,
+      select: 'role',
+    });
+
+    if (targetUser.role === 'admin' && this.currentUser.isNot('superAdmin'))
+      throw new ForbiddenError(this.t('error.ban.unban_admin'));
+
     if (this.currentUser.id === targetId)
       throw new ValidationError(this.t('error.ban.unban_self'));
 
@@ -124,15 +153,17 @@ class UserBanService extends BaseService<IBanEntity> {
     return ban;
   }
 
-  private checkIsBanExpired(ban: IBanEntity) {
-    return ban.type === 'temporary' && ban.endAt && ban.endAt < new Date();
-  }
-
-  async checkIsBanned(banedUserId: DocumentId) {
-    const ban = await this.getUserBan(banedUserId);
+  async checkIsBanned(userId: DocumentId) {
+    const ban = await this.getUserBan(userId);
     if (!ban || ban.status === 'expired') return false;
     else return true;
   }
+
+  private checkIsBanExpired(ban: IBanEntity) {
+    const current = dayjs();
+
+    return ban.type === 'temporary' && dayjs(ban.endAt).isBefore(current);
+  }
 }
 
-export default UserBanService;
+export default BanService;

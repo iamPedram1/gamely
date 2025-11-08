@@ -1,15 +1,28 @@
 import { container } from 'tsyringe';
 import { faker } from '@faker-js/faker';
 
+// Models
+import User from 'features/shared/user/core/user.model';
+import Session from 'features/shared/auth/session/session.model';
+
 // Services
 import UserService from 'features/shared/user/core/user.service';
 
 // Utils
-import { expectBadRequest } from 'core/utilities/testHelpers';
+import { sendBanRequest } from 'features/management/user/ban/tests/ban.testUtils';
+import {
+  expectBadRequest,
+  expectForbiddenRequest,
+  clearDbAfterEach,
+  describe200,
+  describe400,
+  describe403,
+} from 'core/utilities/testHelpers';
 import {
   createUser,
   generateAccessToken,
   generateUser,
+  registerAndLogin,
   sendChangePasswordRequest,
   sendLoginRequest,
   sendRecoverPasswordRequest,
@@ -36,50 +49,57 @@ describe('auth routes', () => {
       token = '';
     });
 
-    const exec = async () => await sendRegisterRequest({ payload, token });
+    clearDbAfterEach(User, Session);
 
-    it('should return 400 if user have token in header', async () => {
-      token = generateAccessToken();
+    const exec = async (overwriteToken?: string) =>
+      await sendRegisterRequest({ payload, token: overwriteToken ?? token });
 
-      const response = await exec();
+    describe200(() => {
+      it('if user has valid payload', async () => {
+        const response = await exec();
 
-      expectBadRequest(response);
+        expect(response.status).toBe(201);
+      });
     });
 
-    it('should return 201 if user has valid payload', async () => {
-      const response = await exec();
+    describe400(() => {
+      it('if user have token in header', async () => {
+        token = generateAccessToken();
 
-      expect(response.status).toBe(201);
-    });
+        const response = await exec();
 
-    it('should return 400 if the email is already taken', async () => {
-      const user = await createUser();
-      payload.email = user.email;
+        expectBadRequest(response);
+      });
 
-      const response = await exec();
+      it('if the email is already taken', async () => {
+        const user = await createUser();
+        payload.email = user.email;
 
-      expectBadRequest(response, /exists/i);
-    });
+        const response = await exec();
 
-    it('should return 400 if the email is not provided in payload', async () => {
-      payload.email = '';
+        expectBadRequest(response, /exists/i);
+      });
 
-      const response = await exec();
-      expectBadRequest(response, /valid email/i);
-    });
+      it('if the email is not provided in payload', async () => {
+        payload.email = '';
 
-    it('should return 400 if the email is not valid', async () => {
-      payload.email = 'email.abcedfg';
+        const response = await exec();
+        expectBadRequest(response, /valid email/i);
+      });
 
-      const response = await exec();
-      expectBadRequest(response, /valid email/i);
-    });
+      it('if the email is not valid', async () => {
+        payload.email = 'email.abcedfg';
 
-    it('should return 400 if the password is not provided in payload', async () => {
-      payload.password = '';
+        const response = await exec();
+        expectBadRequest(response, /valid email/i);
+      });
 
-      const response = await exec();
-      expectBadRequest(response, /characters/i);
+      it('if the password is not provided in payload', async () => {
+        payload.password = '';
+
+        const response = await exec();
+        expectBadRequest(response, /characters/i);
+      });
     });
   });
 
@@ -94,39 +114,60 @@ describe('auth routes', () => {
       token = '';
     });
 
-    const exec = async () => await sendLoginRequest({ payload, token });
+    const exec = async (overwriteToken?: string) =>
+      await sendLoginRequest({ payload, token: overwriteToken ?? token });
 
-    it('should return 400 if user have token in header', async () => {
-      token = generateAccessToken();
+    describe200(() => {
+      it('if user credentials is valid', async () => {
+        await sendRegisterRequest({ payload: register });
 
-      const response = await exec();
+        const response = await exec();
 
-      expectBadRequest(response);
+        expect(response.status).toBe(200);
+      });
     });
 
-    it('should return 200 if user credentials is valid', async () => {
-      await sendRegisterRequest({ payload: register });
+    describe400(() => {
+      it('if user have token in header', async () => {
+        token = generateAccessToken();
 
-      const response = await exec();
+        const response = await exec();
 
-      expect(response.status).toBe(200);
+        expectBadRequest(response);
+      });
+
+      it('if password is incorrect', async () => {
+        await sendRegisterRequest({ payload: register });
+
+        payload.password = 'incorrect-password';
+
+        const response = await exec();
+
+        expectBadRequest(response, /email or password/i);
+      });
+
+      it('if password provided in payload', async () => {
+        payload.password = '';
+
+        const response = await exec();
+        expectBadRequest(response, /characters/i);
+      });
     });
 
-    it('should return 400 if password is not correct', async () => {
-      await sendRegisterRequest({ payload: register });
+    describe403(() => {
+      it('if user is banned', async () => {
+        await sendRegisterRequest({ payload: register });
+        const user = await userService.getOneByKey('email', payload.email, {
+          lean: true,
+        });
+        const adminToken = (await registerAndLogin({ role: 'admin' }))!
+          .accessToken;
+        await sendBanRequest(user._id.toHexString(), { token: adminToken });
 
-      payload.password = 'incorrect-password';
+        const response = await exec();
 
-      const response = await exec();
-
-      expectBadRequest(response, /email or password/i);
-    });
-
-    it('should return 400 if the password is not provided in payload', async () => {
-      payload.password = '';
-
-      const response = await exec();
-      expectBadRequest(response, /characters/i);
+        expectForbiddenRequest(response, /suspended/);
+      });
     });
   });
 
@@ -142,41 +183,47 @@ describe('auth routes', () => {
       token = '';
     });
 
-    const exec = async () =>
-      await sendRecoverPasswordRequest({ payload, token });
-
-    it('should return 400 if user have token in header', async () => {
-      token = generateAccessToken();
-
-      const response = await exec();
-
-      expectBadRequest(response);
-    });
-
-    it('should return 200 if email does not exist', async () => {
-      payload.email = 'somethingTezt@gmail.com';
-
-      const response = await exec();
-
-      expect(response.status).toBe(200);
-    });
-
-    it('should return 200 if email exists', async () => {
-      const response = await exec();
-
-      expect(response.status).toBe(200);
-    });
-
-    it('should set recoverKey in user model if email exist', async () => {
-      const response = await exec();
-
-      const user = await userService.getUserByEmail(register.email, {
-        select: '+recoveryKey',
+    const exec = async (overwriteToken?: string) =>
+      await sendRecoverPasswordRequest({
+        payload,
+        token: overwriteToken ?? token,
       });
 
-      expect(user.email).toBe(register.email.toLowerCase());
-      expect(user.recoveryKey).toBeDefined();
-      expect(response.status).toBe(200);
+    describe200(() => {
+      it('if email does not exist', async () => {
+        payload.email = 'somethingTezt@gmail.com';
+
+        const response = await exec();
+
+        expect(response.status).toBe(200);
+      });
+
+      it('if email exists', async () => {
+        const response = await exec();
+
+        expect(response.status).toBe(200);
+      });
+      it('and set recoverKey in user model if email exist', async () => {
+        const response = await exec();
+
+        const user = await userService.getUserByEmail(register.email, {
+          select: '+recoveryKey',
+        });
+
+        expect(user.email).toBe(register.email.toLowerCase());
+        expect(user.recoveryKey).toBeDefined();
+        expect(response.status).toBe(200);
+      });
+    });
+
+    describe400(() => {
+      it('if user have token in header', async () => {
+        token = generateAccessToken();
+
+        const response = await exec();
+
+        expectBadRequest(response);
+      });
     });
   });
 
@@ -197,60 +244,66 @@ describe('auth routes', () => {
       };
     });
 
-    const exec = async () =>
-      await sendChangePasswordRequest({ payload, token });
+    const exec = async (overwriteToken?: string) =>
+      await sendChangePasswordRequest({
+        payload,
+        token: overwriteToken ?? token,
+      });
 
-    it('should return 400 if user have token in header', async () => {
-      token = generateAccessToken();
+    describe200(() => {
+      it('and change the password if recoveryKey is valid', async () => {
+        const recoverResponse = await sendRecoverPasswordRequest({
+          payload: { email: register.email },
+        });
+        payload.recoveryKey = recoverResponse.body.data?.recoveryKey || '';
 
-      const response = await exec();
+        const userPrev = await userService.getUserByEmail(register.email, {
+          select: '+recoveryKey +password',
+        });
 
-      expectBadRequest(response);
+        const response = await exec();
+
+        const userAfter = await userService.getUserByEmail(register.email, {
+          select: '+recoveryKey +password',
+        });
+
+        expect(response.status).toBe(200);
+        expect(userPrev.recoveryKey).toBeDefined();
+
+        expect(userAfter.password).not.toBe(userPrev.password);
+      });
+
+      it('and clear recoveryKey if password changed', async () => {
+        const recoverResponse = await sendRecoverPasswordRequest({
+          payload: { email: register.email },
+        });
+
+        payload.recoveryKey = recoverResponse?.body?.data?.recoveryKey || '';
+
+        const response = await exec();
+
+        const user = await userService.getUserByEmail(register.email, {
+          select: '+recoveryKey',
+        });
+
+        expect(response.status).toBe(200);
+        expect(user.recoveryKey).toBeNull();
+      });
     });
+    describe400(() => {
+      it('if user have token in header', async () => {
+        token = generateAccessToken();
 
-    it('should return 400 if recoveryKey does not exist', async () => {
-      const response = await exec();
+        const response = await exec();
 
-      expectBadRequest(response);
-    });
-
-    it('should change the password if recoveryKey is valid', async () => {
-      const recoverResponse = await sendRecoverPasswordRequest({
-        payload: { email: register.email },
-      });
-      payload.recoveryKey = recoverResponse.body.data?.recoveryKey || '';
-
-      const userPrev = await userService.getUserByEmail(register.email, {
-        select: '+recoveryKey +password',
+        expectBadRequest(response);
       });
 
-      const response = await exec();
+      it('if recoveryKey does not exist', async () => {
+        const response = await exec();
 
-      const userAfter = await userService.getUserByEmail(register.email, {
-        select: '+recoveryKey +password',
+        expectBadRequest(response);
       });
-
-      expect(response.status).toBe(200);
-      expect(userPrev.recoveryKey).toBeDefined();
-
-      expect(userAfter.password).not.toBe(userPrev.password);
-    });
-
-    it('should clear recoveryKey if password changed', async () => {
-      const recoverResponse = await sendRecoverPasswordRequest({
-        payload: { email: register.email },
-      });
-
-      payload.recoveryKey = recoverResponse?.body?.data?.recoveryKey || '';
-
-      const response = await exec();
-
-      const user = await userService.getUserByEmail(register.email, {
-        select: '+recoveryKey',
-      });
-
-      expect(response.status).toBe(200);
-      expect(user.recoveryKey).toBeNull();
     });
   });
 });

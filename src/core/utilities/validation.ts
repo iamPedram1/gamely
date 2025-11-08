@@ -1,4 +1,5 @@
 import type { CountryCode } from 'libphonenumber-js/max';
+import dayjs from 'dayjs';
 import {
   IsString as CVIsString,
   IsNumber as CVIsNumber,
@@ -391,6 +392,121 @@ export function IsSlug(validationOptions?: ValidationOptions) {
 
           return t('error.validation.isSlug', {
             property: args.property,
+          });
+        },
+      },
+    });
+  };
+}
+
+export function IsMinDateNow(validationOptions?: ValidationOptions) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: 'isMinDateNow',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        /*
+
+        2025-11-07T14:47:18.237Z -> User
+        2025-11-07T14:47:19.048Z -> Server 
+        2025-11-07T14:48:19.048Z -> Server + 1 MIN
+        false
+
+        */
+        validate(value: any) {
+          const marginMinutes = 1;
+
+          return (
+            value && dayjs(value).add(marginMinutes, 'minute').isAfter(dayjs())
+          );
+        },
+        defaultMessage(args: ValidationArguments) {
+          return t('error.validation.isMinDateNow', {
+            property: args.property,
+          });
+        },
+      },
+    });
+  };
+}
+export function IsMaxDateNow(validationOptions?: ValidationOptions) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: 'isMaxDateNow',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return value && dayjs(value).isAfter(dayjs());
+        },
+        defaultMessage(args: ValidationArguments) {
+          return t('error.validation.isMaxDateNow', {
+            property: args.property,
+          });
+        },
+      },
+    });
+  };
+}
+
+export function IsDateBefore(
+  property: string,
+  marginMs = 5000,
+  validationOptions?: ValidationOptions
+) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: 'isDateBefore',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          const obj = args.object as any;
+          const maxDate = obj[property];
+
+          if (!value || !maxDate) return true; // skip if undefined
+
+          return dayjs(value).subtract(1, 'minutes').isBefore(maxDate);
+        },
+        defaultMessage(args: ValidationArguments) {
+          return t('error.validation.isDateBefore', {
+            property: propertyName,
+            keyName: property,
+          });
+        },
+      },
+    });
+  };
+}
+
+export function IsDateAfter(
+  property: string,
+  marginMs = 5000,
+  validationOptions?: ValidationOptions
+) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: 'isDateAfter',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          const obj = args.object as any;
+          const minDate = obj[property];
+
+          if (!value || !minDate) return true;
+
+          return dayjs(value).add(marginMs, 'milliseconds').isAfter(minDate);
+        },
+        defaultMessage(args: ValidationArguments) {
+          return t('error.validation.isDateAfter', {
+            property: propertyName,
+            keyName: property,
           });
         },
       },

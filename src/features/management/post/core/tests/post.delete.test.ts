@@ -1,20 +1,25 @@
 import { faker } from '@faker-js/faker';
-import { container } from 'tsyringe';
-
-// Services
-import PostService from 'features/shared/post/core/post.service';
 
 // Utils
 import { adminRoles } from 'features/shared/user/core/user.constant';
-import { expectUnauthorizedError } from 'core/utilities/testHelpers';
+import { generatePostService } from 'features/shared/post/core/post.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
   sendCreatePostRequest,
   sendDeletePostRequest,
 } from 'features/management/post/core/tests/post.testUtils';
+import {
+  describe200,
+  describe400,
+  describe401,
+  describe403,
+  describe404,
+  itShouldRequireToken,
+  itShouldRequireManagementRole,
+} from 'core/utilities/testHelpers';
 
 describe('DELETE /management/posts', () => {
-  const postService = container.resolve(PostService);
+  const postService = generatePostService();
 
   let token: string;
   let payload: { postId: string };
@@ -27,51 +32,25 @@ describe('DELETE /management/posts', () => {
     payload = { postId: res.body.data?.id || '' };
   });
 
-  const exec = async () => sendDeletePostRequest(payload.postId, token);
+  const exec = async (overwriteToken?: string) =>
+    sendDeletePostRequest(payload.postId, overwriteToken ?? token);
 
-  it('should return 401 if user does not have token in header', async () => {
-    token = '';
+  describe200(() => {
+    it('if role is author and you own the post', async () => {
+      token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-    const response = await exec();
+      payload.postId = (await sendCreatePostRequest({ token })).body.data
+        ?.id as string;
 
-    expectUnauthorizedError(response);
-  });
+      const response = await exec();
 
-  it('should return 403 if role is not [author,admin,superAdmin]', async () => {
-    token = (await registerAndLogin())?.accessToken || '';
+      expect(response.status).toBe(200);
+      expect(response.body.isSuccess).toBe(true);
+      expect(response.body.message).toMatch(/success/i);
+    });
 
-    const response = await exec();
-
-    expect(response.status).toBe(403);
-  });
-
-  it('should return 400 if role is author but you dont own the post', async () => {
-    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
-
-    const response = await exec();
-
-    expect(response.status).toBe(400);
-    expect(response.body.isSuccess).toBe(false);
-    expect(response.body.message).toMatch(/you didn't/i);
-  });
-
-  it('should return 200 if role is author and you own the post', async () => {
-    token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
-
-    payload.postId = (await sendCreatePostRequest({ token })).body.data
-      ?.id as string;
-
-    const response = await exec();
-
-    expect(response.status).toBe(200);
-    expect(response.body.isSuccess).toBe(true);
-    expect(response.body.message).toMatch(/success/i);
-  });
-
-  describe.each(adminRoles)(
-    'should return 200 and delete post if',
-    async (role) => {
-      it(`role is ${role}`, async () => {
+    adminRoles.forEach((role) => {
+      it(`and delete post if role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
@@ -83,14 +62,36 @@ describe('DELETE /management/posts', () => {
         expect(post).toBeNull();
         expect(response.body.isSuccess).toBe(true);
       });
-    }
-  );
+    });
+  });
 
-  it('should return 404 if post does not exist', async () => {
-    payload.postId = faker.database.mongodbObjectId();
+  describe400(() => {
+    it('if role is author but you dont own the post', async () => {
+      token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-    const response = await exec();
-    expect(response.status).toBe(404);
-    expect(response.body.isSuccess).toBe(false);
+      const response = await exec();
+
+      expect(response.status).toBe(400);
+      expect(response.body.isSuccess).toBe(false);
+      expect(response.body.message).toMatch(/you didn't/i);
+    });
+  });
+
+  describe401(() => {
+    itShouldRequireToken(exec);
+  });
+
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
+  });
+
+  describe404(() => {
+    it('if post does not exist', async () => {
+      payload.postId = faker.database.mongodbObjectId();
+
+      const response = await exec();
+      expect(response.status).toBe(404);
+      expect(response.body.isSuccess).toBe(false);
+    });
   });
 });

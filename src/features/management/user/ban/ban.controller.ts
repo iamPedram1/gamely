@@ -2,7 +2,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
-import UserBanService from 'features/management/user/ban/ban.service';
+import BanService from 'features/management/user/ban/ban.service';
 
 // Utilities
 import sendResponse from 'core/utilities/response';
@@ -17,8 +17,8 @@ export default class UserBanController {
   constructor(
     @inject(delay(() => UserBanMapper))
     private userBanMapper: UserBanMapper,
-    @inject(delay(() => UserBanService))
-    private userBanService: UserBanService
+    @inject(delay(() => BanService))
+    private userBanService: BanService
   ) {}
 
   ban: RequestHandler = async (req, res) => {
