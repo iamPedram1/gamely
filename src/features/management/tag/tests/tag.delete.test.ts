@@ -14,6 +14,10 @@ import {
   describe401,
   describe403,
   describe404,
+  expectBadRequest,
+  expectNotFoundError,
+  expectSuccess,
+  itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 
@@ -43,12 +47,10 @@ describe('DELETE /management/tags', () => {
 
       const response = await exec();
 
-      expect(response.status).toBe(200);
-      expect(response.body.isSuccess).toBe(true);
-      expect(response.body.message).toMatch(/success/i);
+      expectSuccess(response, 200, /success/i);
     });
 
-    adminRoles.forEach(async (role) => {
+    adminRoles.forEach((role) => {
       it(`and delete tag if role is ${role}`, async () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
 
@@ -57,9 +59,8 @@ describe('DELETE /management/tags', () => {
           throwError: false,
         });
 
-        expect(response.status).toBe(200);
         expect(tag).toBeNull();
-        expect(response.body.isSuccess).toBe(true);
+        expectSuccess(response, 200, /success/i);
       });
     });
   });
@@ -70,9 +71,7 @@ describe('DELETE /management/tags', () => {
 
       const response = await exec();
 
-      expect(response.status).toBe(400);
-      expect(response.body.isSuccess).toBe(false);
-      expect(response.body.message).toMatch(/you didn't/i);
+      expectBadRequest(response, /you didn't/i);
     });
   });
 
@@ -81,13 +80,7 @@ describe('DELETE /management/tags', () => {
   });
 
   describe403(() => {
-    it('if role is not [author,admin,superAdmin]', async () => {
-      token = (await registerAndLogin())?.accessToken || '';
-
-      const response = await exec();
-
-      expect(response.status).toBe(403);
-    });
+    itShouldRequireManagementRole(exec);
   });
 
   describe404(() => {
@@ -96,8 +89,7 @@ describe('DELETE /management/tags', () => {
 
       const response = await exec();
 
-      expect(response.status).toBe(404);
-      expect(response.body.isSuccess).toBe(false);
+      expectNotFoundError(response);
     });
   });
 });

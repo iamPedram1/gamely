@@ -15,6 +15,7 @@ import {
   describe404,
   describe200,
   describe400,
+  expectNotFoundError,
 } from 'core/utilities/testHelpers';
 import {
   sendCreateCategoryRequest,
@@ -94,8 +95,7 @@ describe('DELETE /management/categories', () => {
 
       const response = await exec();
 
-      expect(response.status).toBe(404);
-      expect(response.body.isSuccess).toBe(false);
+      expectNotFoundError(response);
     });
   });
 });

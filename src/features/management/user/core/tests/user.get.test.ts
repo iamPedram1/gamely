@@ -1,9 +1,5 @@
 import { faker } from '@faker-js/faker';
 
-// Models
-import User from 'features/shared/user/core/user.model';
-import Session from 'features/shared/auth/session/session.model';
-
 // Utils
 import { UserRole } from 'features/shared/user/core/user.types';
 import { adminRoles } from 'features/shared/user/core/user.constant';
@@ -11,7 +7,6 @@ import { generateUserService } from 'features/shared/user/core/user.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import { sendGetUserRequest } from 'features/management/user/core/tests/user.testUtils';
 import {
-  clearDbAfterEach,
   describe200,
   describe401,
   describe403,
@@ -36,8 +31,6 @@ describe('GET /management/users', () => {
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
   });
-
-  clearDbAfterEach(User, Session);
 
   const exec = async (overwriteToken?: string) =>
     sendGetUserRequest<WithPagination<UserManagementResponseDto>>(
@@ -100,8 +93,6 @@ describe('GET /management/users/:id', () => {
 
     userId = (await registerAndLogin())?.userId || '';
   });
-
-  clearDbAfterEach(User, Session);
 
   const exec = async (overwriteToken?: string) =>
     sendGetUserRequest(overwriteToken ?? token, userId);

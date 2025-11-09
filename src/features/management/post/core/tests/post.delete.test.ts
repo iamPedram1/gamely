@@ -16,6 +16,7 @@ import {
   describe404,
   itShouldRequireToken,
   itShouldRequireManagementRole,
+  expectNotFoundError,
 } from 'core/utilities/testHelpers';
 
 describe('DELETE /management/posts', () => {
@@ -90,8 +91,7 @@ describe('DELETE /management/posts', () => {
       payload.postId = faker.database.mongodbObjectId();
 
       const response = await exec();
-      expect(response.status).toBe(404);
-      expect(response.body.isSuccess).toBe(false);
+      expectNotFoundError(response);
     });
   });
 });

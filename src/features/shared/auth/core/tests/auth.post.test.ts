@@ -1,10 +1,6 @@
 import { container } from 'tsyringe';
 import { faker } from '@faker-js/faker';
 
-// Models
-import User from 'features/shared/user/core/user.model';
-import Session from 'features/shared/auth/session/session.model';
-
 // Services
 import UserService from 'features/shared/user/core/user.service';
 
@@ -13,7 +9,6 @@ import { sendBanRequest } from 'features/management/user/ban/tests/ban.testUtils
 import {
   expectBadRequest,
   expectForbiddenRequest,
-  clearDbAfterEach,
   describe200,
   describe400,
   describe403,
@@ -48,8 +43,6 @@ describe('auth routes', () => {
       payload = generateUser();
       token = '';
     });
-
-    clearDbAfterEach(User, Session);
 
     const exec = async (overwriteToken?: string) =>
       await sendRegisterRequest({ payload, token: overwriteToken ?? token });

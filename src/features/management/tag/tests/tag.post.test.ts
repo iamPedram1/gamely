@@ -12,6 +12,7 @@ import {
   describe401,
   describe403,
   expectBadRequest,
+  itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 
@@ -67,12 +68,6 @@ describe('POST /management/tags', () => {
   });
 
   describe403(() => {
-    it('if role is not [author,admin,superAdmin]', async () => {
-      token = (await registerAndLogin())?.accessToken || '';
-
-      const response = await exec();
-
-      expect(response.status).toBe(403);
-    });
+    itShouldRequireManagementRole(exec);
   });
 });

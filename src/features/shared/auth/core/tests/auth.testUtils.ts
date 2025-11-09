@@ -48,9 +48,7 @@ export async function createUser(user: RegisterDto = generateUser()) {
 
 export async function registerAndLogin(
   options?: SendRequestOptions<RegisterDto> & { role?: UserRole }
-): Promise<
-  (RegisterResponseDto & { userId: string; sessionId: string }) | null
-> {
+): Promise<RegisterResponseDto & { userId: string; sessionId: string }> {
   const payload = options?.payload ?? generateUser();
 
   await sendRegisterRequest({
@@ -76,7 +74,21 @@ export async function registerAndLogin(
     sessionId = decoded.sessionId;
   }
 
-  return res?.body?.data ? { ...res.body.data, userId, sessionId } : null;
+  return { ...res.body.data, userId, sessionId } as RegisterResponseDto & {
+    userId: string;
+    sessionId: string;
+  };
+}
+
+export async function registerAndLoginBatch(
+  count: number,
+  options?: SendRequestOptions<RegisterDto> & { role?: UserRole }
+): Promise<Array<RegisterResponseDto & { userId: string; sessionId: string }>> {
+  return await Promise.all(
+    Array(count)
+      .fill(0)
+      .map(() => registerAndLogin(options))
+  );
 }
 
 export const sendRegisterRequest = async (

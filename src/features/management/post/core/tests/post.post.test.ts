@@ -9,8 +9,13 @@ import {
   sendCreatePostRequest,
 } from 'features/management/post/core/tests/post.testUtils';
 import {
+  describe201,
+  describe400,
+  describe401,
+  describe403,
   expectBadRequest,
   expectNotFoundError,
+  itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 
@@ -41,7 +46,7 @@ describe('POST /management/posts', () => {
     });
   };
 
-  describe('should return 201', () => {
+  describe201(() => {
     it('if the payload is valid', async () => {
       const response = await exec();
       const post = await postService.getOneBySlug(payload.slug, { lean: true });
@@ -66,7 +71,7 @@ describe('POST /management/posts', () => {
     });
   });
 
-  describe('should return 400', () => {
+  describe400(() => {
     it('if the slug is already taken', async () => {
       const post = await sendCreatePostRequest({ token });
       payload.slug = post.body.data!.slug;
@@ -88,18 +93,12 @@ describe('POST /management/posts', () => {
     });
   });
 
-  describe('should return 401', () => {
+  describe401(() => {
     itShouldRequireToken(exec);
   });
 
-  describe('should return 403', () => {
-    it('if role is not [author,admin,superAdmin]', async () => {
-      token = (await registerAndLogin())?.accessToken || '';
-
-      const response = await exec();
-
-      expect(response.status).toBe(403);
-    });
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
   });
 
   describe('should return 404', () => {

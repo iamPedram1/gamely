@@ -15,7 +15,6 @@ import NotificationService from 'features/shared/user/notification/notification.
 
 // Utilities
 import { ValidationError } from 'core/utilities/errors';
-import { includeIf } from 'core/utilities/helperPack';
 
 // Types
 import type { IPostEntity } from 'features/shared/post/core/post.types';
@@ -127,32 +126,31 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     // --- Fetch target post + optional parent comment ---
     const [post, parentComment] = await Promise.all([
       this.postService.getOneById(data.post, { lean: true, select: 'creator' }),
-      ...includeIf(
-        isReply,
-        this.getOneById(data.replyToComment!, { lean: true })
-      ),
+      ...(isReply
+        ? [this.getOneById(data.replyToComment!, { lean: true })]
+        : []),
     ]);
 
     // --- Validate block relations ---
-    const [isBlockedByPostAuthor, isBlockedByParentAuthor = false] =
-      await Promise.all([
-        this.blockService.checkIsBlock(post.creator._id, this.currentUser.id),
-        ...includeIf(
-          Boolean(parentComment),
-          this.blockService.checkIsBlock(
-            parentComment.creator._id,
-            this.currentUser.id
-          )
-        ),
-      ]);
+    const [isBlockedByAuthor, isBlockedByUser = false] = await Promise.all([
+      this.blockService.checkIsBlock(post.creator._id, this.currentUser.id),
+      ...(parentComment
+        ? [
+            this.blockService.checkIsBlock(
+              parentComment.creator._id,
+              this.currentUser.id
+            ),
+          ]
+        : []),
+    ]);
 
-    if (isBlockedByPostAuthor) {
+    if (isBlockedByAuthor) {
       throw new ValidationError(
         this.t('error.block.have_been_blocked_by_author')
       );
     }
 
-    if (isReply && isBlockedByParentAuthor) {
+    if (isReply && isBlockedByUser) {
       throw new ValidationError(
         this.t('error.block.have_been_blocked_by_user')
       );

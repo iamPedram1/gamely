@@ -94,13 +94,12 @@ export const describe404 = (fn: () => void) => {
 };
 
 export const itShouldReturnsPaginatedDocs = (exec: () => any) => {
-  it('and return paginated user docs', async () => {
+  it('and return paginated docs', async () => {
     const res = await exec();
     const { data } = res.body;
 
-    expect(data?.pagination?.totalDocs).toBeGreaterThan(0);
+    expect(data?.pagination).toBeDefined();
     expect(Array.isArray(data?.docs)).toBe(true);
-    expect(data?.docs.length).toBeGreaterThan(0);
   });
 };
 

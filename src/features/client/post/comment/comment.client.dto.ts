@@ -8,7 +8,6 @@ import {
 } from 'core/utilities/validation';
 
 // DTO
-import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
 
@@ -20,7 +19,7 @@ export class CreateCommentDto {
 
   @IsOptional()
   @IsMongoId()
-  replyToComment: string;
+  replyToComment?: string;
 }
 
 export class CommentClientResponseDto extends BaseResponseDto {

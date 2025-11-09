@@ -1,9 +1,5 @@
 import { faker } from '@faker-js/faker';
 
-// Models
-import User from 'features/shared/user/core/user.model';
-import Session from 'features/shared/auth/session/session.model';
-
 // Utils
 import { normalizeUsername } from 'core/utilities/helperPack';
 import { sendPatchUserRequest } from 'features/management/user/core/tests/user.testUtils';
@@ -16,7 +12,6 @@ import {
   registerAndLogin,
 } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
-  clearDbAfterEach,
   describe200,
   describe400,
   describe401,
@@ -55,8 +50,6 @@ describe('PATCH /management/users', () => {
     userToken = user!.accessToken;
     userId = user!.userId;
   });
-
-  clearDbAfterEach(User, Session);
 
   const exec = async (token: string) => {
     before = await userService.getOneById(userId, {

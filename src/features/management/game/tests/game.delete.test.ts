@@ -14,6 +14,7 @@ import {
   describe401,
   describe403,
   describe404,
+  expectNotFoundError,
   itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
@@ -91,8 +92,7 @@ describe('DELETE /management/games', () => {
 
       const response = await exec();
 
-      expect(response.status).toBe(404);
-      expect(response.body.isSuccess).toBe(false);
+      expectNotFoundError(response);
     });
   });
 });

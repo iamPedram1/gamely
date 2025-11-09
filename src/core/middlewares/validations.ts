@@ -137,8 +137,12 @@ export function validateRequestField<T>(
   return async (req: Request, _res: Response, next: NextFunction) => {
     const rawValue = req[source][fieldName];
 
-    if (!rawValue && required) {
-      throw new ErrorClass(req.t('error.param.required', { param: fieldName }));
+    if (!rawValue) {
+      if (required)
+        throw new ErrorClass(
+          req.t('error.param.required', { param: fieldName })
+        );
+      else return next();
     }
 
     // Normalize value to array if needed

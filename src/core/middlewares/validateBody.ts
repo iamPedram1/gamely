@@ -24,7 +24,9 @@ import {
  */
 export default function validateBody<T>(DtoClass: ClassConstructor<T>) {
   return async function (req: Request, res: Response, next: NextFunction) {
-    const dto = plainToInstance(DtoClass, req.body, {
+    console.log(req.baseUrl, DtoClass, req.body, req.params, req.query);
+
+    const dto = plainToInstance(DtoClass, req.body || {}, {
       enableImplicitConversion: true,
       exposeDefaultValues: true,
       enableCircularCheck: true,
