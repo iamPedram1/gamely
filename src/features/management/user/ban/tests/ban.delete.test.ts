@@ -1,5 +1,3 @@
-import { faker } from '@faker-js/faker';
-
 // Utils
 import { generateBanService } from 'features/management/user/ban/ban.constant';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
@@ -12,8 +10,7 @@ import {
   describe404,
   expectBadRequest,
   expectForbiddenRequest,
-  expectNotFoundError,
-  expectUnauthorizedError,
+  itShouldExist,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 import {
@@ -33,18 +30,18 @@ import { CreateBanDto } from 'features/management/user/ban/ban.dto';
 import type { UserRole } from 'features/shared/user/core/user.types';
 
 describe('DELETE /bans/:id', () => {
-  const userService = generateUserService();
   const banService = generateBanService();
+  const userService = generateUserService();
   const sessionService = generateSessionService();
   let token: string;
-  let userId: string;
+  let targetId: string;
   let payload: CreateBanDto;
 
   beforeEach(async () => {
     payload = generateBanPayload();
     token = (await registerAndLogin({ role: 'superAdmin' }))?.accessToken || '';
-    userId = (await registerAndLogin())?.userId || '';
-    await sendBanRequest(userId, { token });
+    targetId = (await registerAndLogin())?.userId || '';
+    await sendBanRequest(targetId, { token });
     vi.isFakeTimers();
   });
 
@@ -53,11 +50,11 @@ describe('DELETE /bans/:id', () => {
   });
 
   const exec = async (overwriteToken?: string) =>
-    await sendDeleteBanRequest(userId, { token: overwriteToken ?? token });
+    await sendDeleteBanRequest(targetId, { token: overwriteToken ?? token });
 
   describe204(() => {
     it('and unban the user', async () => {
-      const before = await banService.getUserBan(userId);
+      const before = await banService.getUserBan(targetId);
 
       const response = await exec();
 
@@ -74,7 +71,7 @@ describe('DELETE /bans/:id', () => {
   describe400(() => {
     for (let role of adminRoles) {
       it(`if ${role} is trying to unban a user which is not banned`, async () => {
-        userId = (await registerAndLogin())?.userId || '';
+        targetId = (await registerAndLogin())?.userId || '';
 
         const res = await exec();
 
@@ -101,7 +98,7 @@ describe('DELETE /bans/:id', () => {
 
     it('if admin is trying to unban another admin', async () => {
       token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
-      userId = (await registerAndLogin({ role: 'admin' }))?.userId || '';
+      targetId = (await registerAndLogin({ role: 'admin' }))?.userId || '';
 
       const res = await exec();
 
@@ -110,12 +107,6 @@ describe('DELETE /bans/:id', () => {
   });
 
   describe404(() => {
-    it('if target user does not exist in db', async () => {
-      userId = faker.database.mongodbObjectId();
-
-      const response = await exec();
-
-      expectNotFoundError(response);
-    });
+    itShouldExist(exec, 'target user', targetId);
   });
 });

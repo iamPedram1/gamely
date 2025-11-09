@@ -29,10 +29,10 @@ import type {
   FindResult,
 } from 'core/types/base.service.type';
 
-export type IFavoriteGameService = InstanceType<typeof FavoriteGameService>;
+export type IGameReviewService = InstanceType<typeof GameReviewService>;
 
 @injectable()
-class FavoriteGameService extends BaseService<GameReviewEntity> {
+class GameReviewService extends BaseService<GameReviewEntity> {
   constructor(
     @inject(delay(() => GameService)) private gameService: GameService
   ) {
@@ -161,4 +161,4 @@ class FavoriteGameService extends BaseService<GameReviewEntity> {
   }
 }
 
-export default FavoriteGameService;
+export default GameReviewService;

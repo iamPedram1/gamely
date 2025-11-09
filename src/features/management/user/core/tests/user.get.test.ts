@@ -1,5 +1,3 @@
-import { faker } from '@faker-js/faker';
-
 // Utils
 import { UserRole } from 'features/shared/user/core/user.types';
 import { adminRoles } from 'features/shared/user/core/user.constant';
@@ -12,8 +10,8 @@ import {
   describe403,
   describe404,
   expectKeysExist,
-  expectNotFoundError,
   expectSuccess,
+  itShouldExist,
   itShouldRequireToken,
   itShouldReturnsPaginatedDocs,
 } from 'core/utilities/testHelpers';
@@ -50,6 +48,12 @@ describe('GET /management/users', () => {
 
     itShouldReturnsPaginatedDocs(exec);
 
+    it('if user exist in database', async () => {
+      const res = await exec();
+
+      expectSuccess(res);
+    });
+
     it('and return user object', async () => {
       const res = await exec();
 
@@ -58,12 +62,23 @@ describe('GET /management/users', () => {
         'email',
         'role',
         'avatar',
+        'isBanned',
+        'createDate',
+        'updateDate',
       ];
-
-      expect(Object.keys(res.body.data!.docs[0]!)).toEqual(
-        expect.arrayContaining(keys)
-      );
+      expectSuccess(res);
+      expectKeysExist(res.body.data!, keys);
     });
+
+    for (let role of adminRoles) {
+      it(`if role is ${role}`, async () => {
+        token = (await registerAndLogin({ role }))?.accessToken || '';
+
+        const res = await exec();
+
+        expectSuccess(res);
+      });
+    }
   });
 
   describe401(() => {
@@ -114,53 +129,6 @@ describe('GET /management/users/:id', () => {
   });
 
   describe404(() => {
-    it('if userId is invalid', async () => {
-      userId = 'aseqwjequhu3h12ui31qm2da';
-
-      const res = await exec();
-
-      expectNotFoundError(res, /id/i);
-    });
-    it('if userId does not exist', async () => {
-      userId = faker.database.mongodbObjectId();
-
-      const res = await exec();
-
-      expectNotFoundError(res, /id/i);
-    });
-  });
-
-  describe200(() => {
-    it('if userId exist in database', async () => {
-      const res = await exec();
-
-      expectSuccess(res);
-    });
-
-    it('and return user object', async () => {
-      const res = await exec();
-
-      const keys: Array<keyof UserManagementResponseDto> = [
-        'username',
-        'email',
-        'role',
-        'avatar',
-        'isBanned',
-        'createDate',
-        'updateDate',
-      ];
-      expectSuccess(res);
-      expectKeysExist(res.body.data!, keys);
-    });
-
-    for (let role of adminRoles) {
-      it(`if role is ${role}`, async () => {
-        token = (await registerAndLogin({ role }))?.accessToken || '';
-
-        const res = await exec();
-
-        expectSuccess(res);
-      });
-    }
+    itShouldExist(exec, 'user', userId);
   });
 });

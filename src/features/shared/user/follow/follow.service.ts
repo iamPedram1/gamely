@@ -22,10 +22,7 @@ import type {
   BaseQueryOptions,
   FindResult,
 } from 'core/types/base.service.type';
-import type {
-  IFollowEntity,
-  FollowDocument,
-} from 'features/shared/user/follow/follow.types';
+import type { IFollowEntity } from 'features/shared/user/follow/follow.types';
 
 export type IFollowService = InstanceType<typeof FollowService>;
 

@@ -15,6 +15,7 @@ import {
   expectForbiddenRequest,
   expectNotFoundError,
   expectSuccess,
+  itShouldExist,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 import {
@@ -38,27 +39,22 @@ describe('POST /bans/:id', () => {
   const banService = generateBanService();
   const sessionService = generateSessionService();
   let token: string;
-  let userId: string;
+  let targetId: string;
   let payload: CreateBanDto;
 
   beforeEach(async () => {
     payload = generateBanPayload();
     token = (await registerAndLogin({ role: 'superAdmin' }))?.accessToken || '';
-    userId = (await registerAndLogin())?.userId || '';
+    targetId = (await registerAndLogin())?.userId || '';
     vi.isFakeTimers();
   });
 
   afterEach(async () => {
     vi.useRealTimers();
-    // await Promise.all([
-    //   userService.clearCollection(),
-    //   banService.clearCollection(),
-    //   sessionService.clearCollection(),
-    // ]);
   });
 
   const exec = async (overwriteToken?: string) =>
-    await sendBanRequest(userId, { payload, token: overwriteToken ?? token });
+    await sendBanRequest(targetId, { payload, token: overwriteToken ?? token });
 
   describe200(() => {
     it('and automatically unban user if "endAt" is passed', async () => {
@@ -70,14 +66,14 @@ describe('POST /bans/:id', () => {
 
       // Ban User
       await exec();
-      const before = await banService.checkIsBanned(userId);
+      const before = await banService.checkIsBanned(targetId);
 
       // Set Date to After of endAt
       const afterEndDate = faker.date.soon({ refDate: payload.endAt });
       vi.setSystemTime(dayjs(afterEndDate).add(1, 'minute').toDate());
 
       // Check is Banned?
-      const after = await banService.checkIsBanned(userId);
+      const after = await banService.checkIsBanned(targetId);
 
       expect(before).toBe(true);
       expect(after).toBe(false);
@@ -92,25 +88,25 @@ describe('POST /bans/:id', () => {
 
       // Ban User
       await exec();
-      const before = await banService.getUserBan(userId);
+      const before = await banService.getUserBan(targetId);
 
       // Set date to after of endAt
       const afterEndDate = faker.date.soon({ refDate: payload.endAt });
       vi.setSystemTime(dayjs(afterEndDate).add(1, 'minute').toDate());
 
-      await banService.checkIsBanned(userId);
+      await banService.checkIsBanned(targetId);
       const ban = await banService.getOneById(before!._id);
 
       expect(ban.status).toBe('expired');
     });
 
     it('and change role to "user" if admin was banned', async () => {
-      userId = (await registerAndLogin({ role: 'admin' }))?.userId || '';
+      targetId = (await registerAndLogin({ role: 'admin' }))?.userId || '';
 
-      const prev = await userService.getOneById(userId, { lean: true });
+      const prev = await userService.getOneById(targetId, { lean: true });
       const res = await exec();
-      const after = await userService.getOneById(userId, { lean: true });
-      const isBanned = await banService.checkIsBanned(userId);
+      const after = await userService.getOneById(targetId, { lean: true });
+      const isBanned = await banService.checkIsBanned(targetId);
 
       expectSuccess(res, 204);
       expect(isBanned).toBe(true);
@@ -124,7 +120,7 @@ describe('POST /bans/:id', () => {
 
       const response = await exec();
 
-      const ban = await banService.getUserBan(userId);
+      const ban = await banService.getUserBan(targetId);
 
       expect(response.status).toBe(204);
       expect(ban).toBeDefined();
@@ -134,7 +130,7 @@ describe('POST /bans/:id', () => {
     it('and ban user temporarly', async () => {
       const response = await exec();
 
-      const ban = await banService.getUserBan(userId);
+      const ban = await banService.getUserBan(targetId);
 
       expect(response.status).toBe(204);
       expect(ban).toBeDefined();
@@ -142,9 +138,9 @@ describe('POST /bans/:id', () => {
     });
 
     it('and clear user sessions after ban', async () => {
-      const before = await sessionService.countDocuments({ user: userId });
+      const before = await sessionService.countDocuments({ user: targetId });
       await exec();
-      const after = await sessionService.countDocuments({ user: userId });
+      const after = await sessionService.countDocuments({ user: targetId });
 
       expect(before).toBeGreaterThan(0);
       expect(after).toBe(0);
@@ -214,7 +210,7 @@ describe('POST /bans/:id', () => {
 
     it('if admin is trying to ban another admin', async () => {
       token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
-      userId = (await registerAndLogin({ role: 'admin' }))?.userId || '';
+      targetId = (await registerAndLogin({ role: 'admin' }))?.userId || '';
 
       const res = await exec();
 
@@ -223,7 +219,7 @@ describe('POST /bans/:id', () => {
 
     it('if admin is trying to ban superAdmin', async () => {
       token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
-      userId = (await registerAndLogin({ role: 'superAdmin' }))?.userId || '';
+      targetId = (await registerAndLogin({ role: 'superAdmin' }))?.userId || '';
 
       const res = await exec();
 
@@ -232,12 +228,6 @@ describe('POST /bans/:id', () => {
   });
 
   describe404(() => {
-    it('if target user does not exist in db', async () => {
-      userId = faker.database.mongodbObjectId();
-
-      const response = await exec();
-
-      expectNotFoundError(response);
-    });
+    itShouldExist(exec, 'target user', targetId);
   });
 });

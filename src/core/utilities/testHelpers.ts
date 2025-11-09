@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 
 // Types
@@ -5,8 +6,8 @@ import type { Model } from 'mongoose';
 import type { Response } from 'supertest';
 import type { SuperTestResponse } from 'core/utilities/supertest';
 import type { IApiResponse } from 'core/utilities/response';
-import { ModelKeys } from 'core/types/common';
-import { UserRole } from 'features/shared/user/core/user.types';
+import type { ModelKeys } from 'core/types/common';
+import type { UserRole } from 'features/shared/user/core/user.types';
 
 export const expectBadRequest = (response: Response, regex?: RegExp) => {
   expect(response.status).toBe(400);
@@ -126,6 +127,20 @@ export const itShouldRequireManagementRole = (
     expect(response.status).toBe(403);
   });
 };
+
+export function itShouldExist(
+  exec: (overwriteToken?: string) => any,
+  name: Lowercase<ModelKeys> | string,
+  idVariable: string
+) {
+  it(`if ${name} does not exist`, async () => {
+    idVariable = faker.database.mongodbObjectId();
+
+    const response = await exec(idVariable);
+
+    expectNotFoundError(response);
+  });
+}
 
 export function itShouldOwn(
   role: UserRole,

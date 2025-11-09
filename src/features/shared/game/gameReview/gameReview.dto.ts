@@ -1,6 +1,5 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { BaseSummaryResponseDto } from 'core/dto/response';
-import { UserRole } from 'features/shared/user/core/user.types';
 import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
 import {
   IsNotEmpty,

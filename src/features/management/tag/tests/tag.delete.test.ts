@@ -1,5 +1,3 @@
-import { faker } from '@faker-js/faker';
-
 // Utils
 import { adminRoles } from 'features/shared/user/core/user.constant';
 import { generateTagService } from 'features/shared/tag/tag.constant';
@@ -13,8 +11,8 @@ import {
   describe401,
   describe403,
   describe404,
-  expectNotFoundError,
   expectSuccess,
+  itShouldExist,
   itShouldOwn,
   itShouldRequireManagementRole,
   itShouldRequireToken,
@@ -24,25 +22,24 @@ describe('DELETE /management/tags', () => {
   const tagService = generateTagService();
 
   let token: string;
-  let payload: { tagId: string };
+  let tagId: string;
 
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
     const response = await sendCreateTagRequest({ token });
 
-    payload = { tagId: response.body.data?.id as string };
+    tagId = response.body.data!.id;
   });
 
   const exec = async (overwriteToken?: string) =>
-    sendDeleteTagRequest(payload.tagId, overwriteToken ?? token);
+    sendDeleteTagRequest(tagId, overwriteToken ?? token);
 
   describe200(() => {
     it('if role is author and you own the tag', async () => {
       token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
 
-      payload.tagId = (await sendCreateTagRequest({ token })).body.data
-        ?.id as string;
+      tagId = (await sendCreateTagRequest({ token })).body.data!.id;
 
       const response = await exec();
 
@@ -54,9 +51,7 @@ describe('DELETE /management/tags', () => {
         token = (await registerAndLogin({ role }))?.accessToken || '';
 
         const response = await exec();
-        const tag = await tagService.getOneById(payload.tagId, {
-          throwError: false,
-        });
+        const tag = await tagService.getOneById(tagId, { throwError: false });
 
         expect(tag).toBeNull();
         expectSuccess(response, 200, /success/i);
@@ -74,12 +69,6 @@ describe('DELETE /management/tags', () => {
   });
 
   describe404(() => {
-    it('if tag does not exist', async () => {
-      payload.tagId = faker.database.mongodbObjectId();
-
-      const response = await exec();
-
-      expectNotFoundError(response);
-    });
+    itShouldExist(exec, 'tag', tagId);
   });
 });
