@@ -15,7 +15,10 @@ import {
   itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
-import { sendCreateCommentRequest } from 'features/client/post/comment/tests/comment.client.testUtils';
+import {
+  generateComment,
+  sendCreateCommentRequest,
+} from 'features/client/post/comment/tests/comment.client.testUtils';
 import { sendCreatePostRequest } from 'features/management/post/core/tests/post.testUtils';
 import { sendDeleteCommentRequest } from 'features/management/post/comment/tests/comment.testUtils';
 import { generatePostService } from 'features/shared/post/core/post.constant';
@@ -77,6 +80,22 @@ describe('DELETE /management/comments', () => {
         expect(comment).toBeNull();
         expect(response.body.isSuccess).toBe(true);
       });
+    });
+
+    it('and delete comment and all of its replies', async () => {
+      const userToken = (await registerAndLogin())?.accessToken || '';
+      await sendCreateCommentRequest(postId, {
+        token: userToken,
+        payload: generateComment({ replyToComment: commentId }),
+      });
+
+      const beforeCount = await commentService.countDocuments({});
+      const res = await exec();
+      const afterCount = await commentService.countDocuments({});
+
+      expectSuccess(res);
+      expect(beforeCount).toBe(2);
+      expect(afterCount).toBe(0);
     });
   });
 

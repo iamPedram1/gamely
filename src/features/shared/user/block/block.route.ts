@@ -16,10 +16,9 @@ import { validateParam } from 'core/middlewares/validations';
 const blockRouter = express.Router();
 const blockController = container.resolve(FollowController);
 
-// <----------------   GET   ---------------->
-
 blockRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 
+// <----------------   GET   ---------------->
 blockRouter.get('/', blockController.getUserBlockList);
 
 // <----------------   POST   ---------------->

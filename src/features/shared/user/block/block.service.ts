@@ -97,7 +97,7 @@ class BlockService extends BaseService<IBlockEntity> {
       populate: [
         {
           path: 'blocked',
-          select: 'username',
+          populate: 'avatar',
           match: search ? { username: new RegExp(search, 'i') } : {},
         },
       ],
@@ -115,11 +115,11 @@ class BlockService extends BaseService<IBlockEntity> {
     ) as any;
   }
 
-  async checkIsBlock(actorId: DocumentId, blockedUserId: DocumentId) {
-    if (actorId === blockedUserId) return false;
+  async checkIsBlock(actorId: DocumentId, targetId: DocumentId) {
+    if (actorId === targetId) return false;
     return await this.existsByCondition({
       user: { $eq: actorId },
-      blocked: { $eq: blockedUserId },
+      blocked: { $eq: targetId },
     });
   }
 }

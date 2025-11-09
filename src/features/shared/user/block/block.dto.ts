@@ -1,8 +1,10 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Transform, plainToInstance } from 'class-transformer';
 import { BaseSummaryResponseDto } from 'core/dto/response';
 import { IsMongoId, IsNotEmpty } from 'core/utilities/validation';
-import { FileResponseDto } from 'features/shared/file/file.dto';
-import { UserRole } from 'features/shared/user/core/user.types';
+import {
+  UserClientResponseDto,
+  UserClientSummaryResponseDto,
+} from 'features/client/user/core/user.client.dto';
 
 export class CreateBlockDto {
   @IsNotEmpty()
@@ -16,21 +18,10 @@ export class CreateBlockDto {
 
 export class BlockResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  @Transform(({ obj }) => obj.blocked?.role)
-  role: UserRole;
-
-  @Expose()
-  @Transform(({ obj }) => obj.blocked?.avatar)
-  @Type(() => FileResponseDto)
-  avatar: FileResponseDto;
-
-  @Expose()
-  @Transform(({ obj }) => obj.blocked?.username)
-  username: string;
-
-  @Expose()
-  @Transform(({ obj }) => obj.blocked?._id)
-  user: string;
+  @Transform(({ obj }) =>
+    plainToInstance(UserClientSummaryResponseDto, obj.blocked)
+  )
+  user: UserClientSummaryResponseDto;
 
   @Expose()
   @Transform(({ obj }) => obj.createdAt)
