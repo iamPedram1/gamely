@@ -6,7 +6,7 @@ import { generateCommentService } from 'features/shared/post/comment/comment.con
 import { sendCreatePostRequest } from 'features/management/post/core/tests/post.testUtils';
 import {
   generateComment,
-  sendAddCommentRequest,
+  sendCreateCommentRequest,
   sendGetCommentRequest,
 } from 'features/client/post/comment/tests/comment.client.testUtils';
 import {
@@ -33,10 +33,7 @@ describe('GET /posts/:id/comments', () => {
       .data!.id;
 
     commentId = (
-      await sendAddCommentRequest(postId, {
-        payload: generateComment(),
-        token: user.accessToken,
-      })
+      await sendCreateCommentRequest(postId, { token: user.accessToken })
     ).body.data!.id;
 
     token = user.accessToken;
@@ -60,7 +57,7 @@ describe('GET /posts/:id/comments', () => {
     });
 
     it('and also return replies if comment has any', async () => {
-      await sendAddCommentRequest(postId, {
+      await sendCreateCommentRequest(postId, {
         payload: generateComment({ replyToComment: commentId }),
         token,
       });

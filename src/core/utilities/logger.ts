@@ -16,15 +16,19 @@ const logger = winston.createLogger({
         winston.format.simple()
       ),
     }),
-    new winston.transports.File({
-      level: 'error',
-      filename: 'logs/app.log',
-      format: winston.format.combine(
-        winston.format.errors({ stack: true }),
-        winston.format.prettyPrint(),
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' })
-      ),
-    }),
+    ...(process.env.NODE_ENV !== 'test'
+      ? [
+          new winston.transports.File({
+            level: 'error',
+            filename: 'logs/app.log',
+            format: winston.format.combine(
+              winston.format.errors({ stack: true }),
+              winston.format.prettyPrint(),
+              winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' })
+            ),
+          }),
+        ]
+      : []),
   ],
 });
 export default logger;

@@ -19,32 +19,9 @@ import {
 
 const commentsURL = prefixManagementBaseUrl('/comments');
 
-export async function generateComment(token?: string) {
-  const img = await sendUploadFileRequest({
-    token: token || '',
-    payload: 'comment',
-  });
-
-  return {
-    coverImage: img?.body?.data?.id || '',
-    releaseDate: faker.date.anytime().toISOString(),
-    slug: faker.lorem.slug({ min: 2, max: 3 }),
-    translations: {
-      en: {
-        title: faker.book.title().trim(),
-        description: faker.lorem.paragraph({ min: 4, max: 7 }).trim(),
-      },
-      fa: {
-        title: fakerFA.book.title().trim(),
-        description: fakerFA.lorem.paragraph({ min: 4, max: 7 }).trim(),
-      },
-    },
-  } as CreateCommentDto;
-}
-
 export const sendPatchCommentRequest = async (
   id: string,
-  options: SendRequestOptions<UpdateCommentDto>
+  options: SendRequestOptions<Partial<UpdateCommentDto>>
 ) => {
   return await sendPatchRequest<CommentManagementResponseDto, UpdateCommentDto>(
     `${commentsURL}/${id}`,

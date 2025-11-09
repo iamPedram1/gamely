@@ -1,7 +1,7 @@
 import type { HydratedDocument, Model, Types } from 'mongoose';
 
 // Utilities
-import { AnonymousError, ValidationError } from 'core/utilities/errors';
+import { ForbiddenError } from 'core/utilities/errors';
 
 // Types
 import BaseQueryService from 'core/services/base/base.query.service';
@@ -44,7 +44,7 @@ class BaseValidationService<
     }
 
     if (!isMadeBySelf && throwError)
-      throw new ValidationError(this.t('error.made_byself_error'));
+      throw new ForbiddenError(this.t('error.made_byself_error'));
     return isMadeBySelf;
   }
 }

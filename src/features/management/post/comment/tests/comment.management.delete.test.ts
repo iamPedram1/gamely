@@ -1,98 +1,101 @@
-// import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 
-// // Utils
-// import { adminRoles } from 'features/shared/user/core/user.constant';
-// import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
-// import { generateCommentService } from 'features/shared/post/comment/comment.constant';
-// import {
-//   sendCreateGameRequest,
-//   sendDeleteGameRequest,
-// } from 'features/management/game/tests/game.testUtils';
-// import {
-//   describe200,
-//   describe400,
-//   describe401,
-//   describe403,
-//   describe404,
-//   itShouldRequireManagementRole,
-//   itShouldRequireToken,
-// } from 'core/utilities/testHelpers';
+// Utils
+import { adminRoles } from 'features/shared/user/core/user.constant';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
+import { generateCommentService } from 'features/shared/post/comment/comment.constant';
+import {
+  describe200,
+  describe401,
+  describe403,
+  describe404,
+  expectNotFoundError,
+  expectSuccess,
+  itShouldOwn,
+  itShouldRequireManagementRole,
+  itShouldRequireToken,
+} from 'core/utilities/testHelpers';
+import { sendCreateCommentRequest } from 'features/client/post/comment/tests/comment.client.testUtils';
+import { sendCreatePostRequest } from 'features/management/post/core/tests/post.testUtils';
+import { sendDeleteCommentRequest } from 'features/management/post/comment/tests/comment.testUtils';
+import { generatePostService } from 'features/shared/post/core/post.constant';
 
-// describe('DELETE /management/comments', () => {
-//   const commentService = generateCommentService();
+describe('DELETE /management/comments', () => {
+  const postService = generatePostService();
+  const commentService = generateCommentService();
 
-//   let token: string;
-//   let payload: { gameId: string };
+  let token: string;
+  let postId: string;
+  let commentId: string;
 
-//   beforeEach(async () => {
-//     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
+  beforeEach(async () => {
+    const [user, admin] = await Promise.all([
+      registerAndLogin(),
+      registerAndLogin({ role: 'admin' }),
+    ]);
 
-//     // const response = await sendCreateGameRequest({ token });
+    token = admin.accessToken;
+    postId = (await sendCreatePostRequest({ token })).body.data!.id;
+    commentId = (
+      await sendCreateCommentRequest(postId, { token: user.accessToken })
+    ).body.data!.id;
+  });
 
-//     // payload = { gameId: response.body.data?.id as string };
-//   });
+  const exec = async (overwriteToken?: string) =>
+    sendDeleteCommentRequest(commentId, overwriteToken ?? token);
 
-//   const exec = async (overwriteToken?: string) =>
-//     sendDeleteGameRequest(payload.gameId, overwriteToken ?? token);
+  describe200(() => {
+    it('if role is author and you own the post', async () => {
+      const [user, author] = await Promise.all([
+        registerAndLogin(),
+        registerAndLogin({ role: 'author' }),
+      ]);
+      token = author.accessToken;
 
-//   describe200(() => {
-//     it('if role is author and you own the game', async () => {
-//       token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
+      postId = (await sendCreatePostRequest({ token })).body.data?.id as string;
 
-//       payload.gameId = (await sendCreateGameRequest({ token })).body.data
-//         ?.id as string;
+      commentId = (
+        await sendCreateCommentRequest(postId, { token: user.accessToken })
+      ).body.data!.id;
 
-//       const response = await exec();
+      const response = await exec();
 
-//       expect(response.status).toBe(200);
-//       expect(response.body.isSuccess).toBe(true);
-//       expect(response.body.message).toMatch(/success/i);
-//     });
+      expectSuccess(response, 200, /success/i);
+    });
 
-//     adminRoles.forEach((role) => {
-//       it(`and delete game if role is ${role}`, async () => {
-//         token = (await registerAndLogin({ role }))?.accessToken || '';
+    adminRoles.forEach((role) => {
+      it(`and delete comment if role is ${role}`, async () => {
+        token = (await registerAndLogin({ role }))?.accessToken || '';
 
-//         const response = await exec();
-//         const game = await gameService.getOneById(payload.gameId, {
-//           throwError: false,
-//         });
+        const response = await exec();
+        const comment = await commentService.getOneById(commentId, {
+          lean: true,
+          throwError: false,
+        });
 
-//         expect(response.status).toBe(200);
-//         expect(game).toBeNull();
-//         expect(response.body.isSuccess).toBe(true);
-//       });
-//     });
-//   });
+        expect(response.status).toBe(200);
+        expect(comment).toBeNull();
+        expect(response.body.isSuccess).toBe(true);
+      });
+    });
+  });
 
-//   describe400(() => {
-//     it('if role is author but you dont own the game', async () => {
-//       token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
+  describe401(() => {
+    itShouldRequireToken(exec);
+  });
 
-//       const response = await exec();
+  describe403(() => {
+    itShouldRequireManagementRole(exec);
+    itShouldOwn('author', exec, 'post');
+  });
 
-//       expect(response.status).toBe(400);
-//       expect(response.body.isSuccess).toBe(false);
-//       expect(response.body.message).toMatch(/you didn't/i);
-//     });
-//   });
+  describe404(() => {
+    it('if comment does not exist', async () => {
+      commentId = faker.database.mongodbObjectId();
 
-//   describe401(() => {
-//     itShouldRequireToken(exec);
-//   });
+      const response = await exec();
 
-//   describe403(() => {
-//     itShouldRequireManagementRole(exec);
-//   });
-
-//   describe404(() => {
-//     it('if game does not exist', async () => {
-//       payload.gameId = faker.database.mongodbObjectId();
-
-//       const response = await exec();
-
-//       expect(response.status).toBe(404);
-//       expect(response.body.isSuccess).toBe(false);
-//     });
-//   });
-// });
+      expectNotFoundError(response);
+    });
+  });
+});

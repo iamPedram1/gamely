@@ -22,14 +22,14 @@ import {
 
 const tagsURL = prefixManagementBaseUrl('/tags');
 
-export function generateTag() {
+export function generateTag(): CreateTagDto {
   return {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
     translations: {
-      en: { title: faker.internet.displayName().trim() },
-      fa: { title: fakerFA.internet.displayName().trim() },
+      en: { title: faker.lorem.word({ length: { min: 3, max: 255 } }) },
+      fa: { title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }) },
     },
-  } as CreateTagDto;
+  };
 }
 
 export const sendCreateTagRequest = async (

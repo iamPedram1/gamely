@@ -32,11 +32,11 @@ export async function generateGame(token?: string) {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
     translations: {
       en: {
-        title: faker.book.title().trim(),
+        title: faker.lorem.word({ length: { min: 3, max: 255 } }),
         description: faker.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
       fa: {
-        title: fakerFA.book.title().trim(),
+        title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }),
         description: fakerFA.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
     },

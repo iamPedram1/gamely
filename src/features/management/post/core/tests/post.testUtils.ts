@@ -26,7 +26,9 @@ import {
   PostManagementResponseDto,
   UpdatePostDto,
 } from 'features/management/post/core/post.management.dto';
-import { WithPagination } from 'core/types/paginate';
+
+// Types
+import type { WithPagination } from 'core/types/paginate';
 
 const postsURL = prefixManagementBaseUrl('/posts');
 
@@ -59,12 +61,12 @@ export async function generatePostData(token: string): Promise<CreatePostDto> {
       translations: {
         en: {
           title: faker.lorem.word({ length: { min: 3, max: 255 } }),
-          abstract: faker.lorem.sentence({ min: 2, max: 4 }),
+          abstract: faker.lorem.word({ length: { min: 1, max: 150 } }),
           content: faker.lorem.paragraph(10),
         },
         fa: {
           title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }),
-          abstract: fakerFA.lorem.sentence({ min: 2, max: 4 }),
+          abstract: fakerFA.lorem.word({ length: { min: 1, max: 150 } }),
           content: fakerFA.lorem.paragraph(10),
         },
       },

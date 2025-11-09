@@ -10,13 +10,13 @@ import {
 } from 'features/management/post/core/tests/post.testUtils';
 import {
   describe200,
-  describe400,
   describe401,
   describe403,
   describe404,
   itShouldRequireToken,
   itShouldRequireManagementRole,
   expectNotFoundError,
+  itShouldOwn,
 } from 'core/utilities/testHelpers';
 
 describe('DELETE /management/posts', () => {
@@ -66,24 +66,13 @@ describe('DELETE /management/posts', () => {
     });
   });
 
-  describe400(() => {
-    it('if role is author but you dont own the post', async () => {
-      token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
-
-      const response = await exec();
-
-      expect(response.status).toBe(400);
-      expect(response.body.isSuccess).toBe(false);
-      expect(response.body.message).toMatch(/you didn't/i);
-    });
-  });
-
   describe401(() => {
     itShouldRequireToken(exec);
   });
 
   describe403(() => {
     itShouldRequireManagementRole(exec);
+    itShouldOwn('author', exec, 'post');
   });
 
   describe404(() => {

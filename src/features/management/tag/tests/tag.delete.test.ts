@@ -10,13 +10,12 @@ import {
 } from 'features/management/tag/tests/tag.testUtils';
 import {
   describe200,
-  describe400,
   describe401,
   describe403,
   describe404,
-  expectBadRequest,
   expectNotFoundError,
   expectSuccess,
+  itShouldOwn,
   itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
@@ -65,22 +64,13 @@ describe('DELETE /management/tags', () => {
     });
   });
 
-  describe400(() => {
-    it('if role is author but you dont own the tag', async () => {
-      token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
-
-      const response = await exec();
-
-      expectBadRequest(response, /you didn't/i);
-    });
-  });
-
   describe401(() => {
     itShouldRequireToken(exec);
   });
 
   describe403(() => {
     itShouldRequireManagementRole(exec);
+    itShouldOwn('author', exec, 'tag');
   });
 
   describe404(() => {

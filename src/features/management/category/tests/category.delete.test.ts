@@ -14,8 +14,8 @@ import {
   itShouldRequireManagementRole,
   describe404,
   describe200,
-  describe400,
   expectNotFoundError,
+  itShouldOwn,
 } from 'core/utilities/testHelpers';
 import {
   sendCreateCategoryRequest,
@@ -69,24 +69,13 @@ describe('DELETE /management/categories', () => {
     });
   });
 
-  describe400(() => {
-    it('if role is author but you dont own the category', async () => {
-      token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
-
-      const response = await exec();
-
-      expect(response.status).toBe(400);
-      expect(response.body.isSuccess).toBe(false);
-      expect(response.body.message).toMatch(/you didn't/i);
-    });
-  });
-
   describe401(() => {
     itShouldRequireToken(exec);
   });
 
   describe403(() => {
     itShouldRequireManagementRole(exec);
+    itShouldOwn('author', exec, 'category');
   });
 
   describe404(() => {

@@ -10,11 +10,11 @@ import {
 } from 'features/management/game/tests/game.testUtils';
 import {
   describe200,
-  describe400,
   describe401,
   describe403,
   describe404,
   expectNotFoundError,
+  itShouldOwn,
   itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
@@ -66,24 +66,13 @@ describe('DELETE /management/games', () => {
     });
   });
 
-  describe400(() => {
-    it('if role is author but you dont own the game', async () => {
-      token = (await registerAndLogin({ role: 'author' }))?.accessToken || '';
-
-      const response = await exec();
-
-      expect(response.status).toBe(400);
-      expect(response.body.isSuccess).toBe(false);
-      expect(response.body.message).toMatch(/you didn't/i);
-    });
-  });
-
   describe401(() => {
     itShouldRequireToken(exec);
   });
 
   describe403(() => {
     itShouldRequireManagementRole(exec);
+    itShouldOwn('author', exec, 'game');
   });
 
   describe404(() => {

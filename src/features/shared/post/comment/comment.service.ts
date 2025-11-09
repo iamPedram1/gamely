@@ -68,21 +68,22 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     id: string,
     options?: BaseMutateOptions & { throwError?: TThrowError }
   ): Promise<TThrowError extends true ? true : boolean> {
-    this.withTransaction(async (session) => {
+    await this.withTransaction(async (session) => {
       if (this.currentUser.is('author')) {
         const post = await this.getCommentPost(id);
         await this.postService.assertOwnership(post);
       }
 
-      await this.notificationService.deleteManyWithConditions(
-        { 'metadata.refId': id, 'metadata.modelKey': 'Comment' },
-        { session, ...options }
-      );
-
-      await this.deleteManyWithConditions(
-        { $or: [{ _id: id }, { parentIds: { $in: id } }] },
-        { session, ...options }
-      );
+      await Promise.all([
+        this.notificationService.deleteManyWithConditions(
+          { 'metadata.refId': id, 'metadata.modelKey': 'Comment' },
+          { ...options, session }
+        ),
+        this.deleteManyWithConditions(
+          { $or: [{ _id: id }, { parentIds: { $in: id } }] },
+          { ...options, session }
+        ),
+      ]);
     }, options?.session);
 
     return true;
@@ -166,7 +167,7 @@ class CommentService extends BaseService<ICommentEntity, CommentDocument> {
     }
 
     // --- Create comment in a transaction ---
-    return this.withTransaction(async (session) => {
+    return await this.withTransaction(async (session) => {
       const newComment = await (
         await super.create(data, { ...options, session })
       ).populate('replyToComment');

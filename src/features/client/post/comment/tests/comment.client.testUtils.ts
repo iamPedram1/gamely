@@ -33,12 +33,12 @@ export const sendGetCommentRequest = async (postId: string) => {
   );
 };
 
-export const sendAddCommentRequest = async (
+export const sendCreateCommentRequest = async (
   postId: string,
   options?: SendRequestOptions<CreateCommentDto>
 ) => {
-  return await sendPostRequest<CommentClientResponseDto>(
-    commentsURL(postId),
-    options
-  );
+  return await sendPostRequest<CommentClientResponseDto>(commentsURL(postId), {
+    payload: generateComment(),
+    ...options,
+  });
 };

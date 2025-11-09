@@ -5,6 +5,8 @@ import type { Model } from 'mongoose';
 import type { Response } from 'supertest';
 import type { SuperTestResponse } from 'core/utilities/supertest';
 import type { IApiResponse } from 'core/utilities/response';
+import { ModelKeys } from 'core/types/common';
+import { UserRole } from 'features/shared/user/core/user.types';
 
 export const expectBadRequest = (response: Response, regex?: RegExp) => {
   expect(response.status).toBe(400);
@@ -124,3 +126,21 @@ export const itShouldRequireManagementRole = (
     expect(response.status).toBe(403);
   });
 };
+
+export function itShouldOwn(
+  role: UserRole,
+  exec: (overwriteToken?: string) => Promise<any>,
+  modelName: Lowercase<ModelKeys>,
+  expectStatus = 403,
+  regex: RegExp = /you didn't/i
+) {
+  it(`should return ${expectStatus} if role is ${role} but you don't own the ${modelName}`, async () => {
+    const token = (await registerAndLogin({ role }))?.accessToken || '';
+
+    const response = await exec(token);
+
+    expect(response.status).toBe(expectStatus);
+    expect(response.body.isSuccess).toBe(false);
+    expect(response.body.message).toMatch(regex);
+  });
+}

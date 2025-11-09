@@ -36,7 +36,7 @@ export const sendPostRequest = async <T = null, P = unknown>(
 
 export const sendPatchRequest = async <T = null, P = null>(
   endpoint: string,
-  options?: SendRequestOptions<P>
+  options?: SendRequestOptions<Partial<P>>
 ): Promise<SuperTestResponse<IApiResponse<T>>> => {
   try {
     const q = request.patch(endpoint).send(options?.payload as any);

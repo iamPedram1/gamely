@@ -27,7 +27,7 @@ import { sendCreatePostRequest } from 'features/management/post/core/tests/post.
 import { CreateCommentDto } from 'features/client/post/comment/comment.client.dto';
 import {
   generateComment,
-  sendAddCommentRequest,
+  sendCreateCommentRequest,
 } from 'features/client/post/comment/tests/comment.client.testUtils';
 
 describe('POST /posts/:id/comments', () => {
@@ -48,7 +48,10 @@ describe('POST /posts/:id/comments', () => {
   });
 
   const exec = async (overwriteToken?: string) =>
-    sendAddCommentRequest(postId, { payload, token: overwriteToken ?? token });
+    sendCreateCommentRequest(postId, {
+      payload,
+      token: overwriteToken ?? token,
+    });
 
   describe201(() => {
     it('and add comment to post', async () => {
