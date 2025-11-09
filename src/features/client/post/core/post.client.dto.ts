@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from 'core/utilities/validation';
-import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 
 // DTOs
 import { BaseQueryDto } from 'core/dto/query';
@@ -37,12 +37,8 @@ export class ClientPostResponseDto extends BaseResponseDto {
   @Transform(pickLocaleField('content'))
   content: string;
 
-  @Expose()
-  @Transform(({ obj }) =>
-    plainToInstance(UserClientSummaryResponseDto, obj.creator, {
-      excludeExtraneousValues: true,
-    })
-  )
+  @Expose({ name: 'creator' })
+  @Type(() => UserClientSummaryResponseDto)
   author: UserClientSummaryResponseDto;
 
   @Expose()

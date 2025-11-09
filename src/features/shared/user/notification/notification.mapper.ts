@@ -1,19 +1,23 @@
 import { singleton } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
 
 // DTO
+import { AbstractMapper } from 'core/mappers/base';
 import { NotificationResponseDto } from 'features/shared/user/notification/notification.dto';
 
 // Types
-import { NotificationLeanDocument } from 'features/shared/user/notification/notification.types';
+import {
+  NotificationDocument,
+  NotificationLeanDocument,
+} from 'features/shared/user/notification/notification.types';
 
 export type INotificationMapper = InstanceType<typeof NotificationMapper>;
 
 @singleton()
-export class NotificationMapper {
+export class NotificationMapper extends AbstractMapper<
+  NotificationDocument,
+  NotificationLeanDocument
+> {
   toDto(doc: NotificationLeanDocument) {
-    return plainToInstance(NotificationResponseDto, doc, {
-      excludeExtraneousValues: true,
-    });
+    return this.toInstance(NotificationResponseDto, doc);
   }
 }

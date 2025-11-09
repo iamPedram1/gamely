@@ -1,4 +1,4 @@
-import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { BaseSummaryResponseDto } from 'core/dto/response';
 import { IsMongoId, IsNotEmpty } from 'core/utilities/validation';
 import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
@@ -13,17 +13,14 @@ export class CreateFollowDto {
 }
 
 export class FollowerResponseDto extends BaseSummaryResponseDto {
-  @Expose()
-  @Transform(({ obj }) =>
-    plainToInstance(UserClientSummaryResponseDto, obj.follower)
-  )
+  @Expose({ name: 'follower' })
+  @Type(() => UserClientSummaryResponseDto)
   user: UserClientSummaryResponseDto;
 
   @Expose()
   isFollowing: boolean;
 
-  @Expose()
-  @Transform(({ obj }) => obj.createdAt)
+  @Expose({ name: 'createdAt' })
   since: Date;
 
   @Expose()
@@ -31,17 +28,14 @@ export class FollowerResponseDto extends BaseSummaryResponseDto {
 }
 
 export class FollowingResponseDto extends BaseSummaryResponseDto {
-  @Expose()
-  @Transform(({ obj }) =>
-    plainToInstance(UserClientSummaryResponseDto, obj.following)
-  )
+  @Expose({ name: 'following' })
+  @Type(() => UserClientSummaryResponseDto)
   user: UserClientSummaryResponseDto;
 
   @Expose()
   isFollowing: boolean;
 
-  @Expose()
-  @Transform(({ obj }) => obj.createdAt)
+  @Expose({ name: 'createdAt' })
   since: Date;
 
   @Expose()

@@ -1,4 +1,4 @@
-import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -149,11 +149,8 @@ export class PostManagementResponseDto extends BasePostResponseDto {
   readingTime: number;
 
   @Expose()
-  @Transform(({ obj }) =>
-    plainToInstance(UserManagementSummaryResponseDto, obj.creator, {
-      excludeExtraneousValues: true,
-    })
-  )
+  @Expose({ name: 'creator' })
+  @Type(() => UserManagementSummaryResponseDto)
   author: UserManagementSummaryResponseDto;
 
   @Expose()

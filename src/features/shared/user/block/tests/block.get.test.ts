@@ -1,15 +1,8 @@
-import { faker } from '@faker-js/faker';
-
 // Utils
 import { registerAndLoginBatch } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
   describe200,
-  describe204,
-  describe400,
   describe401,
-  describe404,
-  expectBadRequest,
-  expectNotFoundError,
   expectSuccess,
   itShouldRequireToken,
   itShouldReturnsPaginatedDocs,
@@ -20,7 +13,6 @@ import { generateBlockService } from 'features/shared/user/block/block.constant'
 import {
   sendBlockRequest,
   sendGetBlocksRequest,
-  sendUnblockRequest,
 } from 'features/shared/user/block/tests/block.testUtils';
 
 describe('GET /user/blocks/:id', () => {
@@ -49,8 +41,8 @@ describe('GET /user/blocks/:id', () => {
 
       expectSuccess(response);
       expect(doc!.id).toBeDefined();
+      expect(doc!.user.id).toBe(targetId);
       expect(doc!.blockedAt).toBeDefined();
-      console.log(doc);
 
       (['id', 'username', 'avatar'] as const).forEach((key) => {
         expect(doc!.user).toHaveProperty(key);

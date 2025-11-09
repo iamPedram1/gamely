@@ -1,4 +1,4 @@
-import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -26,10 +26,8 @@ export class CommentClientResponseDto extends BaseResponseDto {
   @Expose()
   message: string;
 
-  @Expose()
-  @Transform(({ obj }) =>
-    plainToInstance(UserClientSummaryResponseDto, obj.creator)
-  )
+  @Expose({ name: 'creator' })
+  @Type(() => UserClientSummaryResponseDto)
   user: UserClientSummaryResponseDto;
 
   @Expose()
@@ -41,9 +39,8 @@ export class CommentClientSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
   message: string;
 
-  @Transform(({ obj }) =>
-    plainToInstance(UserClientSummaryResponseDto, obj.creator)
-  )
+  @Expose({ name: 'creator' })
+  @Type(() => UserClientSummaryResponseDto)
   user: UserClientSummaryResponseDto;
 
   @Expose()

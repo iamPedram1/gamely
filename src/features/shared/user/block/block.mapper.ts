@@ -1,19 +1,23 @@
 import { singleton } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
 
 // DTO
+import { BlockResponseDto } from 'features/shared/user/block/block.dto';
+import { AbstractMapper } from 'core/mappers/base';
 
 // Types
-import { BlockResponseDto } from 'features/shared/user/block/block.dto';
-import { BlockLeanDocument } from 'features/shared/user/block/block.types';
+import {
+  BlockDocument,
+  BlockLeanDocument,
+} from 'features/shared/user/block/block.types';
 
 export type IBlockMapper = InstanceType<typeof BlockMapper>;
 
 @singleton()
-export class BlockMapper {
+export class BlockMapper extends AbstractMapper<
+  BlockDocument,
+  BlockLeanDocument
+> {
   toUserBlockDto(doc: BlockLeanDocument) {
-    return plainToInstance(BlockResponseDto, doc, {
-      excludeExtraneousValues: true,
-    });
+    return this.toInstance(BlockResponseDto, doc);
   }
 }

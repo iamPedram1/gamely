@@ -2,8 +2,6 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { BaseSummaryResponseDto } from 'core/dto/response';
 import { IsMongoId, IsNotEmpty } from 'core/utilities/validation';
 import { UserClientSummaryResponseDto } from 'features/client/user/core/user.client.dto';
-import { FileResponseDto } from 'features/shared/file/file.dto';
-import { UserRole } from 'features/shared/user/core/user.types';
 
 export class CreateFavoriteGameDto {
   @IsNotEmpty()
@@ -22,8 +20,7 @@ export class FavoriteGameResponseDto extends BaseSummaryResponseDto {
   @Expose()
   isFollowing: boolean;
 
-  @Expose()
-  @Transform(({ obj }) => obj.createdAt)
+  @Expose({ name: 'createdAt' })
   since: Date;
 
   @Expose()
@@ -38,8 +35,7 @@ export class FollowingResponseDto extends BaseSummaryResponseDto {
   @Expose()
   isFollowing: boolean;
 
-  @Expose()
-  @Transform(({ obj }) => obj.createdAt)
+  @Expose({ name: 'createdAt' })
   since: Date;
 
   @Expose()

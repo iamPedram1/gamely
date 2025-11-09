@@ -7,8 +7,7 @@ export class BaseResponseDto {
   @Transform(({ obj }) => String(obj._id))
   id: string;
 
-  @Expose()
-  @Transform(({ obj }) => obj.createdAt)
+  @Expose({ name: 'createdAt' })
   createDate: string;
 
   @Expose()

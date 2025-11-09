@@ -1,27 +1,29 @@
 import { singleton } from 'tsyringe';
-import { plainToInstance } from 'class-transformer';
 
 // DTO
+import { AbstractMapper } from 'core/mappers/base';
 import {
   FollowerResponseDto,
   FollowingResponseDto,
 } from 'features/shared/user/follow/follow.dto';
 
 // Types
-import { FollowLeanDocument } from 'features/shared/user/follow/follow.types';
+import {
+  FollowDocument,
+  FollowLeanDocument,
+} from 'features/shared/user/follow/follow.types';
 
 export type IFollowMapper = InstanceType<typeof FollowMapper>;
 
 @singleton()
-export class FollowMapper {
+export class FollowMapper extends AbstractMapper<
+  FollowDocument,
+  FollowLeanDocument
+> {
   toFollowerDto(doc: FollowLeanDocument) {
-    return plainToInstance(FollowerResponseDto, doc, {
-      excludeExtraneousValues: true,
-    });
+    return this.toInstance(FollowerResponseDto, doc);
   }
   toFollowingDto(doc: FollowLeanDocument) {
-    return plainToInstance(FollowingResponseDto, doc, {
-      excludeExtraneousValues: true,
-    });
+    return this.toInstance(FollowingResponseDto, doc);
   }
 }
