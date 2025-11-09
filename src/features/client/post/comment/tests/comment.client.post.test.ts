@@ -1,34 +1,29 @@
 import { faker } from '@faker-js/faker';
 
 // Utils
-import { adminRoles } from 'features/shared/user/core/user.constant';
+import { generateCommentService } from 'features/shared/post/comment/comment.constant';
+import { sendCreatePostRequest } from 'features/management/post/core/tests/post.testUtils';
+import { CreateCommentDto } from 'features/client/post/comment/comment.client.dto';
+import { sendBlockRequest } from 'features/shared/user/block/tests/block.testUtils';
+import {
+  generateComment,
+  sendCreateCommentRequest,
+} from 'features/client/post/comment/tests/comment.client.testUtils';
 import {
   registerAndLogin,
   registerAndLoginBatch,
 } from 'features/shared/auth/core/tests/auth.testUtils';
-import { generateCommentService } from 'features/shared/post/comment/comment.constant';
 import {
-  sendCreateGameRequest,
-  sendDeleteGameRequest,
-} from 'features/management/game/tests/game.testUtils';
-import {
-  describe200,
   describe201,
   describe400,
   describe401,
   describe403,
   describe404,
+  expectBadRequest,
   expectNotFoundError,
   expectSuccess,
-  itShouldRequireManagementRole,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
-import { sendCreatePostRequest } from 'features/management/post/core/tests/post.testUtils';
-import { CreateCommentDto } from 'features/client/post/comment/comment.client.dto';
-import {
-  generateComment,
-  sendCreateCommentRequest,
-} from 'features/client/post/comment/tests/comment.client.testUtils';
 
 describe('POST /posts/:id/comments', () => {
   const commentService = generateCommentService();
@@ -36,14 +31,14 @@ describe('POST /posts/:id/comments', () => {
   let token: string;
   let payload: CreateCommentDto;
   let postId: string;
+  let authorToken: string;
 
   beforeEach(async () => {
-    const adminToken = (await registerAndLogin({ role: 'admin' })).accessToken;
-    postId =
-      (await sendCreatePostRequest({ token: adminToken }))?.body.data?.id || '';
+    authorToken = (await registerAndLogin({ role: 'author' })).accessToken;
+    postId = (await sendCreatePostRequest({ token: authorToken }))?.body.data!
+      .id;
 
     token = (await registerAndLogin()).accessToken;
-
     payload = generateComment();
   });
 
@@ -154,12 +149,28 @@ describe('POST /posts/:id/comments', () => {
     });
   });
 
-  //   describe400(() => {
-  //     it('if its trying to reply but user is blocked', async () => {
-  //       const [userA, userB] = await registerAndLoginBatch(2);
-  //       const commentA = await exec(token);
-  //     });
-  //   });
+  describe400(() => {
+    it('if its trying to reply but user is blocked', async () => {
+      const [userA, userB] = await registerAndLoginBatch(2);
+      await sendBlockRequest(userB.userId, { token: userA.accessToken });
+      const commentA = await exec(userA.accessToken);
+
+      payload = generateComment({ replyToComment: commentA.body.data!.id });
+      const commentB = await exec(userB.accessToken);
+
+      expectBadRequest(commentB, /blocked/i);
+    });
+
+    it('if its trying to send comment but user is blocked by author', async () => {
+      const user = await registerAndLogin();
+      await sendBlockRequest(user.userId, { token: authorToken });
+      token = user.accessToken;
+
+      const comment = await exec();
+
+      expectBadRequest(comment, /blocked/i);
+    });
+  });
 
   describe401(() => {
     itShouldRequireToken(exec);

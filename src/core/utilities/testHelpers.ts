@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 
 // Types
@@ -127,20 +126,6 @@ export const itShouldRequireManagementRole = (
     expect(response.status).toBe(403);
   });
 };
-
-export function itShouldExist(
-  exec: (overwriteToken?: string) => any,
-  name: Lowercase<ModelKeys> | string,
-  idVariable: string
-) {
-  it(`if ${name} does not exist`, async () => {
-    idVariable = faker.database.mongodbObjectId();
-
-    const response = await exec(idVariable);
-
-    expectNotFoundError(response);
-  });
-}
 
 export function itShouldOwn(
   role: UserRole,

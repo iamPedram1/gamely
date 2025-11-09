@@ -15,7 +15,6 @@ import {
   expectForbiddenRequest,
   expectNotFoundError,
   expectSuccess,
-  itShouldExist,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
 import {
@@ -28,7 +27,6 @@ import {
 } from 'features/shared/user/core/user.constant';
 
 // Dto
-
 import { CreateBanDto } from 'features/management/user/ban/ban.dto';
 
 // Types
@@ -228,6 +226,12 @@ describe('POST /bans/:id', () => {
   });
 
   describe404(() => {
-    itShouldExist(exec, 'target user', targetId);
+    it('if target user does not exist', async () => {
+      targetId = faker.database.mongodbObjectId();
+
+      const response = await exec();
+
+      expectNotFoundError(response);
+    });
   });
 });

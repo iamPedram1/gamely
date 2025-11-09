@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 // Utils
 import { adminRoles } from 'features/shared/user/core/user.constant';
 import { generateTagService } from 'features/shared/tag/tag.constant';
@@ -11,8 +13,8 @@ import {
   describe401,
   describe403,
   describe404,
+  expectNotFoundError,
   expectSuccess,
-  itShouldExist,
   itShouldOwn,
   itShouldRequireManagementRole,
   itShouldRequireToken,
@@ -27,9 +29,7 @@ describe('DELETE /management/tags', () => {
   beforeEach(async () => {
     token = (await registerAndLogin({ role: 'admin' }))?.accessToken || '';
 
-    const response = await sendCreateTagRequest({ token });
-
-    tagId = response.body.data!.id;
+    tagId = (await sendCreateTagRequest({ token })).body.data!.id;
   });
 
   const exec = async (overwriteToken?: string) =>
@@ -69,6 +69,12 @@ describe('DELETE /management/tags', () => {
   });
 
   describe404(() => {
-    itShouldExist(exec, 'tag', tagId);
+    it('if tag does not exist', async () => {
+      tagId = faker.database.mongodbObjectId();
+
+      const response = await exec();
+
+      expectNotFoundError(response);
+    });
   });
 });

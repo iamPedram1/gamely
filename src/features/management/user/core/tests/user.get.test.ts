@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 // Utils
 import { UserRole } from 'features/shared/user/core/user.types';
 import { adminRoles } from 'features/shared/user/core/user.constant';
@@ -10,8 +12,8 @@ import {
   describe403,
   describe404,
   expectKeysExist,
+  expectNotFoundError,
   expectSuccess,
-  itShouldExist,
   itShouldRequireToken,
   itShouldReturnsPaginatedDocs,
 } from 'core/utilities/testHelpers';
@@ -67,7 +69,7 @@ describe('GET /management/users', () => {
         'updateDate',
       ];
       expectSuccess(res);
-      expectKeysExist(res.body.data!, keys);
+      expectKeysExist(res.body.data!.docs![0], keys);
     });
 
     for (let role of adminRoles) {
@@ -129,6 +131,12 @@ describe('GET /management/users/:id', () => {
   });
 
   describe404(() => {
-    itShouldExist(exec, 'user', userId);
+    it('if user does not exist', async () => {
+      userId = faker.database.mongodbObjectId();
+
+      const response = await exec();
+
+      expectNotFoundError(response);
+    });
   });
 });

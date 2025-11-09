@@ -1,5 +1,8 @@
+import { faker } from '@faker-js/faker';
+
 // Utils
 import { generateBlockService } from 'features/shared/user/block/block.constant';
+import { sendBlockRequest } from 'features/shared/user/block/tests/block.testUtils';
 import { registerAndLoginBatch } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
   describe204,
@@ -7,13 +10,10 @@ import {
   describe401,
   describe404,
   expectBadRequest,
+  expectNotFoundError,
   expectSuccess,
-  itShouldExist,
   itShouldRequireToken,
 } from 'core/utilities/testHelpers';
-
-// Types
-import { sendBlockRequest } from 'features/shared/user/block/tests/block.testUtils';
 
 describe('POST /user/blocks/:id', () => {
   const blockService = generateBlockService();
@@ -62,6 +62,12 @@ describe('POST /user/blocks/:id', () => {
   });
 
   describe404(() => {
-    itShouldExist(exec, 'target user', targetId);
+    it('if target user does not exist in db', async () => {
+      targetId = faker.database.mongodbObjectId();
+
+      const response = await exec();
+
+      expectNotFoundError(response);
+    });
   });
 });
