@@ -113,15 +113,15 @@ Code Coverage:
 
 The frontend is built with **React.js** — fully multilingual, and integrated with the backend APIs.
 
-🖥️ [Frontend Repository (GameLy-User)](https://github.com/your-frontend-link)  
-🧩 [Backend Repository (GameLy-API)](https://github.com/your-backend-link)
+🖥️ [Frontend Repository (GameLy-User)](https://github.com/iamPedram1/gamely-front)  
+🧩 [Backend Repository (GameLy-API)](https://github.com/iamPedram1/gamely-back)
 
 ---
 
 ## 🧱 Example Collections
 
 You can test API endpoints using this Postman collection:  
-📦 [GameLy API Postman Collection](https://example.com)
+📦 [GameLy API Postman Collection](https://www.postman.com/pm9999/workspace/gamely-api/collection/20997982-88ee4296-56ba-44ed-a253-99b749d311a5?action=share&creator=20997982&active-environment=20997982-1f0b0a00-df69-424f-a0f2-017311f5e2f5)
 
 ---
 
