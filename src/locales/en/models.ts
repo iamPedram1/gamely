@@ -4,7 +4,7 @@ export const modelsTranslations = {
     plural: 'Users',
   },
   File: {
-    singluar: 'File',
+    singular: 'File',
     plural: 'Files',
   },
   Category: {

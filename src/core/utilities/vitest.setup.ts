@@ -9,7 +9,7 @@ import {
   clearDatabase,
   closeDatabase,
   connectDatabase,
-} from 'core/tests/database';
+} from 'core/utilities/database';
 import { Server } from 'http';
 
 let request: Agent;

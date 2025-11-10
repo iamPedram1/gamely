@@ -22,7 +22,6 @@ blockRouter.use(auth(['user', 'author', 'admin', 'superAdmin']));
 blockRouter.get('/', blockController.getUserBlockList);
 
 // <----------------   POST   ---------------->
-
 blockRouter.post(
   '/:targetId/block',
   validateParam(User, 'targetId', '_id', { type: 'id' }),

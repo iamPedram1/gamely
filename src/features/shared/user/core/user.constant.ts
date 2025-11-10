@@ -11,5 +11,4 @@ export const adminRoles: Array<Exclude<UserRole, 'user' | 'author'>> = [
 ];
 export const userRoles: UserRole[] = ['user', 'author', 'admin', 'superAdmin'];
 export const userStatus: UserStatus[] = ['active', 'blocked'];
-export const usernameRegex = /^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/;
 export const generateUserService = () => container.resolve(UserService);

@@ -7,7 +7,6 @@ import {
   Length,
   Matches,
 } from 'core/utilities/validation';
-import { usernameRegex } from 'features/shared/user/core/user.constant';
 
 export class RecoverPasswordDto {
   @IsNotEmpty()
@@ -29,7 +28,7 @@ export class ChangePasswordDto {
 export class RegisterDto {
   @IsNotEmpty()
   @IsString()
-  @Matches(usernameRegex)
+  @Matches(/^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/)
   @Length(3, 255)
   username: string;
 

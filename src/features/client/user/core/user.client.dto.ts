@@ -6,7 +6,6 @@ import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseUserUpdate } from 'features/shared/user/core/user.dto';
 
 // Utilities
-import { usernameRegex } from 'features/shared/user/core/user.constant';
 import {
   IsEmail,
   IsMongoId,
@@ -29,7 +28,7 @@ export class UpdateProfileDto extends BaseUserUpdate {
 
   @IsOptional()
   @IsString()
-  @Matches(usernameRegex)
+  @Matches(/^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/)
   @Length(3, 255)
   username: string;
 

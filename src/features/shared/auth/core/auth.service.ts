@@ -16,7 +16,6 @@ import {
 } from 'features/shared/auth/core/auth.dto';
 
 // Utilities
-import logger from 'core/utilities/logger';
 import { sendEmail } from 'core/utilities/mail';
 import { withTransaction } from 'core/utilities/mongoose';
 import { i18nInstance, t } from 'core/utilities/request-context';
@@ -74,19 +73,10 @@ export default class AuthService {
       throwError: false,
     });
     if (!user) return;
-    if (user.recoveryKey) {
-      try {
-        this.verifyRecoveryJwt(user.recoveryKey);
-        await this.sendRecoveryEmail(user, user.recoveryKey);
-      } catch (error) {
-        logger.error('User Recovery is invalid or expired', {
-          message: error.message,
-          user: user._id,
-        });
-      }
-    }
+
     return await withTransaction(async (session) => {
       const key = this.generatePasswordRecoveryKey(user._id.toHexString());
+      console.log('user.recoveryKey', key);
       await user.set('recoveryKey', key).save({ session, ...options });
       const result = await this.sendRecoveryEmail(user, key);
       if (!result.success) throw new InternalServerError();

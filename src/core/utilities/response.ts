@@ -94,8 +94,8 @@ const sendResponse = <T>(
   const response: IApiResponse<T> = {
     statusCode,
     isSuccess,
-    data,
     message,
+    data,
     errors,
     errorDetails,
   };

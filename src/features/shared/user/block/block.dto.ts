@@ -14,10 +14,10 @@ export class CreateBlockDto {
 }
 
 export class BlockResponseDto extends BaseSummaryResponseDto {
+  @Expose({ name: 'createdAt' })
+  blockedAt: Date;
+
   @Expose({ name: 'blocked' })
   @Type(() => UserClientSummaryResponseDto)
   user: UserClientSummaryResponseDto;
-
-  @Expose({ name: 'createdAt' })
-  blockedAt: Date;
 }

@@ -22,6 +22,8 @@ import {
   RefreshTokenDto,
   RevokeTokenDto,
 } from 'features/shared/auth/session/session.dto';
+import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
+import User from 'features/shared/user/core/user.model';
 
 const authClientRouter = express.Router();
 const authController = container.resolve(AuthController);
@@ -37,6 +39,7 @@ authClientRouter.post('/register', [
   limitier,
   validateBody(RegisterDto),
   blockRequestWithToken,
+  validateUniqueConflict(User, 'username', 'username'),
   authController.register,
 ]);
 authClientRouter.post('/recover-password', [

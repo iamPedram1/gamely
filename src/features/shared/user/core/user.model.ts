@@ -3,10 +3,7 @@ import { Model, Schema, model } from 'mongoose';
 
 // Utils
 import crypto from 'core/utilities/crypto';
-import {
-  usernameRegex,
-  userRoles,
-} from 'features/shared/user/core/user.constant';
+import { userRoles } from 'features/shared/user/core/user.constant';
 
 // Types
 import type {
@@ -41,7 +38,7 @@ const userSchema = new Schema<
       lowercase: true,
       minlength: 3,
       maxlength: 30,
-      match: usernameRegex,
+      match: /^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/,
       required: true,
     },
     bio: {

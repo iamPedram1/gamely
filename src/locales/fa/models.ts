@@ -4,7 +4,7 @@ const modelsTranslations = {
     plural: 'کاربران',
   },
   File: {
-    singluar: 'فایل',
+    singular: 'فایل',
     plural: 'فایل‌ها',
   },
   Category: {

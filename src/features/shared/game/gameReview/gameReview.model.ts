@@ -34,7 +34,7 @@ const gameReviewSchema = new Schema<GameReviewEntity, Model<GameReviewEntity>>(
   { timestamps: true }
 );
 
-gameReviewSchema.index({ userId: 1, gameId: 1 }, { unique: true });
+gameReviewSchema.index({ user: 1, game: 1 }, { unique: true });
 
 export const GameReview = model<GameReviewEntity>(
   'GameReview',
