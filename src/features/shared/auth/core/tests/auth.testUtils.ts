@@ -20,7 +20,7 @@ import {
 
 // Types
 import type { UserRole } from 'features/shared/user/core/user.types';
-import { IAccessToken } from 'features/shared/auth/session/session.types';
+import type { IAccessToken } from 'features/shared/auth/session/session.types';
 
 const registerURL = prefixBaseUrl('/auth/register');
 const loginURL = prefixBaseUrl('/auth/login');
