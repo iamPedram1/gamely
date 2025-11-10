@@ -95,6 +95,10 @@ const errosTranslations = {
   gameReview: {
     already_reviewed: 'شما قبلا یک نقد برای این بازی نوشته اید',
   },
+  gameFavorite: {
+    already_favorited: 'شما قبلا این بازی رو به علاقمندی‌ها اضافه کردید',
+    unfavorite_notFavorited: 'شما قبلا این بازی رو به علاقمندی‌ها اضافه نکردید',
+  },
   validation: {
     isString: '{{property}} باید رشته متنی باشد',
     isNotEmpty: '{{property}} نباید خالی باشد',

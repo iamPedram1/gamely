@@ -95,6 +95,11 @@ const errosTranslations = {
   },
   gameReview: {
     already_reviewed: "You've already wrote a review in the game",
+    target_not_exist: 'Report target does not exist or has been removed',
+  },
+  gameFavorite: {
+    already_favorited: "You've already favorited this game",
+    unfavorite_notFavorited: "You haven't add this game to your favorites",
   },
   validation: {
     isString: '{{property}} must be a string',

@@ -22,7 +22,7 @@ export function generateComment(
   payload?: Partial<CreateCommentDto>
 ): CreateCommentDto {
   return {
-    message: faker.lorem.word({ length: { min: 10, max: 500 } }),
+    message: faker.lorem.word({ length: { min: 10, max: 500 } }).trim(),
     ...payload,
   };
 }

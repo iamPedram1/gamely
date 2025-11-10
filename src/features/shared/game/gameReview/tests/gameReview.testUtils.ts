@@ -29,7 +29,7 @@ const gameReviewURL = (gameId: string) =>
 export function generateGameReview(): CreateGameReviewDto {
   return {
     rate: faker.number.int({ min: 1, max: 5 }),
-    description: faker.lorem.word({ length: { min: 10, max: 500 } }),
+    description: faker.lorem.word({ length: { min: 10, max: 500 } }).trim(),
   };
 }
 

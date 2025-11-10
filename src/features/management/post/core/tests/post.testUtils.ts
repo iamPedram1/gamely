@@ -60,13 +60,13 @@ export async function generatePostData(token: string): Promise<CreatePostDto> {
       readingTime: faker.number.int({ min: 1, max: 20 }),
       translations: {
         en: {
-          title: faker.lorem.word({ length: { min: 3, max: 255 } }),
-          abstract: faker.lorem.word({ length: { min: 1, max: 150 } }),
+          title: faker.lorem.word({ length: { min: 3, max: 255 } }).trim(),
+          abstract: faker.lorem.word({ length: { min: 1, max: 150 } }).trim(),
           content: faker.lorem.paragraph(10),
         },
         fa: {
-          title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }),
-          abstract: fakerFA.lorem.word({ length: { min: 1, max: 150 } }),
+          title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }).trim(),
+          abstract: fakerFA.lorem.word({ length: { min: 1, max: 150 } }).trim(),
           content: fakerFA.lorem.paragraph(10),
         },
       },

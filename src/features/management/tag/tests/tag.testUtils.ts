@@ -26,8 +26,10 @@ export function generateTag(): CreateTagDto {
   return {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
     translations: {
-      en: { title: faker.lorem.word({ length: { min: 3, max: 255 } }) },
-      fa: { title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }) },
+      en: { title: faker.lorem.word({ length: { min: 3, max: 255 } }).trim() },
+      fa: {
+        title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }).trim(),
+      },
     },
   };
 }

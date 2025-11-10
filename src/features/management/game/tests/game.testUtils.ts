@@ -17,6 +17,7 @@ import {
   GameManagementResponseDto,
   UpdateGameDto,
 } from 'features/management/game/game.management.dto';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 
 const gameURL = prefixManagementBaseUrl('/games');
 
@@ -32,11 +33,11 @@ export async function generateGame(token?: string) {
     slug: faker.lorem.slug({ min: 2, max: 3 }),
     translations: {
       en: {
-        title: faker.lorem.word({ length: { min: 3, max: 255 } }),
+        title: faker.lorem.word({ length: { min: 3, max: 255 } }).trim(),
         description: faker.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
       fa: {
-        title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }),
+        title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }).trim(),
         description: fakerFA.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
     },
@@ -68,4 +69,14 @@ export const sendGetGameRequest = async <T = any>(token: string) => {
 
 export const sendDeleteGameRequest = async (id: string, token: string) => {
   return await sendDeleteRequest(`${gameURL}/${id}`, { token });
+};
+
+export const generateUserAndGame = async () => {
+  const user = await registerAndLogin();
+  const admin = await registerAndLogin({ role: 'admin' });
+  const gameResponse = await sendCreateGameRequest({
+    token: admin.accessToken,
+  });
+  const gameId = gameResponse.body.data!.id;
+  return { user, gameId };
 };

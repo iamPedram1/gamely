@@ -14,15 +14,12 @@ import { ValidationError } from 'core/utilities/errors';
 
 // Types
 import type { DocumentId } from 'core/types/common';
+import type { IFavoriteGameEntity } from 'features/shared/user/favoriteGame/favoriteGame.types';
 import type {
   BaseMutateOptions,
   BaseQueryOptions,
   FindResult,
 } from 'core/types/base.service.type';
-import type {
-  IFavoriteGameEntity,
-  FavoriteGameDocument,
-} from 'features/shared/user/favoriteGame/favoriteGame.types';
 
 export type IFavoriteGameService = InstanceType<typeof FavoriteGameService>;
 
@@ -39,7 +36,7 @@ class FavoriteGameService extends BaseService<IFavoriteGameEntity> {
     );
 
     if (isGameFavorited)
-      throw new ValidationError(this.t('error.follow.already_following'));
+      throw new ValidationError(this.t('error.gameFavorite.already_favorited'));
 
     const favoriteGame = new CreateFavoriteGameDto();
     favoriteGame.user = this.currentUser.id;
@@ -57,7 +54,10 @@ class FavoriteGameService extends BaseService<IFavoriteGameEntity> {
       throwError: false,
     });
 
-    if (!record) return;
+    if (!record)
+      throw new ValidationError(
+        this.t('error.gameFavorite.unfavorite_notFavorited')
+      );
 
     await record?.deleteOne(options);
   }
