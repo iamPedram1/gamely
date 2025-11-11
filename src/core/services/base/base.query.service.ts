@@ -2,6 +2,7 @@ import paginate, { paginateAggregate } from 'core/utilities/pagination';
 import { NotFoundError } from 'core/utilities/errors';
 
 // Types
+import type { DocumentId } from 'core/types/common';
 import type { BaseTFunction } from 'core/services/base/base.service';
 import type {
   Model,
@@ -19,7 +20,6 @@ import {
   NullableQueryResult,
   RelatedLookup,
 } from 'core/types/base.service.type';
-import { DocumentId } from 'core/types/common';
 
 /**
  * Generic base service for query operations (read-only) on Mongoose models.
@@ -272,7 +272,7 @@ class BaseQueryService<
 
     if (options.select) q = q.select(options.select);
     if (options.populate) q = q.populate(options.populate);
-    if (options.sort) q = q.sort(options.sort);
+    q = q.sort(options.sort ?? '-createdAt');
     if (options.limit) q = q.limit(options.limit);
     if (options.skip) q = q.skip(options.skip);
     if (options.lean) q = q.lean();

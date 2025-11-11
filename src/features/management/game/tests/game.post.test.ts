@@ -53,13 +53,14 @@ describe('POST /management/games', () => {
       expectBadRequest(response, /taken/i);
     });
 
-    appLanguages.forEach((lang) => {
-      it(`if translations.${lang}.title is not valid`, async () => {
-        payload.translations[lang].title = 'ab';
-        const response = await exec();
+    it(`if title is not valid`, async () => {
+      payload.title = 'ab';
+      const response = await exec();
 
-        expectBadRequest(response, /title/i);
-      });
+      expectBadRequest(response, /title/i);
+    });
+
+    appLanguages.forEach((lang) => {
       it(`if translations.${lang}.description is not valid`, async () => {
         payload.translations[lang].description = 'a';
 

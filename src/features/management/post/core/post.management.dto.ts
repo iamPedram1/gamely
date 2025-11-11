@@ -148,7 +148,6 @@ export class PostManagementResponseDto extends BasePostResponseDto {
   @Expose()
   readingTime: number;
 
-  @Expose()
   @Expose({ name: 'creator' })
   @Type(() => UserManagementSummaryResponseDto)
   author: UserManagementSummaryResponseDto;

@@ -3,6 +3,7 @@ import { faker, fakerFA } from '@faker-js/faker';
 // Utilities
 import { prefixManagementBaseUrl } from 'core/utilities/configs';
 import { sendUploadFileRequest } from 'features/shared/file/test/file.testUtils';
+import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 import {
   sendDeleteRequest,
   sendGetRequest,
@@ -17,7 +18,6 @@ import {
   GameManagementResponseDto,
   UpdateGameDto,
 } from 'features/management/game/game.management.dto';
-import { registerAndLogin } from 'features/shared/auth/core/tests/auth.testUtils';
 
 const gameURL = prefixManagementBaseUrl('/games');
 
@@ -31,13 +31,12 @@ export async function generateGame(token?: string) {
     coverImage: img?.body?.data?.id || '',
     releaseDate: faker.date.anytime().toISOString(),
     slug: faker.lorem.slug({ min: 2, max: 3 }),
+    title: faker.lorem.word({ length: { min: 3, max: 255 } }).trim(),
     translations: {
       en: {
-        title: faker.lorem.word({ length: { min: 3, max: 255 } }).trim(),
         description: faker.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
       fa: {
-        title: fakerFA.lorem.word({ length: { min: 3, max: 255 } }).trim(),
         description: fakerFA.lorem.paragraph({ min: 4, max: 7 }).trim(),
       },
     },

@@ -31,7 +31,7 @@ export default class GameManagementController {
           matchMode: 'contains',
           options: 'i',
           queryKey: 'search',
-          modelKeys: ['translations.en.title', 'translations.fa.title'],
+          modelKeys: ['title'],
         },
       ],
     });

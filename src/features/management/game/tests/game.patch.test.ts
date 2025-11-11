@@ -87,19 +87,25 @@ describe('PATCH /management/games', () => {
       expectBadRequest(response, /taken/i);
     });
 
+    it(`if title is not valid`, async () => {
+      payload = { title: 'ab' };
+      delete payload.slug;
+      delete payload.releaseDate;
+      delete payload.translations;
+      delete payload.coverImage;
+      const response = await exec();
+
+      expectBadRequest(response, /title/i);
+    });
     appLanguages.forEach((lang) => {
-      it(`if translations.${lang}.title is not valid`, async () => {
-        payload.translations![lang] = { title: 'ab' };
-        delete payload.slug;
-        delete payload.releaseDate;
-        delete payload.coverImage;
-        const response = await exec();
-        expectBadRequest(response, /title/i);
-      });
       it(`if translations.${lang}.description is not valid`, async () => {
         payload.translations![lang] = { description: 'a' };
         delete payload.slug;
+        delete payload.title;
+        delete payload.releaseDate;
+        delete payload.coverImage;
         const response = await exec();
+
         expectBadRequest(response, /description/i);
       });
     });

@@ -23,16 +23,11 @@ import { IsSlug } from 'core/utilities/validation';
 
 // Types
 import type { IFileSummary } from 'features/shared/file/file.types';
-import { WithDictionaries } from 'core/types/translations';
-import { GameTranslation } from 'features/shared/game/core/game.types';
+import type { WithDictionaries } from 'core/types/translations';
+import type { GameTranslation } from 'features/shared/game/core/game.types';
 
 // <----------------   CREATE   ---------------->
 export class CreateTranslationDto {
-  @IsNotEmpty()
-  @IsString()
-  @Length(3, 255)
-  title: string;
-
   @IsNotEmpty()
   @IsString()
   @Length(10, 500)
@@ -47,6 +42,11 @@ export class CreateGameDto {
   @IsNotEmptyObject()
   @IsTranslationsField(CreateTranslationsDto)
   translations: CreateTranslationsDto;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(3, 255)
+  title: string;
 
   @IsNotEmpty()
   @IsSlug()
@@ -65,11 +65,6 @@ export class CreateGameDto {
 export class UpdateTranslationDto {
   @IsOptional()
   @IsString()
-  @Length(3, 255)
-  title?: string;
-
-  @IsOptional()
-  @IsString()
   @Length(10, 500)
   description?: string;
 }
@@ -82,6 +77,11 @@ export class UpdateGameDto {
   @IsOptional()
   @IsSlug()
   slug?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(3, 255)
+  title?: string;
 
   @IsOptional()
   @IsMongoId()
@@ -102,6 +102,9 @@ export class GameManagementResponseDto extends BaseResponseDto {
   translations: WithDictionaries<GameTranslation>;
 
   @Expose()
+  title: string;
+
+  @Expose()
   slug: string;
 
   @Expose()
@@ -118,7 +121,7 @@ export class GameManagementResponseDto extends BaseResponseDto {
 
 export class GameManagementSummaryResponseDto extends BaseSummaryResponseDto {
   @Expose()
-  translations: WithDictionaries<Pick<GameTranslation, 'title'>>;
+  title: string;
 
   @Expose()
   slug!: string;

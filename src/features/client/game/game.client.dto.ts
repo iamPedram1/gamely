@@ -13,7 +13,6 @@ import type { IFileSummary } from 'features/shared/file/file.types';
 
 export class GameClientResponseDto extends BaseResponseDto {
   @Expose()
-  @Transform(pickLocaleField('title'))
   title: string;
 
   @Expose()

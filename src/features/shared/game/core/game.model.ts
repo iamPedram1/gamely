@@ -5,13 +5,6 @@ import type { IGameEntity } from 'features/shared/game/core/game.types';
 
 const translationSchema = new Schema(
   {
-    title: {
-      type: String,
-      trim: true,
-      minlength: 3,
-      maxlength: 255,
-      required: true,
-    },
     description: {
       type: String,
       trim: true,
@@ -25,6 +18,13 @@ const translationSchema = new Schema(
 
 const gameSchema = new Schema<IGameEntity, Model<IGameEntity>>(
   {
+    title: {
+      type: String,
+      trim: true,
+      minlength: 3,
+      maxlength: 255,
+      required: true,
+    },
     translations: {
       en: { type: translationSchema, required: true },
       fa: { type: translationSchema, required: true },
