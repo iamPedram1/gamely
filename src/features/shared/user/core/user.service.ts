@@ -29,6 +29,7 @@ import {
 import type {
   BaseMutateOptions,
   BaseQueryOptions,
+  NullableQueryResult,
 } from 'core/types/base.service.type';
 
 export type IUserService = InstanceType<typeof UserService>;
@@ -186,14 +187,23 @@ export default class UserService extends BaseService<IUserEntity> {
     return user._id.toHexString();
   }
 
-  async getUserByEmail(
+  async getUserByEmail<
+    TLean extends boolean = false,
+    TThrowError extends boolean = true,
+  >(
     email: string,
-    options?: BaseQueryOptions<UserDocument> & { throwError?: boolean }
-  ) {
-    return await this.getOneByKey('email', email.trim().toLowerCase(), {
-      lean: true,
-      ...options,
-    });
+    options?: Omit<BaseQueryOptions<UserDocument>, 'filter'> & {
+      lean?: TLean;
+      throwError?: TThrowError;
+    }
+  ): Promise<
+    NullableQueryResult<IUserEntity, UserDocument, TLean, TThrowError>
+  > {
+    return (await this.getOneByKey(
+      'email',
+      email.trim().toLowerCase(),
+      options
+    )) as NullableQueryResult<IUserEntity, UserDocument, TLean, TThrowError>;
   }
 
   private validateBlocking(

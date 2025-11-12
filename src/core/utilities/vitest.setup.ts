@@ -33,15 +33,18 @@ beforeEach(async () => {
 });
 
 vi.mock('features/shared/mail/mail.service', async () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      sendEmail: vi
-        .fn()
-        .mockResolvedValue({ success: true, message: 'Mocked' }),
-      sendPasswordRecovery: vi.fn().mockResolvedValue(undefined),
-      sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
-    })),
-  };
+  class MockMailService {
+    sendEmail = vi.fn().mockResolvedValue({
+      success: true,
+      message: 'Mocked email sent successfully',
+    });
+
+    sendPasswordRecovery = vi.fn().mockResolvedValue(undefined);
+
+    sendVerificationEmail = vi.fn().mockResolvedValue(undefined);
+  }
+
+  return { default: MockMailService };
 });
 
 process.on('unhandledRejection', (err) => {

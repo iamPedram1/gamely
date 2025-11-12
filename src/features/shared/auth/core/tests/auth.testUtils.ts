@@ -16,6 +16,7 @@ import {
   RecoverPasswordDto,
   RegisterDto,
   RegisterResponseDto,
+  VerifyEmailDto,
 } from 'features/shared/auth/core/auth.dto';
 
 // Types
@@ -23,6 +24,7 @@ import type { UserRole } from 'features/shared/user/core/user.types';
 import type { IAccessToken } from 'features/shared/auth/session/session.types';
 
 const registerURL = prefixBaseUrl('/auth/register');
+const verifyEmailURL = prefixBaseUrl('/auth/register/verify-email');
 const loginURL = prefixBaseUrl('/auth/login');
 const recoverPasswordURL = prefixBaseUrl('/auth/recover-password');
 const changePasswordURL = prefixBaseUrl('/auth/change-password');
@@ -44,7 +46,7 @@ export function generateAccessToken() {
 }
 
 export async function createUser(user: RegisterDto = generateUser()) {
-  return await new User(user).save();
+  return await new User({ ...user, status: 'verified' }).save();
 }
 
 export async function registerAndLogin(
@@ -52,7 +54,7 @@ export async function registerAndLogin(
 ): Promise<RegisterResponseDto & { userId: string; sessionId: string }> {
   const payload = options?.payload ?? generateUser();
 
-  await sendRegisterRequest({
+  const register = await sendRegisterRequest({
     payload,
     ...options,
   });
@@ -94,11 +96,26 @@ export async function registerAndLoginBatch(
 
 export const sendRegisterRequest = async (
   options?: SendRequestOptions<RegisterDto>
-) =>
-  await sendPostRequest<RegisterResponseDto>(registerURL, {
-    payload: generateUser(),
+) => {
+  const payload = options?.payload ?? generateUser();
+
+  const res = await sendPostRequest<RegisterResponseDto>(registerURL, {
     ...options,
+    payload,
   });
+
+  if (res.body.isSuccess) {
+    await sendVerifyEmailRequest({
+      payload: { email: payload.email, code: (res.body.data as any).code },
+    });
+  }
+
+  return res;
+};
+
+export const sendVerifyEmailRequest = async (
+  options: SendRequestOptions<VerifyEmailDto>
+) => await sendPostRequest<null>(verifyEmailURL, options);
 
 export const sendLoginRequest = async (
   options?: SendRequestOptions<LoginDto>

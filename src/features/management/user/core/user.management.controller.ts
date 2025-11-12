@@ -33,6 +33,7 @@ export default class UserManagementController {
       lean: true,
     });
 
+    // @ts-ignore
     user.isBanned = Boolean(await this.banService.getUserBan(user._id));
 
     sendResponse(res, 200, {
@@ -60,6 +61,7 @@ export default class UserManagementController {
 
     await Promise.all(
       users.docs.map(async (user) => {
+        // @ts-ignore
         user.isBanned = await this.banService.checkIsBanned(user._id);
       })
     );

@@ -39,7 +39,12 @@ export default class AuthController {
     );
 
     sendResponse(res, 201, {
-      body: { message: req.t('messages.auth.register_success') },
+      body: {
+        message: req.t('messages.auth.register_success'),
+        ...(process.env.NODE_ENV === 'test' && {
+          data: { code: result ? result.code : '' },
+        }),
+      },
     });
   };
 

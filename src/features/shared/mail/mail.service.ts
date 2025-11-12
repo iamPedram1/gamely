@@ -73,7 +73,6 @@ export default class MailService {
           ? verificationPersianHtml(name, code)
           : verificationEnglishHtml(name, code),
     });
-    console.log(res);
 
     if (!res.success)
       logger.error('An error occured while sending verification email.');
