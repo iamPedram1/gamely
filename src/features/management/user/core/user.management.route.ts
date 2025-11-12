@@ -9,7 +9,7 @@ import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import { validateParam } from 'core/middlewares/validations';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
-import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
+import ensureUnique from 'core/middlewares/ensureUnique';
 
 // Controller
 import UserManagementController from 'features/management/user/core/user.management.controller';
@@ -46,7 +46,7 @@ userManagementRouter.patch(
   '/:id',
   validateBody(UpdateUserDto),
   validateParam(User, 'id', '_id', { type: 'id' }),
-  validateUniqueConflict(User, 'username', 'username', 'id'),
+  ensureUnique(User, 'username', 'username', 'id'),
   userController.update
 );
 

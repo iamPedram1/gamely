@@ -10,5 +10,5 @@ export const adminRoles: Array<Exclude<UserRole, 'user' | 'author'>> = [
   'superAdmin',
 ];
 export const userRoles: UserRole[] = ['user', 'author', 'admin', 'superAdmin'];
-export const userStatus: UserStatus[] = ['active', 'blocked'];
+export const userStatus: UserStatus[] = ['verified', 'unverified'];
 export const generateUserService = () => container.resolve(UserService);

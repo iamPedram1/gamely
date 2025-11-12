@@ -29,6 +29,7 @@ const changePasswordURL = prefixBaseUrl('/auth/change-password');
 
 export function generateUser() {
   return {
+    name: faker.person.fullName(),
     username: normalizeUsername(faker.internet.username()),
     password: faker.internet.password(),
     email: faker.internet.email(),

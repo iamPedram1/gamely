@@ -28,6 +28,7 @@ const errosTranslations = {
   forbidden_error: 'Access Denied',
   unauthorized_error: 'Unauthorized',
   too_many_request: 'Too many attempts, Please try again later',
+  try_again_after: 'Try again after {{seconds}} seconds',
   update_failed: 'An error occured in updating {{name}}',
   create_failed: 'An error occured in creating {{name}}',
   delete_failed: 'An error occured in deleting {{name}}',

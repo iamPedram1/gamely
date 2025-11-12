@@ -3,6 +3,7 @@ import { delay, inject, injectable } from 'tsyringe';
 import type { RequestHandler } from 'express';
 
 // Service
+import MailService from 'features/shared/mail/mail.service';
 import AuthService from 'features/shared/auth/core/auth.service';
 
 // DTO
@@ -12,6 +13,8 @@ import {
   RegisterDto,
   ChangePasswordDto,
   RecoverPasswordDto,
+  SendVerificationDto,
+  VerifyEmailDto,
 } from 'features/shared/auth/core/auth.dto';
 
 // Utilities
@@ -21,42 +24,19 @@ import { jwtRefreshTokenExpiresInDays } from 'features/shared/auth/session/sessi
 @injectable()
 export default class AuthController {
   constructor(
-    @inject(delay(() => AuthService)) private authService: AuthService
+    @inject(delay(() => AuthService)) private authService: AuthService,
+    @inject(delay(() => MailService)) private mailService: MailService
   ) {}
-
-  recoverPassword: RequestHandler = async (req, res) => {
-    const dto = req.body as RecoverPasswordDto;
-
-    const result = await this.authService.recoverPassword(dto);
-
-    sendResponse(res, 200, {
-      body: {
-        isSuccess: true,
-        message: req.t('messages.auth.recover_password'),
-        ...(process.env.NODE_ENV === 'test' && {
-          data: { recoveryKey: result?.recoveryKey },
-        }),
-      },
-    });
-  };
-
-  changePassword: RequestHandler = async (req, res) => {
-    const dto = req.body as ChangePasswordDto;
-
-    await this.authService.changePassword(dto);
-
-    sendResponse(res, 200, {
-      body: {
-        isSuccess: true,
-        message: req.t('messages.auth.password_changed'),
-      },
-    });
-  };
 
   register: RequestHandler = async (req, res) => {
     const dto = req.body as RegisterDto;
 
-    await this.authService.register(dto);
+    const result = await this.authService.register(dto);
+    await this.mailService.sendVerificationEmail(
+      result.email,
+      result.name,
+      result.code
+    );
 
     sendResponse(res, 201, {
       body: { message: req.t('messages.auth.register_success') },
@@ -86,6 +66,70 @@ export default class AuthController {
         data: { accessToken, refreshToken },
         message: req.t('messages.auth.login_success'),
       },
+    });
+  };
+
+  recoverPassword: RequestHandler = async (req, res) => {
+    const dto = req.body as RecoverPasswordDto;
+
+    const result = await this.authService.recoverPassword(dto);
+
+    if (result) {
+      await this.mailService.sendPasswordRecovery(
+        result.email,
+        result.name,
+        result.key
+      );
+    }
+
+    sendResponse(res, 200, {
+      body: {
+        isSuccess: true,
+        message: req.t('messages.auth.recover_password'),
+        ...(process.env.NODE_ENV === 'test' && {
+          data: { recoveryKey: result ? result.key : '' },
+        }),
+      },
+    });
+  };
+
+  changePassword: RequestHandler = async (req, res) => {
+    const dto = req.body as ChangePasswordDto;
+
+    await this.authService.changePassword(dto);
+
+    sendResponse(res, 200, {
+      body: {
+        isSuccess: true,
+        message: req.t('messages.auth.password_changed'),
+      },
+    });
+  };
+
+  resendVerifyCode: RequestHandler = async (req, res) => {
+    const dto = req.body as SendVerificationDto;
+
+    const result = await this.authService.createVerification(dto);
+    if (result) {
+      await this.mailService.sendVerificationEmail(
+        result.email,
+        result.name,
+        result.code
+      );
+    }
+
+    sendResponse(res, 200, {
+      body: { message: req.t('messages.auth.verification_code_sent') },
+    });
+  };
+
+  verifyEmail: RequestHandler = async (req, res) => {
+    const dto = req.body as VerifyEmailDto;
+
+    await this.authService.verifyEmail(dto);
+
+    sendResponse(res, 200, {
+      body: { message: req.t('messages.auth.account_verification_success') },
     });
   };
 }

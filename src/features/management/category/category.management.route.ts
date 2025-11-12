@@ -6,7 +6,7 @@ import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import validateObjectId from 'core/middlewares/validateObjectId';
 import { validateQuery } from 'core/middlewares/validateQuery';
-import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
+import ensureUnique from 'core/middlewares/ensureUnique';
 
 // Model
 import Category from 'features/shared/category/category.model';
@@ -47,7 +47,7 @@ categoryManagementRouter.get(
 categoryManagementRouter.post(
   '/',
   validateBody(CreateCategoryDto),
-  validateUniqueConflict(Category, 'slug'),
+  ensureUnique(Category, 'slug'),
   categoryController.create
 );
 
@@ -56,7 +56,7 @@ categoryManagementRouter.patch(
   '/:id',
   validateBody(UpdateCategoryDto),
   validateObjectId(Category),
-  validateUniqueConflict(Category, 'slug'),
+  ensureUnique(Category, 'slug'),
   categoryController.update
 );
 

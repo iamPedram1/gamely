@@ -10,7 +10,9 @@ import {
   closeDatabase,
   connectDatabase,
 } from 'core/utilities/database';
-import { Server } from 'http';
+
+// Types
+import type { Server } from 'http';
 
 let request: Agent;
 let server: Server;
@@ -30,11 +32,17 @@ beforeEach(async () => {
   await clearDatabase();
 });
 
-vi.mock('core/utilities/mail', () => ({
-  sendEmail: vi.fn(async (args) => {
-    return { success: true, message: 'Mocked email success 🚀' };
-  }),
-}));
+vi.mock('features/shared/mail/mail.service', async () => {
+  return {
+    default: vi.fn().mockImplementation(() => ({
+      sendEmail: vi
+        .fn()
+        .mockResolvedValue({ success: true, message: 'Mocked' }),
+      sendPasswordRecovery: vi.fn().mockResolvedValue(undefined),
+      sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
+    })),
+  };
+});
 
 process.on('unhandledRejection', (err) => {
   logger.error('🔴🔴🔴🔴🔴🔴 VITEST SETUP ERROR - unhandledRejection', err);

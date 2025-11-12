@@ -37,7 +37,13 @@ const messageTranslations = {
     else: 'درخواست با موفقیت انجام شد',
   },
   auth: {
+    verification_code_sent: 'کد فعال سازی به ایمل شما ارسال شد',
+    already_verified: 'این ایمیل قبلا تایید شده است',
+    no_active_code: 'کد فعالی برای این ایمیل یافت نشد',
+    expired_code: 'این کد منقضی شده لطفا درخواست ارسال مجدد کد دهید',
+    invalid_code: 'کد فعالسازی نامعتبر میباشد',
     password_recovery_emailSubject: 'گیم‌لی - بازیابی کلمه عبور',
+    verify_account_emailSubject: 'گیم‌لی - فعال‌سازی حساب',
     password_changed: 'کلمه عبور با موفقیت تغییر کرد',
     recover_password:
       'در صورت صحت اطلاعات، ایمیل تأیید به آدرس شما ارسال خواهد شد',
@@ -46,7 +52,9 @@ const messageTranslations = {
     token_refresh_success: 'توکن با موفقیت تازه‌سازی شد',
     login_success: 'با موفقیت وارد حساب خود شدید',
     logout_success: 'با موفقیت از حساب خارج شدید',
+    not_verified: 'این حساب هنوز توسط کاربر فعال نشده است',
     register_success: 'ثبت نام با موفقیت انجام شد',
+    account_verification_success: 'فعالسازی حساب شما با موفقیت انجام شد',
   },
   user: {
     profile_updated: 'پروفایل با موفقیت بروزرسانی شد',

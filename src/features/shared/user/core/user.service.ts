@@ -188,7 +188,7 @@ export default class UserService extends BaseService<IUserEntity> {
 
   async getUserByEmail(
     email: string,
-    options?: BaseQueryOptions<UserDocument>
+    options?: BaseQueryOptions<UserDocument> & { throwError?: boolean }
   ) {
     return await this.getOneByKey('email', email.trim().toLowerCase(), {
       lean: true,

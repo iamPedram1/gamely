@@ -7,7 +7,7 @@ import validateBody from 'core/middlewares/validateBody';
 import { validateRequestField } from 'core/middlewares/validations';
 import { softValidateQuery } from 'core/middlewares/validateQuery';
 import validateObjectId from 'core/middlewares/validateObjectId';
-import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
+import ensureUnique from 'core/middlewares/ensureUnique';
 
 // Model
 import Tag from 'features/shared/tag/tag.model';
@@ -55,7 +55,7 @@ postManagementRouter.delete('/:id', [
 // <----------------   POST   ---------------->
 postManagementRouter.post('/', [
   validateBody(CreatePostDto),
-  validateUniqueConflict(Post, 'slug'),
+  ensureUnique(Post, 'slug'),
   validateRequestField(File, 'body', 'coverImage', '_id', {
     type: 'id',
     required: true,
@@ -79,7 +79,7 @@ postManagementRouter.post('/', [
 postManagementRouter.patch('/:id', [
   validateBody(UpdatePostDto),
   validateObjectId(Post),
-  validateUniqueConflict(Post, 'slug'),
+  ensureUnique(Post, 'slug'),
   validateRequestField(File, 'body', 'coverImage', '_id', {
     type: 'id',
     required: false,

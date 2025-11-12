@@ -39,3 +39,38 @@ export const recoveryPersianHtml = (name: string, key: string) => {
   </html>
   `;
 };
+
+export const verificationEnglishHtml = (name: string, otp: string) => {
+  return `
+  <html>
+  <body style="font-family: Arial, sans-serif; background-color:#f5f5f5; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+      <h2 style="color: #333;">Welcome ${name},</h2>
+      <p>Thank you for signing up for your <strong>Gamely</strong> account.</p>
+      <p>Your verification code is:</p>
+      <p style="text-align:center; font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #1a73e8; margin: 20px 0;">${otp}</p>
+      <p>Please enter this code in the app to verify your account. The code will expire in 10 minutes.</p>
+      <p>If you didn’t sign up, you can safely ignore this email.</p>
+      <p>Thanks,<br/>The Gamely Team</p>
+    </div>
+  </body>
+  </html>
+  `;
+};
+
+export const verificationPersianHtml = (name: string, otp: string) => {
+  return `
+  <html dir="rtl">
+    <body style="font-family: Tahoma, sans-serif; background-color:#f5f5f5; padding: 20px;">
+      <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); text-align: right;">
+        <h2 style="direction: rtl; color: #333;">${name} عزیز، به گیم‌لی خوش آمدی!</h2>
+        <p style="direction: rtl;">برای فعال‌سازی حساب خود، لطفاً کد تأیید زیر را وارد کنید:</p>
+        <p style="text-align:center; font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #1a73e8; margin: 20px 0;">${otp}</p>
+        <p style="direction: rtl;">این کد تا ۱۰ دقیقه معتبر است.</p>
+        <p style="direction: rtl;">اگر شما در گیم‌لی ثبت‌نام نکرده‌اید، این ایمیل را نادیده بگیرید.</p>
+        <p style="direction: rtl;">با تشکر،<br/>تیم Gamely</p>
+      </div>
+    </body>
+  </html>
+  `;
+};

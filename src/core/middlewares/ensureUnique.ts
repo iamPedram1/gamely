@@ -13,7 +13,7 @@ import type { Request, Response, NextFunction } from 'express';
  * @param bodyFieldKey - Optional: key in req.body that holds the value (defaults to fieldName)
  * @param paramIdKey - Optional: key in req.params for the current document ID (defaults to 'id')
  */
-export default function validateUniqueConflict<T>(
+export default function ensureUnique<T>(
   model: Model<T>,
   fieldName: string,
   bodyFieldKey: string = fieldName,

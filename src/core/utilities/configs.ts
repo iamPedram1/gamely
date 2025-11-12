@@ -1,11 +1,6 @@
 import config from 'config';
 import dotenv from 'dotenv';
 dotenv.config({ quiet: true });
-const env = process.env;
-
-// Secrets
-export const fromEmail = env.FROM_Email as string;
-export const emailApiKey = env.EMAIL_Api_Key as string;
 
 // Configs
 export const appPort = Number(config.get('PORT'));

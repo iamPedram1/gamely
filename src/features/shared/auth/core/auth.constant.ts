@@ -5,8 +5,6 @@ dotenv.config({ quiet: true });
 const env = process.env;
 
 // Secrets
-export const fromEmail = env.FROM_Email as string;
-export const emailApiKey = env.EMAIL_Api_Key as string;
 export const jwtRecoverPasswordKey = env.JWT_RecoverPassword_Key as string;
 
 // Expires

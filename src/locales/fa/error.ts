@@ -43,6 +43,7 @@ const errosTranslations = {
   unauthorized_error: 'خطا احراز هویت',
   too_many_request:
     'تعداد تلاش‌ها بیش از حد مجاز است، لطفاً بعداً دوباره تلاش کنید',
+  try_again_after: 'لطفا بعد از {{seconds}} ثانیه دوباره تلاش کنید',
   invalid_route: "مسیر مورد نظر '{{url}}' وجود ندارد.",
   invalid_credentials: 'ایمیل یا کلمه عبور معتبر نیست',
   not_found_by_id: '{{model}} با شناسه ({{id}}) پیدا نشد',

@@ -6,7 +6,8 @@ import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import validateObjectId from 'core/middlewares/validateObjectId';
 import { validateQuery } from 'core/middlewares/validateQuery';
-import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
+import ensureUnique from 'core/middlewares/ensureUnique';
+import { validateParam } from 'core/middlewares/validations';
 
 // Model
 import Game from 'features/shared/game/core/game.model';
@@ -20,7 +21,6 @@ import {
   CreateGameDto,
   UpdateGameDto,
 } from 'features/management/game/game.management.dto';
-import { validateParam } from 'core/middlewares/validations';
 
 const gameManagementRouter = express.Router();
 const gameController = container.resolve(GameManagementController);
@@ -51,7 +51,7 @@ gameManagementRouter.delete('/:id', [
 // <----------------   POST   ---------------->
 gameManagementRouter.post('/', [
   validateBody(CreateGameDto),
-  validateUniqueConflict(Game, 'slug'),
+  ensureUnique(Game, 'slug'),
   gameController.create,
 ]);
 
@@ -59,7 +59,7 @@ gameManagementRouter.post('/', [
 gameManagementRouter.patch('/:id', [
   validateBody(UpdateGameDto),
   validateParam(Game, 'id', '_id', { type: 'id' }),
-  validateUniqueConflict(Game, 'slug'),
+  ensureUnique(Game, 'slug'),
   gameController.update,
 ]);
 

@@ -3,13 +3,28 @@ import { Model, Schema, model } from 'mongoose';
 
 // Utils
 import crypto from 'core/utilities/crypto';
-import { userRoles } from 'features/shared/user/core/user.constant';
+import { userRoles, userStatus } from 'features/shared/user/core/user.constant';
 
 // Types
 import type {
   IUserEntity,
   IUserEntityMethods,
 } from 'features/shared/user/core/user.types';
+
+const verificationSchema = new Schema(
+  {
+    hashedCode: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    expireAt: {
+      type: Date,
+      required: true,
+    },
+  },
+  { _id: false }
+);
 
 const userSchema = new Schema<
   IUserEntity,
@@ -29,6 +44,13 @@ const userSchema = new Schema<
       required: true,
       default: 'user',
       index: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+      required: true,
     },
     username: {
       type: String,
@@ -71,6 +93,17 @@ const userSchema = new Schema<
       maxlength: 255,
       required: true,
       select: false,
+    },
+    verification: {
+      type: verificationSchema,
+      default: null,
+      select: false,
+      required: false,
+    },
+    status: {
+      type: String,
+      enum: userStatus,
+      default: 'unverified',
     },
     blocksCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },

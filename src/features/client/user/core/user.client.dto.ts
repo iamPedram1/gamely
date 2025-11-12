@@ -29,8 +29,13 @@ export class UpdateProfileDto extends BaseUserUpdate {
   @IsOptional()
   @IsString()
   @Matches(/^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/)
-  @Length(3, 255)
+  @Length(3, 30)
   username: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(3, 30)
+  name: string;
 
   @IsOptional()
   @IsEmail()
@@ -58,6 +63,9 @@ export class UserBaseResponseDto extends BaseResponseDto {
 
   @Expose()
   username: string;
+
+  @Expose()
+  name: string;
 }
 
 export class UserProfileResponseDto extends UserBaseResponseDto {

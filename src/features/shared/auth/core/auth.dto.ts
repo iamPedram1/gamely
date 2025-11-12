@@ -25,12 +25,34 @@ export class ChangePasswordDto {
   password: string;
 }
 
+export class SendVerificationDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+
+export class VerifyEmailDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(6, 6)
+  code: string;
+}
+
 export class RegisterDto {
   @IsNotEmpty()
   @IsString()
   @Matches(/^(?!.*\.\.)(?!.*__)[a-zA-Z0-9._]{3,255}$/)
-  @Length(3, 255)
+  @Length(3, 30)
   username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(3, 255)
+  name: string;
 
   @IsNotEmpty()
   @IsEmail()

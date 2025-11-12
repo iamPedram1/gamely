@@ -6,7 +6,7 @@ import auth from 'core/middlewares/auth';
 import validateBody from 'core/middlewares/validateBody';
 import { validateQuery } from 'core/middlewares/validateQuery';
 import validateObjectId from 'core/middlewares/validateObjectId';
-import validateUniqueConflict from 'core/middlewares/uniqueCheckerConflict';
+import ensureUnique from 'core/middlewares/ensureUnique';
 
 // Model
 import Tag from 'features/shared/tag/tag.model';
@@ -43,7 +43,7 @@ tagManagementRouter.delete('/:id', validateObjectId(Tag), tagController.delete);
 tagManagementRouter.post(
   '/',
   validateBody(CreateTagDto),
-  validateUniqueConflict(Tag, 'slug'),
+  ensureUnique(Tag, 'slug'),
   tagController.create
 );
 
@@ -52,7 +52,7 @@ tagManagementRouter.patch(
   '/:id',
   validateBody(UpdateTagDto),
   validateObjectId(Tag),
-  validateUniqueConflict(Tag, 'slug'),
+  ensureUnique(Tag, 'slug'),
   tagController.update
 );
 

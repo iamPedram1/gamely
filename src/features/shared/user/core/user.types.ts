@@ -10,16 +10,24 @@ export type UserDocument = HydratedDocument<IUserEntity, IUserEntityMethods>;
 export type UserLeanDocument = FlattenMaps<IUserEntity>;
 
 export type UserRole = 'user' | 'author' | 'admin' | 'superAdmin';
-export type UserStatus = 'active' | 'blocked';
+export type UserStatus = 'verified' | 'unverified';
+
+export interface IVerification {
+  hashedCode: string;
+  expireAt: Date;
+}
 
 interface PrivateKeys {
   recoveryKey: string | null;
   password: string;
+  status: UserStatus;
+  verification: IVerification;
 }
 
 export interface IUserEntity extends PrivateKeys {
   _id: Types.ObjectId;
   role: UserRole;
+  name: string;
   username: string;
   bio: string;
   email: string;

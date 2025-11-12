@@ -13,14 +13,11 @@ import { FileResponseDto } from 'features/shared/file/file.dto';
 import { BaseResponseDto, BaseSummaryResponseDto } from 'core/dto/response';
 
 // Utilities
-import { userRoles, userStatus } from 'features/shared/user/core/user.constant';
+import { userRoles } from 'features/shared/user/core/user.constant';
 
 // Types
 import type { Types } from 'mongoose';
-import type {
-  UserRole,
-  UserStatus,
-} from 'features/shared/user/core/user.types';
+import type { UserRole } from 'features/shared/user/core/user.types';
 
 // <----------------   UPDATE   ---------------->
 export class UpdateUserDto {
@@ -80,9 +77,4 @@ export class UserManagementQueryDto extends BaseQueryDto {
   @IsString()
   @IsIn(userRoles)
   role: UserRole;
-
-  @IsOptional()
-  @IsString()
-  @IsIn(userStatus)
-  status: UserStatus;
 }
