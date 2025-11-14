@@ -89,7 +89,7 @@
     "skipNodeModulesBundle": true
   },
   "engines": {
-    "node": "20.11.0"
+    "node": "22.19.0"
   },
   "keywords": [],
   "author": "Pedram Alizadeh",
