@@ -88,6 +88,9 @@
     "splitting": false,
     "skipNodeModulesBundle": true
   },
+  "engines": {
+    "node": "20.11.0"
+  },
   "keywords": [],
   "author": "Pedram Alizadeh",
   "license": "ISC",
