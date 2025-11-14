@@ -1,4 +1,4 @@
-import SibApiV3Sdk from '@sendinblue/client';
+import * as SibApiV3Sdk from '@sendinblue/client';
 import { injectable } from 'tsyringe';
 
 // Utilities

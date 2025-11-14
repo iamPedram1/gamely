@@ -1,7 +1,8 @@
 import 'reflect-metadata';
+import 'module-alias/register';
 
 // Startup
-import app from 'app';
+import app from './app';
 
 // Utilities
 import logger from 'core/utilities/logger';
