@@ -10,7 +10,7 @@ export const appDbUrl = (
   NODE_ENV === 'production' ? process.env.MONGO_URI : config.get('DB')
 ) as string;
 export const apiVersion = Number(config.get('VERSION'));
-export const appUrl = `http://localhost:${appPort}`;
+export const appUrl = process.env.APP_URL || `http://localhost:${appPort}`;
 export const prefixBaseUrl = (url: string) => `/api/v${apiVersion}${url}`;
 export const prefixManagementBaseUrl = (url: string) =>
   `/api/v${apiVersion}/management${url}`;
