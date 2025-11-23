@@ -67,6 +67,7 @@
   },
   "name": "gamely",
   "version": "1.0.0",
+  "type": "commonjs",
   "scripts": {
     "dev": "cross-env NODE_ENV=development&& tsx --watch src/server.ts",
     "start": "cross-env NODE_ENV=production&& node dist/server.js",
