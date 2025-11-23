@@ -89,9 +89,7 @@ export default class CategoryManagementController {
   };
 
   create: RequestHandler = async (req, res) => {
-    const category = await this.categoryService.create(req.body, {
-      lean: true,
-    });
+    const category = await this.categoryService.create(req.body);
 
     sendResponse(res, 201, {
       httpMethod: 'POST',

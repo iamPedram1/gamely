@@ -113,7 +113,7 @@ export default class UserService extends BaseService<IUserEntity> {
     return await this.withTransaction(async (session) => {
       if (isBlocking)
         await this.sessionService.deleteManyByKey('user', userId, { session });
-      return await this.updateOneById(userId, data, { session, lean: true });
+      return await this.updateOneById(userId, data, { session });
     });
   }
 

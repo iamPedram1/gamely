@@ -38,7 +38,7 @@ export default function auth(roles: UserRole[]) {
     // Check User Exists
     const user = await User.findById(userId).lean();
     if (!user)
-      throw new AnonymousError('User with given id does not exist', mask, 400);
+      throw new AnonymousError('User with given id does not exist', mask, 401);
 
     // Check Role
     if (!roles.includes(user.role))

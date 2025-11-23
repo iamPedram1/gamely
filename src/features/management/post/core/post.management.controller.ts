@@ -130,7 +130,6 @@ export default class PostManagementController {
 
   update: RequestHandler = async (req, res) => {
     const post = await this.postService.updateOneById(req.params.id, req.body, {
-      lean: true,
       populate: postPopulate,
     });
 

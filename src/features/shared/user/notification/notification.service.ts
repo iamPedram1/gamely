@@ -68,7 +68,7 @@ export default class NotificationService extends BaseService<INotificationEntity
     id: DocumentId,
     options?: Pick<BaseMutateOptions<true>, 'session'>
   ): Promise<void> {
-    await this.updateOneById(id, { seen: true }, { ...options, lean: true });
+    await this.updateOneById(id, { seen: true }, { ...options });
   }
 
   async seenAllNotifications(

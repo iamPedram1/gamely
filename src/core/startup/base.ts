@@ -6,22 +6,23 @@ import helmet from 'helmet';
 import express from 'express';
 import requestIp from 'request-ip';
 import mongoSanitize from 'express-mongo-sanitize';
+import compression from 'compression';
 import type { Express } from 'express';
 import { updateSessionActivity } from 'features/shared/auth/session/session.middleware';
 
 export default function baseStartup(app: Express) {
-  app.disable('etag');
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.json({ limit: '10kb' }));
+  app.use(express.json({ limit: '100kb' }));
   const publicPath = path.resolve(process.cwd(), 'public');
   app.use('/', express.static(publicPath));
   app.set('query parser', 'extended');
 
   // Security
   app.use(helmet());
+  app.use(compression());
   app.use(
     cors({
-      origin: 'http://localhost:5173',
+      origin: 'https://gamely-front.vercel.app',
       credentials: true,
     })
   );

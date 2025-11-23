@@ -51,7 +51,7 @@ export default class PostClientController {
       searchBy: [
         {
           queryKey: 'search',
-          modelKeys: ['translations.en.title', 'translations.fa'],
+          modelKeys: ['translations.en.title', 'translations.fa.title'],
           operator: 'or',
         },
       ],

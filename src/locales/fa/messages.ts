@@ -37,7 +37,7 @@ const messageTranslations = {
     else: 'درخواست با موفقیت انجام شد',
   },
   auth: {
-    verification_code_sent: 'کد فعال سازی به ایمل شما ارسال شد',
+    verification_code_sent: 'کد فعال سازی به ایمیل شما ارسال شد',
     already_verified: 'این ایمیل قبلا تایید شده است',
     no_active_code: 'کد فعالی برای این ایمیل یافت نشد',
     expired_code: 'این کد منقضی شده لطفا درخواست ارسال مجدد کد دهید',

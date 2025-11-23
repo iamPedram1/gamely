@@ -52,7 +52,7 @@ export default class CategoryClientController {
   };
 
   getOne: RequestHandler = async (req, res) => {
-    const category = await this.categoryService.getOneById(req.params.id, {
+    const category = await this.categoryService.getOneBySlug(req.params.slug, {
       lean: true,
       populate: [{ path: 'creator', populate: 'avatar' }],
     });

@@ -2,7 +2,7 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 // Middlewares
-import validateObjectId from 'core/middlewares/validateObjectId';
+import { validateParam } from 'core/middlewares/validations';
 
 // Model
 import Category from 'features/shared/category/category.model';
@@ -16,8 +16,8 @@ const categoryController = container.resolve(CategoryClientController);
 // <----------------   GET   ---------------->
 categoryClientRouter.get('/nested', categoryController.getAllNested);
 categoryClientRouter.get(
-  '/:id',
-  validateObjectId(Category),
+  '/:slug',
+  validateParam(Category, 'slug', 'slug'),
   categoryController.getOne
 );
 

@@ -1,19 +1,15 @@
 import jwt from 'jsonwebtoken';
 
 // Utilites
+import logger from 'core/utilities/logger';
 import { t } from 'core/utilities/request-context';
-import {
-  AnonymousError,
-  InternalServerError,
-  ValidationError,
-} from 'core/utilities/errors';
+import { AnonymousError, UnauthorizedError } from 'core/utilities/errors';
 import {
   jwtRefreshTokenExpiresInDays,
   jwtRefreshTokenKey,
   jwtAccessTokenExpiresInMinutes,
   jwtAccessTokenKey,
 } from 'features/shared/auth/session/session.constant';
-import logger from 'core/utilities/logger';
 
 const tokenUtils = {
   decode<T>(token: string) {
@@ -30,11 +26,11 @@ const tokenUtils = {
       logger.error(error);
 
       if (error instanceof jwt.TokenExpiredError)
-        throw new ValidationError(t('error.jwt.verify_expired', { name }));
+        throw new UnauthorizedError(t('error.jwt.verify_expired', { name }));
       if (error instanceof jwt.JsonWebTokenError)
-        throw new ValidationError(t('error.jwt.verify_invalid', { name }));
+        throw new UnauthorizedError(t('error.jwt.verify_invalid', { name }));
 
-      throw new InternalServerError();
+      throw new UnauthorizedError(t('error.unauthorized_error'));
     }
   },
   generateAccessToken(userId: string, sessionId: string) {
