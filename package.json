@@ -92,9 +92,9 @@
     "skipNodeModulesBundle": true
   },
   "_moduleAliases": {
-    "core": "dist/core",
-    "features": "dist/features",
-    "locales": "dist/locales"
+    "core": "./dist/core",
+    "features": "./dist/features",
+    "locales": "./dist/locales"
   },
   "keywords": [],
   "author": "Pedram Alizadeh",
