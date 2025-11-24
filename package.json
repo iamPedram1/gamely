@@ -71,7 +71,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development&& tsx --watch src/server.ts",
     "start": "cross-env NODE_ENV=production&& node dist/server.js",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "test": "cross-env NODE_ENV=test vitest --watch",
     "test:cov": "vitest run --coverage"
   },
