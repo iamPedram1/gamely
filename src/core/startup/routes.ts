@@ -38,6 +38,9 @@ import { prefixBaseUrl, prefixManagementBaseUrl } from 'core/utilities/configs';
 
 function publicRoutes(app: Express) {
   app.use(prefixBaseUrl('/upload'), fileRouter);
+  app.get(prefixBaseUrl('/health'), (req, res, next) => {
+    res.status(200).json({ ok: true });
+  });
 }
 
 function privateRoutes(app: Express) {
